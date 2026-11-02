@@ -3,79 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ordini Asporto - Real Time</title>
-    <!-- Tailwind CSS per una grafica moderna e pulita -->
+    <title>Ordini Asporto - Regia & Menu</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans antialiased">
 
     <!-- SCHERMATA LOGIN / NOME CLIENTE -->
-    <div id="login-screen" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl">
+    <div id="login-screen" class="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl">
             <div class="text-center mb-6">
-                <div class="bg-orange-100 text-orange-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl font-bold">
+                <div class="bg-orange-100 text-orange-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl font-bold shadow-inner">
                     <i class="fa-solid fa-utensils"></i>
                 </div>
-                <h2 class="text-2xl font-bold text-gray-900">Benvenuto!</h2>
-                <p class="text-sm text-gray-500">Inserisci i tuoi dati per procedere con l'ordine d'asporto</p>
+                <h2 class="text-2xl font-black text-gray-900">Benvenuto!</h2>
+                <p class="text-sm text-gray-500 mt-1">Inserisci i tuoi dati per ordinare l'asporto</p>
             </div>
             <form id="user-form" class="space-y-4">
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Il tuo Nome *</label>
-                    <input type="text" id="client-name" required placeholder="Es. Mario Rossi" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-orange-500 focus:outline-none">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">Il tuo Nome *</label>
+                    <input type="text" id="client-name" required placeholder="Es. Mario Rossi" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-orange-500 focus:outline-none font-medium">
                 </div>
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-1">Tavolo / Riferimento Asporto (Opzionale)</label>
-                    <input type="text" id="client-table" placeholder="Es. Asporto ore 20:30 o Tavolo 4" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-orange-500 focus:outline-none">
+                    <label class="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">Tavolo / Riferimento (Opzionale)</label>
+                    <input type="text" id="client-table" placeholder="Es. Asporto ore 20:30" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-orange-500 focus:outline-none font-medium">
                 </div>
-                <button type="submit" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-3.5 rounded-xl transition shadow-lg shadow-orange-600/30">
-                    Entra nel Menu
+                <button type="submit" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-4 rounded-xl transition shadow-lg shadow-orange-600/30">
+                    Accedi al Menu
                 </button>
             </form>
             <div class="mt-6 border-t pt-4 text-center">
-                <button onclick="switchToRegia()" class="text-xs text-gray-400 hover:text-gray-600 underline">
-                    Sei lo staff? Accedi alla Regia
+                <button onclick="switchToRegia()" class="text-xs font-semibold text-gray-400 hover:text-gray-700 underline">
+                    🔒 Accesso Staff / Regia Cucina
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- APP PRINCIPALE -->
+    <!-- APP PRINCIPALE CLIENTE -->
     <div id="main-app" class="hidden min-h-screen flex flex-col">
         <!-- HEADER -->
         <header class="bg-white shadow-sm sticky top-0 z-30">
-            <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
-                <div>
-                    <h1 class="font-bold text-lg text-orange-600 flex items-center gap-2">
-                        <i class="fa-solid fa-fire"></i> Ordini Asporto
-                    </h1>
-                    <p class="text-xs text-gray-500">Cliente: <span id="display-client-name" class="font-semibold text-gray-700"></span></p>
-                </div>
+            <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
                 <div class="flex items-center gap-3">
-                    <button onclick="openCart()" class="relative bg-orange-50 text-orange-600 px-4 py-2 rounded-xl font-semibold flex items-center gap-2 border border-orange-200 hover:bg-orange-100 transition">
-                        <i class="fa-solid fa-shopping-bag"></i>
-                        <span id="cart-count" class="bg-orange-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">0</span>
+                    <button onclick="toggleSidebar()" class="text-gray-700 hover:text-orange-600 p-2 rounded-xl text-xl transition">
+                        <i class="fa-solid fa-bars"></i>
                     </button>
-                    <button onclick="switchToRegia()" class="bg-gray-800 text-white px-3 py-2 rounded-xl text-xs font-semibold hover:bg-gray-900 transition">
+                    <div>
+                        <h1 class="font-black text-base text-orange-600 flex items-center gap-2">
+                            <i class="fa-solid fa-fire"></i> Ordini Asporto
+                        </h1>
+                        <p class="text-xs text-gray-500">Cliente: <span id="display-client-name" class="font-bold text-gray-700"></span></p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="openCart()" class="relative bg-orange-50 text-orange-600 px-4 py-2 rounded-xl font-bold flex items-center gap-2 border border-orange-200 hover:bg-orange-100 transition shadow-sm">
+                        <i class="fa-solid fa-shopping-bag"></i>
+                        <span id="cart-count" class="bg-orange-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold">0</span>
+                    </button>
+                    <button onclick="switchToRegia()" class="bg-gray-900 text-white px-3 py-2 rounded-xl text-xs font-bold hover:bg-gray-800 transition">
                         Regia
                     </button>
                 </div>
             </div>
         </header>
 
-        <!-- CONTENUTO CATALOGO / MENU -->
-        <main class="flex-1 max-w-5xl w-full mx-auto p-4 pb-24">
-            <!-- Navigazione Categorie -->
-            <div id="category-nav" class="flex gap-2 overflow-x-auto pb-3 mb-4 scrollbar-none">
-                <!-- Generate via JS -->
-            </div>
+        <!-- LAYOUT CON BARRA LATERALE E CONTENUTO -->
+        <div class="flex-1 max-w-6xl w-full mx-auto flex p-4 gap-6 relative">
+            
+            <!-- SIDEBAR CATEGORIE (Desktop & Mobile Drawer) -->
+            <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-72 bg-white shadow-2xl p-5 transform -translate-x-full transition-transform duration-300 md:translate-x-0 md:static md:w-64 md:shadow-none md:border-r md:bg-transparent flex flex-col">
+                <div class="flex justify-between items-center mb-4 md:hidden">
+                    <h3 class="font-black text-lg text-gray-900">Categorie Menu</h3>
+                    <button onclick="toggleSidebar()" class="text-gray-500 hover:text-gray-800 text-xl font-bold">&times;</button>
+                </div>
+                <h3 class="hidden md:block font-black text-xs uppercase tracking-wider text-gray-400 mb-3">Categorie</h3>
+                <div id="category-list" class="space-y-1.5 overflow-y-auto flex-1 pr-1">
+                    <!-- Categorie generate via JS -->
+                </div>
+            </aside>
 
-            <!-- Lista Prodotti -->
-            <div id="products-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <!-- Generati via JS -->
-            </div>
-        </main>
+            <!-- OVERLAY PER MOBILE SIDEBAR -->
+            <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/50 z-30 hidden md:hidden"></div>
+
+            <!-- CONTENUTO PRODOTTI -->
+            <main class="flex-1 w-full">
+                <div class="mb-4 flex justify-between items-center">
+                    <h2 id="current-category-title" class="text-2xl font-black text-gray-900">Antipasti</h2>
+                    <span class="text-xs font-bold text-gray-400 uppercase tracking-wide">Tocca un prodotto per ordinare</span>
+                </div>
+                <div id="products-container" class="grid grid-cols-1 md:grid-cols-2 gap-4 pb-20">
+                    <!-- Prodotti generati via JS -->
+                </div>
+            </main>
+        </div>
     </div>
 
     <!-- DASHBOARD REGIA -->
@@ -83,10 +105,10 @@
         <header class="bg-gray-900 text-white shadow">
             <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
                 <div class="flex items-center gap-3">
-                    <div class="bg-orange-600 p-2 rounded-lg"><i class="fa-solid fa-desktop"></i></div>
-                    <h1 class="text-xl font-bold">Dashboard Regia & Cucina</h1>
+                    <div class="bg-orange-600 p-2 rounded-xl text-white"><i class="fa-solid fa-desktop"></i></div>
+                    <h1 class="text-lg font-bold">Dashboard Regia & Cucina</h1>
                 </div>
-                <button onclick="switchToClient()" class="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-xl text-sm font-semibold transition">
+                <button onclick="switchToClient()" class="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-xl text-xs font-bold transition">
                     Torna al Menu Cliente
                 </button>
             </div>
@@ -94,7 +116,7 @@
         <main class="flex-1 max-w-6xl w-full mx-auto p-4">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-lg font-bold text-gray-700">Ordini in tempo reale</h2>
-                <span class="text-xs bg-green-100 text-green-700 px-3 py-1 rounded-full font-semibold flex items-center gap-1">
+                <span class="text-xs bg-green-100 text-green-700 px-3 py-1 rounded-full font-bold flex items-center gap-1">
                     <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> Sincronizzato
                 </span>
             </div>
@@ -104,59 +126,60 @@
         </main>
     </div>
 
-    <!-- MODALE CARRELLO -->
-    <div id="cart-modal" class="fixed inset-0 bg-black/50 z-50 hidden flex justify-end">
+    <!-- MODALE RIEPILOGO CARRELLO -->
+    <div id="cart-modal" class="fixed inset-0 bg-black/60 z-50 hidden flex justify-end">
         <div class="bg-white w-full max-w-md h-full flex flex-col shadow-2xl">
             <div class="p-4 border-b flex justify-between items-center bg-gray-50">
-                <h2 class="font-bold text-lg text-gray-800">Il tuo Carrello</h2>
-                <button onclick="closeCart()" class="text-gray-400 hover:text-gray-600 text-xl font-bold">&times;</button>
+                <h2 class="font-black text-lg text-gray-900"><i class="fa-solid fa-shopping-bag text-orange-600 mr-2"></i> Riepilogo Ordine</h2>
+                <button onclick="closeCart()" class="text-gray-400 hover:text-gray-600 text-2xl font-bold">&times;</button>
             </div>
             <div id="cart-items" class="flex-1 overflow-y-auto p-4 space-y-3">
                 <!-- Elementi carrello -->
             </div>
             <div class="p-4 border-t bg-gray-50 space-y-3">
-                <div class="flex justify-between text-lg font-bold text-gray-900">
-                    <span>Totale:</span>
-                    <span id="cart-total">€ 0.00</span>
+                <div class="flex justify-between text-lg font-black text-gray-900">
+                    <span>Totale Complessivo:</span>
+                    <span id="cart-total" class="text-orange-600">€ 0.00</span>
                 </div>
-                <button onclick="submitOrder()" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-3.5 rounded-xl transition shadow-lg shadow-orange-600/30">
-                    Invia Ordine alla Regia
+                <button onclick="submitOrder()" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-4 rounded-xl transition shadow-lg shadow-orange-600/30">
+                    Invia Ordine alla Regia 🚀
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- MODALE QUANTITA' E VARIAZIONE PRODOTTO -->
-    <div id="variation-modal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl">
-            <h3 id="modal-product-title" class="text-xl font-bold text-gray-900 mb-1"></h3>
-            <p id="modal-product-price" class="text-orange-600 font-semibold mb-4"></p>
+    <!-- MODALE QUANTITA' E VARIAZIONI -->
+    <div id="variation-modal" class="fixed inset-0 bg-black/70 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl animate-scale">
+            <h3 id="modal-product-title" class="text-xl font-black text-gray-900 mb-1"></h3>
+            <p id="modal-product-price" class="text-orange-600 font-bold text-sm mb-4"></p>
             
             <div class="mb-4">
-                <label class="block text-sm font-semibold text-gray-700 mb-1">Quantità</label>
+                <label class="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-2">Quantità</label>
                 <div class="flex items-center gap-3">
-                    <button type="button" onclick="decrementQty()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold w-10 h-10 rounded-xl text-lg">-</button>
-                    <input type="number" id="product-qty" value="1" min="1" class="w-20 text-center px-3 py-2 rounded-xl border border-gray-300 font-bold focus:outline-none">
-                    <button type="button" onclick="incrementQty()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold w-10 h-10 rounded-xl text-lg">+</button>
+                    <button type="button" onclick="decrementQty()" class="bg-gray-100 hover:bg-gray-200 text-gray-800 font-black w-12 h-12 rounded-xl text-xl">-</button>
+                    <input type="number" id="product-qty" value="1" min="1" class="flex-1 text-center py-3 rounded-xl border border-gray-300 font-black text-lg focus:outline-none">
+                    <button type="button" onclick="incrementQty()" class="bg-gray-100 hover:bg-gray-200 text-gray-800 font-black w-12 h-12 rounded-xl text-xl">+</button>
                 </div>
             </div>
 
-            <div class="mb-4">
-                <label class="block text-sm font-semibold text-gray-700 mb-1">Note / Variazioni personalizzate</label>
-                <textarea id="product-notes" rows="3" placeholder="Es. Senza cipolla, ben cotto, salsa a parte..." class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-orange-500 focus:outline-none text-sm"></textarea>
+            <div class="mb-6">
+                <label class="block text-xs font-bold uppercase tracking-wider text-gray-600 mb-1">Note / Variazioni personalizzate</label>
+                <textarea id="product-notes" rows="3" placeholder="Es. Senza cipolla, ben cotto, salsa a parte..." class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-orange-500 focus:outline-none text-sm font-medium"></textarea>
             </div>
 
             <div class="flex gap-3">
-                <button onclick="closeVariationModal()" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-3 rounded-xl transition">Annulla</button>
-                <button onclick="confirmAddToCart()" class="flex-1 bg-orange-600 hover:bg-orange-700 text-white font-semibold py-3 rounded-xl transition">Aggiungi al Carrello</button>
+                <button onclick="closeVariationModal()" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-3.5 rounded-xl transition">Annulla</button>
+                <button onclick="confirmAddToCart()" class="flex-1 bg-orange-600 hover:bg-orange-700 text-white font-bold py-3.5 rounded-xl transition shadow-md">Conferma</button>
             </div>
         </div>
     </div>
 
-    <!-- SCRIPT LOGICA APPLICATIVA -->
+    <!-- SCRIPT APPLICATIVO COMPLETO -->
     <script>
         const WHATSAPP_REGIA_NUMBER = "393391318613";
 
+        // MENU COMPLETO AL 100% CON TUTTI I PRODOTTI
         const menuData = [
             {
                 category: "Antipasti",
@@ -170,7 +193,7 @@
             {
                 category: "Torte al Testo",
                 items: [
-                    { name: "TORTA AL TESTO", price: 8.50, desc: "Tipica torta umbra della tradizione fatta con acqua e farina, farcita con salsiccia, erba cotta e pecorino." }
+                    { name: "TORTA AL TESTO", price: 8.50, desc: "Tipica torta umbra della tradizione fatta con acqua e farina, farcita con salsiccia, erba cotta e pecorino. Puoi farcirla con solo crudo / sella di San Venanzo / verdure grigliate e mozzarella." }
                 ]
             },
             {
@@ -190,26 +213,26 @@
                 category: "Pizze Rosse",
                 items: [
                     { name: "CUBA", price: 10.00, desc: "Pomodoro, Mozzarella fior di latte, Cipolla rossa, Peperoni, Crema di 'nduja calabrese, Peperoncino (Nuovo)" },
-                    { name: "GRENADA (PERUGINA)", price: 7.00, desc: "Pomodoro, Mozzarella fior di latte, Salsiccia." },
-                    { name: "LEVANTE (BISMARK)", price: 7.50, desc: "Pomodoro, Mozzarella fior di latte, Uovo alla coque, Speck." },
-                    { name: "CALABRESE", price: 7.50, desc: "Pomodoro, Mozzarella fior di latte, Salame piccante, Pom. semi secchi, Capriccio mediterraneo." },
-                    { name: "EL GUAPO", price: 8.50, desc: "Pomodoro, Mozzarella fior di latte, Salame piccante, Salsiccia, Salsa piccante Harissa, Capperi." },
-                    { name: "GEORGE TOWN", price: 7.50, desc: "Solo pomodoro, Verdure miste grigliate, Origano (con olio aromatizzato all'aglio)." },
-                    { name: "MANZANILLA", price: 7.50, desc: "Pomodoro, Mozzarella, Salsiccia, Funghi." },
-                    { name: "MARACAIBO", price: 8.00, desc: "Pomodoro, Mozzarella fior di latte, Funghi, Uovo, Carciofi, Crudo, Olive nere." },
-                    { name: "PANAMA", price: 7.50, desc: "Pomodoro, Mozzarella fior di latte, Salsa 4 formaggi, Prosciutto cotto, Gorgonzola." },
-                    { name: "SAINT VINCENT", price: 7.50, desc: "Pomodoro, Mozzarella fior di latte, Peperoni, Salsiccia." },
-                    { name: "PORT AU PRINCE", price: 7.50, desc: "Pomodoro, Mozzarella fior di latte, Funghi, Salame piccante." },
-                    { name: "SANTO DOMINGO", price: 7.50, desc: "Pomodoro, Mozzarella fior di latte, Salame piccante, 4 formaggi." },
-                    { name: "TOBAGO", price: 7.50, desc: "Pomodoro, Mozzarella fior di latte, Funghi, Crudo." },
-                    { name: "TORTOLA", price: 8.00, desc: "Pomodoro, Mozzarella fior di latte, Crudo, Funghi, Salsiccia, Peperoncino, Rucola, Grana (Nuovo)" },
+                    { name: "GRENADA (PERUGINA)", price: 7.00, desc: "Pom., Mozzarella fior di latte, Salsiccia." },
+                    { name: "LEVANTE (BISMARK)", price: 7.50, desc: "Pom., Mozzarella fior di latte, Uovo alla coque, Speck." },
+                    { name: "CALABRESE", price: 7.50, desc: "Pom., Mozzarella fior di latte, Salame piccante, Pom. semi secchi, Capriccio mediterraneo." },
+                    { name: "EL GUAPO", price: 8.50, desc: "Pom., Mozzarella fior di latte, Salame piccante, Salsiccia, Salsa Harissa, Capperi." },
+                    { name: "GEORGE TOWN (VEG)", price: 7.50, desc: "Solo pom., Verdure miste grigliate, Origano (con olio all'aglio)." },
+                    { name: "MANZANILLA (BOSCAIOLA)", price: 7.50, desc: "Pomodoro, Mozzarella, Salsiccia, Funghi." },
+                    { name: "MARACAIBO (4 STAGIONI)", price: 8.00, desc: "Pom., Mozzarella fior di latte, Funghi, Uovo, Carciofi, Crudo, Olive nere." },
+                    { name: "PANAMA", price: 7.50, desc: "Pom., Mozzarella fior di latte, Salsa 4 formaggi, Prosciutto cotto, Gorgonzola." },
+                    { name: "SAINT VINCENT", price: 7.50, desc: "Pom., Mozzarella fior di latte, Peperoni, Salsiccia." },
+                    { name: "PORT AU PRINCE", price: 7.50, desc: "Pom., Mozzarella fior di latte, Funghi, Salame piccante." },
+                    { name: "SANTO DOMINGO", price: 7.50, desc: "Pom., Mozzarella fior di latte, Salame piccante, 4 formaggi." },
+                    { name: "TOBAGO (FRANCESCANA)", price: 7.50, desc: "Pom., Mozzarella fior di latte, Funghi, Crudo." },
+                    { name: "TORTOLA", price: 8.00, desc: "Pom., Mozzarella fior di latte, Crudo, Funghi, Salsiccia, Peperoncino, Rucola, Grana (Nuovo)" },
                     { name: "MARGHERITA", price: 6.00, desc: "Pomodoro, Mozzarella fior di latte." }
                 ]
             },
             {
                 category: "Pizze Bianche",
                 items: [
-                    { name: "DOMINICA", price: 10.00, desc: "Mozzarella fior di latte, Mortadella al pistacchio, Granelle di pistacchio, Stracciatella (Nuovo)" },
+                    { name: "DOMINICA", price: 10.00, desc: "Mozzarella fior di latte, Mortadella al pistacchio, Granella di pistacchio, Stracciatella (Nuovo)" },
                     { name: "NASSAU", price: 7.00, desc: "Mozzarella fior di latte, Pachino, Rucola, Mozzarella fresca." },
                     { name: "ANTIGUA", price: 7.50, desc: "Mozzarella fior di latte, 4 formaggi, Salsa tartufata." },
                     { name: "BARRANQUILLA", price: 8.00, desc: "Mozzarella fior di latte, Salsa tartufata, Funghi, Salsiccia." },
@@ -218,7 +241,7 @@
                     { name: "BUFALINA", price: 8.50, desc: "Mozzarella di bufala, Pachino, Basilico, Origano." },
                     { name: "CANCUN", price: 8.00, desc: "Mozzarella fior di latte, Bresaola, Rucola, Grana." },
                     { name: "CARACAS", price: 8.50, desc: "Mozzarella fior di latte, Salmone, Rucola, Grana." },
-                    { name: "CARTAGENA", price: 7.50, desc: "Mozzarella fior di latte, Melanzane, Zucchine, Radicchio, Mais, Pachino." },
+                    { name: "CARTAGENA (VEG)", price: 7.50, desc: "Mozzarella fior di latte, Melanzane, Zucchine, Radicchio, Mais, Pachino." },
                     { name: "ELEUTHERA", price: 7.50, desc: "Mozzarella fior di latte, Stracchino, Rucola, Crudo." },
                     { name: "EMILIANA", price: 7.50, desc: "Mozzarella fior di latte, Capriccio di tartufo, Mortadella a julienne, Rosmarino." },
                     { name: "GUADALUPA", price: 8.50, desc: "Mozzarella fior di latte, 4 formaggi, Porcini, Salsa di porcini." },
@@ -226,35 +249,35 @@
                     { name: "KINGSTON (FOCACCIA)", price: 4.50, desc: "Focaccia classica con olio e rosmarino." },
                     { name: "MAREMMANA", price: 8.00, desc: "Mozzarella fior di latte, Crema di zucca, Lardo di Colonnata." },
                     { name: "PUERTO RICO", price: 9.00, desc: "Mozzarella fior di latte, 4 formaggi, Gamberetti in salsa rosa, Mais, Rucola." },
-                    { name: "TORTUGA", price: 8.00, desc: "Mozzarella fior di latte, 4 formaggi, Gorgonzola." }
+                    { name: "TORTUGA (4 FORMAGGI)", price: 8.00, desc: "Mozzarella fior di latte, 4 formaggi, Gorgonzola." }
                 ]
             },
             {
                 category: "Hamburger",
                 items: [
-                    { name: "BOMBARDINO", price: 14.00, desc: "220gr Chianina, Cheddar, Bacon, Cipolla caramellata, Jalapeno, Pomodoro, Lattuga, Salsa Galleon (Nuovo)" },
-                    { name: "ARUBA", price: 12.00, desc: "Cotoletta di petto di pollo alla Milanese con Patate Fritte (Nuovo)" },
-                    { name: "BAHAMAS", price: 15.00, desc: "Hamburger di Scottona 220gr, Melanzane, Pom. semi secchi, Provola, Maionese, Patate arrosto (Nuovo)" },
-                    { name: "CURACAO", price: 14.00, desc: "Hamburger di Pollo 150gr, Maionese, Lattuga, Pomodoro, Verdure pastellate (Nuovo)" },
-                    { name: "PETTO DI POLLO ALLA GRIGLIA", price: 12.00, desc: "Con contorno a scelta e Torta al Testo (Nuovo)" },
-                    { name: "HAMBURGER AL PIATTO", price: 14.00, desc: "Chianina 220gr con contorno a scelta e torta al testo." },
-                    { name: "ANNIVERSARY BURGER", price: 15.00, desc: "Angus 220gr, Cheddar, Bacon, Pomodoro, Cipolla, Lattuga, Salsa B&B, Maionese." },
-                    { name: "ALESSIA'S BURGER", price: 15.00, desc: "Manzo 150gr, Burrata, Pom. semi secchi, Mortadella, Maionese, Rucola, Olio al basilico." },
-                    { name: "BEEF BURGER", price: 13.00, desc: "Manzo 150gr, Ragù di manzo, Melanzane, Zucchine, Mozzarella alla piastra, Lattuga." },
+                    { name: "BOMBARDINO", price: 14.00, desc: "220gr Chianina, Cheddar, Bacon, Cipolla caramellata, Jalapeno, Pom., Lattuga, Salsa Galleon (No contorno, Nuovo)" },
+                    { name: "ARUBA", price: 12.00, desc: "Cotoletta di petto di pollo alla Milanese. Contorno Patate Fritte (Nuovo)" },
+                    { name: "BAHAMAS", price: 15.00, desc: "Hamburger di Scottona 220gr, Melanzane, Pom. semi secchi, Provola, Maionese. Contorno Patate Arrosto (Nuovo)" },
+                    { name: "CURACAO", price: 14.00, desc: "Hamburger di Pollo 150gr, Maionese, Lattuga, Pomodoro. Contorno Verdure pastellate (Nuovo)" },
+                    { name: "PETTO DI POLLO ALLA GRIGLIA", price: 12.00, desc: "Petto di pollo con contorno a scelta e Torta al Testo (Nuovo)" },
+                    { name: "HAMBURGER AL PIATTO", price: 14.00, desc: "Chianina 220gr con contorno a scelta e torta al testo casareccia." },
+                    { name: "ANNIVERSARY BURGER", price: 15.00, desc: "220gr Angus Argentina, Salsa cheddar, Bacon, Pom., Cipolla rossa, Lattuga, Salsa B&B, Maionese." },
+                    { name: "ALESSIA'S BURGER", price: 15.00, desc: "Manzo 150gr, Burrata fresca, Pom. semi secchi, Mortadella, Maionese, Rucola, Olio al basilico." },
+                    { name: "BEEF BURGER", price: 13.00, desc: "150gr Manzo nostrano, Ragù di manzo, Melanzane, Zucchine, Mozzarella alla piastra, Lattuga." },
                     { name: "ANTONIO'S", price: 15.00, desc: "Chianina 220gr, Mozzarella fresca, 4 formaggi, Salsa rosa, Bacon, Rucola." },
-                    { name: "PETER'S", price: 15.00, desc: "Chianina 220gr, Salsa piccante, Sottiletta, Cipolla fritta, Cetrioli, Pomodoro, Ketchup." },
-                    { name: "DOUBLE BACON BURGER", price: 15.00, desc: "Fassona 200gr, Doppio bacon, Cheddar, Cipolla caramellata, Insalata, Pomodoro, Beconaise." },
+                    { name: "PETER'S", price: 15.00, desc: "Chianina 220gr, Salsa piccante, Sottiletta, Cipolla fritta, Cetrioli, Pomodoro, Ketchup, Lattuga." },
+                    { name: "DOUBLE BACON BURGER", price: 15.00, desc: "200gr Fassona piemontese, Doppio bacon, Cheddar, Cipolla caramellata, Insalata, Pomodoro, Beconaise." },
                     { name: "CABOTO", price: 9.00, desc: "Manzo 150gr, Salsa 4 formaggi, Harissa, Sottiletta, Salsa rosa, Crauti." },
                     { name: "CABRAL", price: 9.00, desc: "Manzo 150gr, Bacon, Salsa Harissa, Maionese." },
                     { name: "CHEESEBURGER", price: 10.00, desc: "Manzo 150gr, Pomodoro, Lattuga, Cipolla, Maionese, 4 formaggi, Cheddar, Gorgonzola." },
-                    { name: "HAMBURGER GALLEON", price: 9.50, desc: "Manzo 150gr, Amatriciana, Pecorino, Uovo, Pomodoro, Lattuga, Crema di mais." },
+                    { name: "HAMBURGER GALLEON", price: 9.50, desc: "Manzo 150gr, Amatriciana, Pecorino, Uovo all'occhio di bue, Pomodoro, Lattuga, Crema di mais." },
                     { name: "NUNEZ", price: 9.00, desc: "Manzo 150gr, Pomodoro, Lattuga, Ketchup, Maionese." }
                 ]
             },
             {
-                category: "Tagliere & Panini",
+                category: "Taglieri & Panini",
                 items: [
-                    { name: "TAGLIERE NOSTRANO", price: 10.00, desc: "Affettati e formaggi nostrani con Torta al Testo." },
+                    { name: "TAGLIERE NOSTRANO", price: 10.00, desc: "Affettati e formaggi nostrani (Prosciutto crudo, Sella, Capocollo, Salame, Salsiccia, Pecorino, Caciotta, Gorgonzola) con Torta al Testo." },
                     { name: "EL PERUGINO", price: 9.00, desc: "Doppia salsiccia, Cipolla caramellata, Peperoni, Salsa piccante, Maionese, Emmental (con patate arrosto e bacon)." },
                     { name: "BRIGANTINO", price: 7.00, desc: "Cotoletta di pollo, Lattuga, Pomodoro, Maionese (con patate fritte)." }
                 ]
@@ -264,9 +287,19 @@
                 items: [
                     { name: "PIADINA con MORTADELLA", price: 12.00, desc: "Manzo 150gr, Burrata, Pom. semi secchi, Rucola, Mortadella, Maionese, Olio al basilico (Nuovo)" },
                     { name: "CAPITANO", price: 6.50, desc: "Mozzarella fior di latte, Prosciutto crudo." },
-                    { name: "CHIANINA", price: 10.00, desc: "Chianina 100gr, Bacon, Cheddar, Insalata, Pomodoro, Cipolla, Ketchup, Maionese." },
-                    { name: "TEDESCO (Hot Dog)", price: 8.00, desc: "Wurstel di suino 90gr, Cipolla caramellata, Crauti, Ketchup, Maionese, Emmental." },
-                    { name: "A GONFIE VELE (Hot Dog)", price: 7.00, desc: "Wurstel di suino 90gr, Ketchup, Maionese (con patate fritte)." }
+                    { name: "CHIANINA", price: 10.00, desc: "Chianina 100gr, Bacon, Cheddar, Insalata, Pom., Cipolla, Ketchup, Maionese, Mozzarella." },
+                    { name: "MOZZO", price: 7.50, desc: "Bresaola, Rucola, Stracchino, Champignon." },
+                    { name: "NOCCHIERO", price: 7.00, desc: "Mozzarella fior di latte, Champignon, Crudo, Rucola, Pachino." },
+                    { name: "NOSTROMO", price: 7.00, desc: "Mozzarella fior di latte, Scamorza affumicata, Speck, Mais, Pachino." },
+                    { name: "ORTOLANA", price: 9.00, desc: "Chianina 100gr, Melanzane, Pom., Insalata, Mozzarella, Paprika, Salse a scelta." },
+                    { name: "PARMIGIANA", price: 7.50, desc: "Parmigiano, Champignon, Rucola, Pachino, Salsiccia." },
+                    { name: "PIADINA CON SELLA", price: 9.00, desc: "Farcita con Sella di San Venanzo e Pecorino." },
+                    { name: "SPUGNA", price: 8.50, desc: "Mozzarella, Salsiccia, Funghi, Tartufo." },
+                    { name: "TACCHINO", price: 8.00, desc: "Tacchino, Rucola, Pachino, Mozzarella, Salsa tonnata." },
+                    { name: "VEGETARIANA", price: 7.00, desc: "Mozzarella fior di latte, Verdure grigliate." },
+                    { name: "TEDESCO (Hot Dog)", price: 8.00, desc: "Wurstel suino 90gr, Cipolla caramellata, Crauti, Ketchup, Maionese, Emmental." },
+                    { name: "A GONFIE VELE (Hot Dog)", price: 7.00, desc: "Wurstel suino 90gr, Ketchup, Maionese (con patate fritte)." },
+                    { name: "IN SECCA (Hot Dog)", price: 7.00, desc: "Wurstel suino 90gr, Salame piccante, Ketchup, Mozzarella (con patate fritte)." }
                 ]
             },
             {
@@ -274,13 +307,23 @@
                 items: [
                     { name: "JALAPENO PICCANTI VERDI", price: 6.00, desc: "5 Pezzi con cheddar (Nuovo)" },
                     { name: "FIORI DI ZUCCA", price: 6.00, desc: "4 Pz Fiori di zucca con alici (Nuovo)" },
-                    { name: "PATATE ARROSTO CON BACON", price: 4.00, desc: "Nuovo (Gluten Free)" },
+                    { name: "PATATE ARROSTO CON BACON", price: 4.00, desc: "Patate arrosto con bacon (Gluten Free, Nuovo)" },
+                    { name: "JALAPENOS PICCANTI ROSSI", price: 6.00, desc: "5 Pezzi" },
                     { name: "ALETTE DI POLLO", price: 6.00, desc: "6 Pezzi" },
-                    { name: "ANELLI DI CIPOLLA", price: 5.00, desc: "Anelli di cipolla fritti" },
+                    { name: "ANELLI DI CIPOLLA", price: 5.00, desc: "Anelli di cipolla" },
+                    { name: "CHELE DI GRANCHIO", price: 5.00, desc: "4 Pezzi" },
+                    { name: "CROCCHETTE DI POLLO O PATATE", price: 5.00, desc: "7 Pezzi" },
                     { name: "FATTO DA NOI", price: 10.00, desc: "2 Roll piccanti, 2 crocchette piccanti, 2 polpette al cheddar, 2 corn dog, patate scavate." },
-                    { name: "GRAN MIX", price: 10.00, desc: "Olive ascolane, mozzarelline, crocchette, chele di granchio, patatine fritte." },
-                    { name: "PATATINE", price: 4.00, desc: "Patatine fritte" },
-                    { name: "SUPPLI", price: 2.00, desc: "Al pezzo singolo" }
+                    { name: "GRAN MIX", price: 10.00, desc: "2 Olive ascolane, 2 mozzarelline, 2 crocchette, 2 chele di granchio, patatine." },
+                    { name: "MIX PICCANTE", price: 10.00, desc: "2 Jalapenos, 2 alette, anelli di cipolla, patate chips, patate al peperoncino." },
+                    { name: "MOZZARELLINE", price: 5.00, desc: "7 Pezzi" },
+                    { name: "OLIVE ASCOLANE", price: 5.00, desc: "7 Pezzi" },
+                    { name: "PATATE SCAVATE (DIPPERS)", price: 4.50, desc: "Patate dippers" },
+                    { name: "PATATE & WURSTEL", price: 5.00, desc: "Patatine e wurstel" },
+                    { name: "PATATINE FRITTE", price: 4.00, desc: "Patatine classiche" },
+                    { name: "PATATINE CHIPS", price: 4.50, desc: "Patatine chips" },
+                    { name: "SUPPLI", price: 2.00, desc: "Al pezzo singolo" },
+                    { name: "VERDURE FRITTE", price: 6.00, desc: "Verdure miste fritte" }
                 ]
             },
             {
@@ -288,6 +331,19 @@
                 items: [
                     { name: "TORTA CHEESECAKE", price: 5.50, desc: "Frutti di bosco / Caramello / Nutella / Pistacchio" },
                     { name: "SEMIFREDDO al PISTACCHIO", price: 6.00, desc: "Semifreddo artigianale (Nuovo)" },
+                    { name: "SEMIFREDDO AL CROCCANTE", price: 5.50, desc: "Su letto di cioccolato fondente" },
+                    { name: "FRAGOLE (STAGIONALI)", price: 6.00, desc: "Con panna o limone" },
+                    { name: "CREMA CATALANA", price: 5.50, desc: "Crema catalana" },
+                    { name: "ANANAS", price: 5.00, desc: "Ananas fresco" },
+                    { name: "COPPA GELATO", price: 5.00, desc: "Fragola, cioccolato, panna, cocco" },
+                    { name: "CREPES", price: 5.50, desc: "Con gelato o Nutella" },
+                    { name: "FRAPPE'", price: 5.00, desc: "Fragola, cioccolato, cocco, panna" },
+                    { name: "GELATO AL COCCO", price: 5.00, desc: "Gelato al cocco" },
+                    { name: "GRAN LIMONE", price: 5.00, desc: "Gran limone" },
+                    { name: "MACEDONIA", price: 5.00, desc: "Con frutta di stagione" },
+                    { name: "PANNA COTTA", price: 5.00, desc: "Frutti di bosco / Caramello / Nutella" },
+                    { name: "PIZZA DOLCE", price: 7.00, desc: "Con Nutella o panna e granelle di nocciola" },
+                    { name: "TARTUFO", price: 5.00, desc: "Bianco o nero (Affogato € 1,00 in più)" },
                     { name: "TIRAMISU'", price: 5.50, desc: "Tiramisù artigianale" },
                     { name: "TORTINO AL CIOCCOLATO", price: 5.50, desc: "Sufflé al cioccolato con cuore caldo" }
                 ]
@@ -295,10 +351,39 @@
             {
                 category: "Bibite & Birre",
                 items: [
-                    { name: "ACQUA 1 L", price: 2.50, desc: "Acqua naturale o frizzante 1 Litro" },
+                    { name: "ACQUA 1/5 L N/F", price: 1.50, desc: "Acqua 1/5 litro" },
+                    { name: "ACQUA 1 L N/F", price: 2.50, desc: "Acqua 1 Litro" },
                     { name: "COCA COLA 0,33 L", price: 3.00, desc: "Bottiglia 0,33 L" },
-                    { name: "CARLSBERG 0.4 L", price: 5.00, desc: "Birra alla spina Lager 0,4 L" },
-                    { name: "CAFFÈ ESPRESSO", price: 1.50, desc: "Caffè espresso" }
+                    { name: "FANTA 0,33 L", price: 3.00, desc: "Bottiglia 0,33 L" },
+                    { name: "SPRITE 0,33 L", price: 3.00, desc: "Bottiglia 0,33 L" },
+                    { name: "THE LIMONE/PESCA", price: 3.00, desc: "The freddo" },
+                    { name: "CARLSBERG 0.30 L", price: 3.50, desc: "Birra alla spina lager 0,30L" },
+                    { name: "CARLSBERG 0.4 L", price: 5.00, desc: "Birra alla spina lager 0,4L" },
+                    { name: "GRIMBERGEN DOUBLE 0.25 L", price: 4.00, desc: "Birra rossa ambrata 0,25L" },
+                    { name: "GRIMBERGEN DOUBLE 0.5 L", price: 6.00, desc: "Birra rossa ambrata 0,5L" },
+                    { name: "SPECIAL BREW 0.3 L", price: 4.50, desc: "Doppio malto chiara 0,3L" },
+                    { name: "SPECIAL BREW 0.4 L", price: 5.50, desc: "Doppio malto chiara 0,4L" },
+                    { name: "TUCHER WEIZEN 0.33 L", price: 4.50, desc: "Birra di frumento 0,33L" },
+                    { name: "TUCHER WEIZEN 0.5 L", price: 6.00, desc: "Birra di frumento 0,5L" },
+                    { name: "ENGEL RADLER", price: 5.00, desc: "Birra radler alc. 2.9" },
+                    { name: "BIRRA GLUTEN FREE", price: 4.00, desc: "Alc. 5.8% vol - 33 cl" },
+                    { name: "TENNENT'S SUPER", price: 4.00, desc: "Alc. 9% vol - 33 cl" }
+                ]
+            },
+            {
+                category: "Vini, Amari & Caffè",
+                items: [
+                    { name: "Refosco dal Peduncolo (0,375 l)", price: 7.00, desc: "Antonutti 1921 - Friuli Grave" },
+                    { name: "Refosco dal Peduncolo (0,75 l)", price: 15.00, desc: "Antonutti 1921 - Friuli Grave" },
+                    { name: "Ribolla Gialla (0,375 l)", price: 7.00, desc: "Antonutti 1921 - Friuli Grave" },
+                    { name: "Ribolla Gialla (0,75 l)", price: 15.00, desc: "Antonutti 1921 - Friuli Grave" },
+                    { name: "Sauvignon (0,375 l)", price: 7.00, desc: "Antonutti 1921 - Friuli Grave" },
+                    { name: "Sauvignon (0,75 l)", price: 15.00, desc: "Antonutti 1921 - Friuli Grave" },
+                    { name: "Traminer Aromatico (0,375 l)", price: 7.00, desc: "Antonutti 1921 - Friuli Grave" },
+                    { name: "Traminer Aromatico (0,75 l)", price: 15.00, desc: "Antonutti 1921 - Friuli Grave" },
+                    { name: "AMARI", price: 3.50, desc: "Selezione di amari" },
+                    { name: "Grappa", price: 4.00, desc: "Grappa barricata/bianca" },
+                    { name: "Caffè espresso", price: 1.50, desc: "Caffè espresso italiano" }
                 ]
             }
         ];
@@ -320,8 +405,15 @@
             document.getElementById("login-screen").classList.add("hidden");
             document.getElementById("main-app").classList.remove("hidden");
             
-            initMenu();
+            initApp();
         });
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById("sidebar");
+            const overlay = document.getElementById("sidebar-overlay");
+            sidebar.classList.toggle("-translate-x-full");
+            overlay.classList.toggle("hidden");
+        }
 
         function switchToRegia() {
             document.getElementById("login-screen").classList.add("hidden");
@@ -335,39 +427,49 @@
             document.getElementById("main-app").classList.remove("hidden");
         }
 
-        function initMenu() {
-            const nav = document.getElementById("category-nav");
-            nav.innerHTML = "";
+        function initApp() {
+            renderSidebar();
+            renderProducts(activeCategoryIndex);
+        }
+
+        function renderSidebar() {
+            const list = document.getElementById("category-list");
+            list.innerHTML = "";
             menuData.forEach((cat, index) => {
                 const btn = document.createElement("button");
-                btn.className = `px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition ${index === activeCategoryIndex ? 'bg-orange-600 text-white shadow-md' : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'}`;
-                btn.innerText = cat.category;
-                btn.onclick = () => { activeCategoryIndex = index; initMenu(); };
-                nav.appendChild(btn);
+                btn.className = `w-full text-left px-4 py-3 rounded-xl text-sm font-bold transition flex justify-between items-center ${index === activeCategoryIndex ? 'bg-orange-600 text-white shadow-md' : 'text-gray-600 hover:bg-gray-100'}`;
+                btn.innerHTML = `<span>${cat.category}</span> <i class="fa-solid fa-chevron-right text-xs opacity-60"></i>`;
+                btn.onclick = () => {
+                    activeCategoryIndex = index;
+                    renderSidebar();
+                    renderProducts(index);
+                    if(window.innerWidth < 768) toggleSidebar();
+                };
+                list.appendChild(btn);
             });
-
-            renderProducts(activeCategoryIndex);
         }
 
         function renderProducts(catIndex) {
             const container = document.getElementById("products-container");
-            container.innerHTML = "";
             const cat = menuData[catIndex];
+            document.getElementById("current-category-title").innerText = cat.category;
+            container.innerHTML = "";
 
             cat.items.forEach((item, itemIndex) => {
                 const card = document.createElement("div");
-                card.className = "bg-white p-4 rounded-2xl border border-gray-200 shadow-sm flex flex-col justify-between hover:shadow-md transition";
+                card.className = "bg-white p-5 rounded-2xl border border-gray-200 shadow-sm flex flex-col justify-between hover:shadow-md hover:border-orange-200 transition cursor-pointer";
+                card.onclick = () => openVariationModal(catIndex, itemIndex);
                 card.innerHTML = `
                     <div>
-                        <div class="flex justify-between items-start gap-2 mb-1">
-                            <h3 class="font-bold text-gray-900">${item.name}</h3>
-                            <span class="bg-orange-50 text-orange-600 font-bold px-2.5 py-1 rounded-lg text-sm">€ ${item.price.toFixed(2)}</span>
+                        <div class="flex justify-between items-start gap-2 mb-2">
+                            <h3 class="font-black text-gray-900 text-base">${item.name}</h3>
+                            <span class="bg-orange-50 text-orange-600 font-black px-3 py-1 rounded-xl text-sm whitespace-nowrap">€ ${item.price.toFixed(2)}</span>
                         </div>
-                        <p class="text-xs text-gray-500 mb-4">${item.desc}</p>
+                        <p class="text-xs text-gray-500 leading-relaxed mb-4">${item.desc}</p>
                     </div>
-                    <button onclick="openVariationModal(${catIndex}, ${itemIndex})" class="w-full bg-orange-50 hover:bg-orange-600 hover:text-white text-orange-600 border border-orange-200 font-semibold py-2.5 rounded-xl text-sm transition flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-plus"></i> <span>Aggiungi / Quantità / Variazioni</span>
-                    </button>
+                    <div class="w-full bg-gray-50 group-hover:bg-orange-600 group-hover:text-white text-orange-600 font-bold py-2.5 rounded-xl text-xs transition flex items-center justify-center gap-2 border border-orange-100">
+                        <i class="fa-solid fa-plus-circle text-sm"></i> <span>Aggiungi / Variazioni</span>
+                    </div>
                 `;
                 container.appendChild(card);
             });
@@ -376,7 +478,7 @@
         function openVariationModal(catIdx, itemIdx) {
             currentSelectedProduct = menuData[catIdx].items[itemIdx];
             document.getElementById("modal-product-title").innerText = currentSelectedProduct.name;
-            document.getElementById("modal-product-price").innerText = `€ ${currentSelectedProduct.price.toFixed(2)} cad.`;
+            document.getElementById("modal-product-price").innerText = `Prezzo unitario: € ${currentSelectedProduct.price.toFixed(2)}`;
             document.getElementById("product-qty").value = 1;
             document.getElementById("product-notes").value = "";
             document.getElementById("variation-modal").classList.remove("hidden");
@@ -423,24 +525,24 @@
             let total = 0;
 
             if(cart.length === 0) {
-                container.innerHTML = `<p class="text-center text-gray-400 py-10">Il tuo carrello è vuoto</p>`;
+                container.innerHTML = `<p class="text-center text-gray-400 py-12 font-medium">Il tuo carrello è vuoto</p>`;
             } else {
                 cart.forEach((item, index) => {
                     const subtotal = item.price * item.qty;
                     total += subtotal;
                     const div = document.createElement("div");
-                    div.className = "bg-gray-50 p-3 rounded-xl border border-gray-200 flex justify-between items-center";
+                    div.className = "bg-gray-50 p-3.5 rounded-2xl border border-gray-200 flex justify-between items-center";
                     div.innerHTML = `
-                        <div>
-                            <h4 class="font-bold text-sm text-gray-900">${item.qty}x ${item.name}</h4>
-                            <p class="text-xs text-orange-600 font-medium">Note: ${item.notes}</p>
+                        <div class="flex-1 pr-2">
+                            <h4 class="font-black text-sm text-gray-900">${item.qty}x ${item.name}</h4>
+                            <p class="text-xs text-orange-600 font-bold mt-0.5">Nota: ${item.notes}</p>
                             <p class="text-xs font-bold text-gray-700 mt-1">€ ${subtotal.toFixed(2)}</p>
                         </div>
-                        <div class="flex items-center gap-2">
-                            <button onclick="decreaseCartItem(${index})" class="bg-gray-200 hover:bg-gray-300 text-gray-800 w-7 h-7 rounded-lg font-bold text-sm">-</button>
-                            <span class="text-sm font-bold">${item.qty}</span>
-                            <button onclick="increaseCartItem(${index})" class="bg-gray-200 hover:bg-gray-300 text-gray-800 w-7 h-7 rounded-lg font-bold text-sm">+</button>
-                            <button onclick="removeFromCart(${index})" class="text-red-500 hover:text-red-700 ml-2 p-1"><i class="fa-solid fa-trash text-sm"></i></button>
+                        <div class="flex items-center gap-1.5 bg-white p-1 rounded-xl border border-gray-200 shadow-sm">
+                            <button onclick="decreaseCartItem(${index})" class="bg-gray-100 hover:bg-gray-200 text-gray-800 w-7 h-7 rounded-lg font-black text-xs">-</button>
+                            <span class="text-xs font-black px-1">${item.qty}</span>
+                            <button onclick="increaseCartItem(${index})" class="bg-gray-100 hover:bg-gray-200 text-gray-800 w-7 h-7 rounded-lg font-black text-xs">+</button>
+                            <button onclick="removeFromCart(${index})" class="text-red-500 hover:text-red-700 ml-1 p-1"><i class="fa-solid fa-trash text-xs"></i></button>
                         </div>
                     `;
                     container.appendChild(div);
@@ -504,50 +606,50 @@
             const orders = JSON.parse(localStorage.getItem('restaurant_orders') || '[]');
 
             if(orders.length === 0) {
-                grid.innerHTML = `<p class="text-center text-gray-400 col-span-full py-12">Nessun ordine ricevuto al momento.</p>`;
+                grid.innerHTML = `<p class="text-center text-gray-400 col-span-full py-12 font-medium">Nessun ordine ricevuto al momento.</p>`;
                 return;
             }
 
             grid.innerHTML = "";
             orders.forEach((order, index) => {
                 const card = document.createElement("div");
-                card.className = "bg-white rounded-2xl shadow-sm border border-gray-200 p-4 flex flex-col justify-between";
+                card.className = "bg-white rounded-3xl shadow-sm border border-gray-200 p-5 flex flex-col justify-between";
                 
                 let itemsHtml = order.items.map(i => `
-                    <div class="text-sm py-1 border-b border-gray-100 last:border-none">
-                        <div class="flex justify-between font-semibold text-gray-800">
+                    <div class="text-sm py-1.5 border-b border-gray-100 last:border-none">
+                        <div class="flex justify-between font-bold text-gray-800">
                             <span>${i.qty}x ${i.name}</span>
                             <span>€ ${(i.price * i.qty).toFixed(2)}</span>
                         </div>
-                        <p class="text-xs text-orange-600 bg-orange-50 px-2 py-0.5 rounded mt-1 inline-block">Var: ${i.notes}</p>
+                        <p class="text-xs text-orange-600 bg-orange-50 px-2 py-0.5 rounded-lg mt-1 inline-block font-semibold">Var: ${i.notes}</p>
                     </div>
                 `).join('');
 
                 card.innerHTML = `
                     <div>
-                        <div class="flex justify-between items-start mb-2">
+                        <div class="flex justify-between items-start mb-3">
                             <div>
-                                <span class="text-xs font-bold text-gray-400">${order.id} - ${order.time}</span>
-                                <h3 class="font-bold text-lg text-gray-900">${order.client}</h3>
-                                <span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full font-medium">${order.table}</span>
+                                <span class="text-xs font-black text-gray-400">${order.id} • ${order.time}</span>
+                                <h3 class="font-black text-lg text-gray-900">${order.client}</h3>
+                                <span class="text-xs bg-gray-100 text-gray-600 px-2.5 py-0.5 rounded-full font-bold">${order.table}</span>
                             </div>
-                            <select onchange="updateOrderStatus(${index}, this.value)" class="text-xs font-semibold px-2.5 py-1.5 rounded-xl border border-gray-300 bg-white focus:outline-none">
+                            <select onchange="updateOrderStatus(${index}, this.value)" class="text-xs font-bold px-3 py-2 rounded-xl border border-gray-300 bg-white focus:outline-none shadow-sm">
                                 <option value="In attesa" ${order.status === 'In attesa' ? 'selected' : ''}>In attesa</option>
                                 <option value="In preparazione" ${order.status === 'In preparazione' ? 'selected' : ''}>In preparazione</option>
                                 <option value="Pronto" ${order.status === 'Pronto' ? 'selected' : ''}>Pronto</option>
                                 <option value="Inviato" ${order.status === 'Inviato' ? 'selected' : ''}>Inviato</option>
                             </select>
                         </div>
-                        <div class="my-3 space-y-1 bg-gray-50 p-3 rounded-xl max-h-40 overflow-y-auto">
+                        <div class="my-3 space-y-1 bg-gray-50 p-3.5 rounded-2xl max-h-48 overflow-y-auto">
                             ${itemsHtml}
                         </div>
                     </div>
                     <div>
-                        <div class="flex justify-between font-bold text-gray-900 mb-3 pt-2 border-t">
-                            <span>Totale Ordine:</span>
-                            <span class="text-orange-600">€ ${order.total.toFixed(2)}</span>
+                        <div class="flex justify-between font-black text-gray-900 mb-3 pt-3 border-t">
+                            <span>Totale:</span>
+                            <span class="text-orange-600 text-lg">€ ${order.total.toFixed(2)}</span>
                         </div>
-                        <button onclick="sendOrderToWhatsApp('${order.id}')" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-xl text-sm transition flex items-center justify-center gap-2 shadow-sm">
+                        <button onclick="sendOrderToWhatsApp('${order.id}')" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl text-sm transition flex items-center justify-center gap-2 shadow-md">
                             <i class="fa-brands fa-whatsapp text-lg"></i> Invia a WhatsApp
                         </button>
                     </div>
