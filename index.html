@@ -126,12 +126,21 @@
         </div>
     </div>
 
-    <!-- MODALE VARIAZIONE PRODOTTO -->
+    <!-- MODALE QUANTITA' E VARIAZIONE PRODOTTO -->
     <div id="variation-modal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl">
             <h3 id="modal-product-title" class="text-xl font-bold text-gray-900 mb-1"></h3>
             <p id="modal-product-price" class="text-orange-600 font-semibold mb-4"></p>
             
+            <div class="mb-4">
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Quantità</label>
+                <div class="flex items-center gap-3">
+                    <button type="button" onclick="decrementQty()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold w-10 h-10 rounded-xl text-lg">-</button>
+                    <input type="number" id="product-qty" value="1" min="1" class="w-20 text-center px-3 py-2 rounded-xl border border-gray-300 font-bold focus:outline-none">
+                    <button type="button" onclick="incrementQty()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold w-10 h-10 rounded-xl text-lg">+</button>
+                </div>
+            </div>
+
             <div class="mb-4">
                 <label class="block text-sm font-semibold text-gray-700 mb-1">Note / Variazioni personalizzate</label>
                 <textarea id="product-notes" rows="3" placeholder="Es. Senza cipolla, ben cotto, salsa a parte..." class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-orange-500 focus:outline-none text-sm"></textarea>
@@ -139,17 +148,15 @@
 
             <div class="flex gap-3">
                 <button onclick="closeVariationModal()" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-3 rounded-xl transition">Annulla</button>
-                <button onclick="confirmAddToCart()" class="flex-1 bg-orange-600 hover:bg-orange-700 text-white font-semibold py-3 rounded-xl transition">Aggiungi</button>
+                <button onclick="confirmAddToCart()" class="flex-1 bg-orange-600 hover:bg-orange-700 text-white font-semibold py-3 rounded-xl transition">Aggiungi al Carrello</button>
             </div>
         </div>
     </div>
 
     <!-- SCRIPT LOGICA APPLICATIVA -->
     <script>
-        // CONFIGURAZIONE WHATSAPP DELLA REGIA (Inserisci qui il numero di telefono es. 393331234567 senza il +)
-        const WHATSAPP_REGIA_NUMBER = "393331234567";
+        const WHATSAPP_REGIA_NUMBER = "393391318613";
 
-        // DATI DEL MENU ESTRAPOLATI
         const menuData = [
             {
                 category: "Antipasti",
@@ -157,7 +164,7 @@
                     { name: "MARTINICA", price: 12.00, desc: "Antipasto vegetariano composto da: Verdure Grigliate, Verdure Fritte, Verdure Ripiene, Crostini Misti. Servito con Torta al Testo (Nuovo, Vegetariano)" },
                     { name: "MONTSERRAT", price: 12.00, desc: "Bresaola, Rucola, Grana, Prosciutto Cotto, Funghi Champignon, Pomodoro Pachino. Servito con Torta al Testo (Nuovo)" },
                     { name: "NICARAGUA", price: 9.00, desc: "Antipasto di sole bruschette composto da: 3 Bruschette (4 Formaggi, Tartufata, Speck) e 3 Bruschette (Mozzarella, Salsiccia, Zucchine, Olio aromatizzato) (Nuovo)" },
-                    { name: "TAGLIERE NOSTRANO", price: 10.00, desc: "Selezione di affettati e formaggi accompagnato da Torta al Testo." }
+                    { name: "TAGLIERE NOSTRANO", price: 10.00, desc: "Selezione di affettati e formaggi accompagnato da Torta al Testo. (Aggiunta di Bruschette € 2,00)" }
                 ]
             },
             {
@@ -172,33 +179,94 @@
                     { name: "PALA ESTIVA", price: 10.00, desc: "Mozzarella fior di latte, Pomodoro pachino, Rucola, Mozzarella a crudo." },
                     { name: "GENOVESE", price: 11.00, desc: "Mozzarella fior di latte, Crema di zucca, Alici, Pomodori secchi, Stracciatella fresca, Gocce di pesto." },
                     { name: "MORTADELLA", price: 11.00, desc: "Mozzarella fior di latte, Mortadella al pistacchio, Granelle di pistacchio, Stracciatella fresca." },
-                    { name: "ALLE NOCI", price: 12.00, desc: "Mozzarella fior di latte, Gorgonzola, Speck, Pere, Noci." }
+                    { name: "ALLE NOCI", price: 12.00, desc: "Mozzarella fior di latte, Gorgonzola, Speck, Pere, Noci." },
+                    { name: "BROCCOLI", price: 11.00, desc: "Mozzarella fior di latte, Provola affumicata, Broccoli saltati in padella, Salsiccia, Patate aromatizzate." },
+                    { name: "LA FONTINA", price: 11.00, desc: "Mozzarella fior di latte, Crema di zucca gialla, Fontina valdostana, Sella di San Venanzo." },
+                    { name: "LARDOSA", price: 12.00, desc: "Mozzarella fior di latte, Lardo di Colonnata, Crema di carciofi, Carciofi saltati, Pomodori semi secchi, Bufala." },
+                    { name: "'NDUJA DI SPILINGA", price: 12.00, desc: "Pomodoro, Mozzarella fior di latte, Crema di 'nduja calabrese, Cipolla rossa, Peperoni, Peperoncino." }
                 ]
             },
             {
                 category: "Pizze Rosse",
                 items: [
-                    { name: "CUBA", price: 10.00, desc: "Pomodoro, Mozzarella fior di latte, Cipolla rossa, Peperoni, Crema di 'nduja calabrese, Spolverata di peperoncino (Nuovo)" },
+                    { name: "CUBA", price: 10.00, desc: "Pomodoro, Mozzarella fior di latte, Cipolla rossa, Peperoni, Crema di 'nduja calabrese, Peperoncino (Nuovo)" },
                     { name: "GRENADA (PERUGINA)", price: 7.00, desc: "Pomodoro, Mozzarella fior di latte, Salsiccia." },
                     { name: "LEVANTE (BISMARK)", price: 7.50, desc: "Pomodoro, Mozzarella fior di latte, Uovo alla coque, Speck." },
+                    { name: "CALABRESE", price: 7.50, desc: "Pomodoro, Mozzarella fior di latte, Salame piccante, Pom. semi secchi, Capriccio mediterraneo." },
+                    { name: "EL GUAPO", price: 8.50, desc: "Pomodoro, Mozzarella fior di latte, Salame piccante, Salsiccia, Salsa piccante Harissa, Capperi." },
+                    { name: "GEORGE TOWN", price: 7.50, desc: "Solo pomodoro, Verdure miste grigliate, Origano (con olio aromatizzato all'aglio)." },
+                    { name: "MANZANILLA", price: 7.50, desc: "Pomodoro, Mozzarella, Salsiccia, Funghi." },
+                    { name: "MARACAIBO", price: 8.00, desc: "Pomodoro, Mozzarella fior di latte, Funghi, Uovo, Carciofi, Crudo, Olive nere." },
+                    { name: "PANAMA", price: 7.50, desc: "Pomodoro, Mozzarella fior di latte, Salsa 4 formaggi, Prosciutto cotto, Gorgonzola." },
+                    { name: "SAINT VINCENT", price: 7.50, desc: "Pomodoro, Mozzarella fior di latte, Peperoni, Salsiccia." },
+                    { name: "PORT AU PRINCE", price: 7.50, desc: "Pomodoro, Mozzarella fior di latte, Funghi, Salame piccante." },
+                    { name: "SANTO DOMINGO", price: 7.50, desc: "Pomodoro, Mozzarella fior di latte, Salame piccante, 4 formaggi." },
+                    { name: "TOBAGO", price: 7.50, desc: "Pomodoro, Mozzarella fior di latte, Funghi, Crudo." },
+                    { name: "TORTOLA", price: 8.00, desc: "Pomodoro, Mozzarella fior di latte, Crudo, Funghi, Salsiccia, Peperoncino, Rucola, Grana (Nuovo)" },
                     { name: "MARGHERITA", price: 6.00, desc: "Pomodoro, Mozzarella fior di latte." }
                 ]
             },
             {
                 category: "Pizze Bianche",
                 items: [
-                    { name: "DOMINICA", price: 10.00, desc: "Mozzarella fior di latte, Mortadella al pistacchio, Granelle di pistacchio, Stracciatella Fresca (Nuovo)" },
+                    { name: "DOMINICA", price: 10.00, desc: "Mozzarella fior di latte, Mortadella al pistacchio, Granelle di pistacchio, Stracciatella (Nuovo)" },
                     { name: "NASSAU", price: 7.00, desc: "Mozzarella fior di latte, Pachino, Rucola, Mozzarella fresca." },
-                    { name: "ANTIGUA", price: 7.50, desc: "Mozzarella fior di latte, 4 formaggi, Salsa tartufata." }
+                    { name: "ANTIGUA", price: 7.50, desc: "Mozzarella fior di latte, 4 formaggi, Salsa tartufata." },
+                    { name: "BARRANQUILLA", price: 8.00, desc: "Mozzarella fior di latte, Salsa tartufata, Funghi, Salsiccia." },
+                    { name: "BELIZE", price: 7.50, desc: "Mozzarella fior di latte, Zucchine, Pancetta, Provola." },
+                    { name: "BERMUDA", price: 8.50, desc: "Mozzarella fior di latte, Gorgonzola, Speck, Pere, Noci." },
+                    { name: "BUFALINA", price: 8.50, desc: "Mozzarella di bufala, Pachino, Basilico, Origano." },
+                    { name: "CANCUN", price: 8.00, desc: "Mozzarella fior di latte, Bresaola, Rucola, Grana." },
+                    { name: "CARACAS", price: 8.50, desc: "Mozzarella fior di latte, Salmone, Rucola, Grana." },
+                    { name: "CARTAGENA", price: 7.50, desc: "Mozzarella fior di latte, Melanzane, Zucchine, Radicchio, Mais, Pachino." },
+                    { name: "ELEUTHERA", price: 7.50, desc: "Mozzarella fior di latte, Stracchino, Rucola, Crudo." },
+                    { name: "EMILIANA", price: 7.50, desc: "Mozzarella fior di latte, Capriccio di tartufo, Mortadella a julienne, Rosmarino." },
+                    { name: "GUADALUPA", price: 8.50, desc: "Mozzarella fior di latte, 4 formaggi, Porcini, Salsa di porcini." },
+                    { name: "JAMAICA", price: 8.00, desc: "Mozzarella fior di latte, Patate lesse, Salsiccia, Rosmarino." },
+                    { name: "KINGSTON (FOCACCIA)", price: 4.50, desc: "Focaccia classica con olio e rosmarino." },
+                    { name: "MAREMMANA", price: 8.00, desc: "Mozzarella fior di latte, Crema di zucca, Lardo di Colonnata." },
+                    { name: "PUERTO RICO", price: 9.00, desc: "Mozzarella fior di latte, 4 formaggi, Gamberetti in salsa rosa, Mais, Rucola." },
+                    { name: "TORTUGA", price: 8.00, desc: "Mozzarella fior di latte, 4 formaggi, Gorgonzola." }
                 ]
             },
             {
                 category: "Hamburger",
                 items: [
-                    { name: "BOMBARDINO", price: 14.00, desc: "220gr di Chianina succosa, Cheddar fuso a cascata, Bacon croccante, Cipolla caramellata, Jalapeno, Pomodoro, Lattuga, Salsa Galleon (No contorno, Nuovo)" },
-                    { name: "ARUBA", price: 12.00, desc: "Cotoletta di petto di pollo alla Milanese. Contorno Patate Fritte (Nuovo)" },
-                    { name: "PETTO DI POLLO ALLA GRIGLIA", price: 12.00, desc: "Petto di Pollo al piatto servito con Torta al Testo (Nuovo)" },
-                    { name: "CHEESEBURGER", price: 10.00, desc: "Hamburger di manzo 150 gr alla griglia, Pomodoro, Lattuga, Cipolla, Maionese, Salsa 4 formaggi, Cheddar, Gorgonzola (Servito con patate fritte)" }
+                    { name: "BOMBARDINO", price: 14.00, desc: "220gr Chianina, Cheddar, Bacon, Cipolla caramellata, Jalapeno, Pomodoro, Lattuga, Salsa Galleon (Nuovo)" },
+                    { name: "ARUBA", price: 12.00, desc: "Cotoletta di petto di pollo alla Milanese con Patate Fritte (Nuovo)" },
+                    { name: "BAHAMAS", price: 15.00, desc: "Hamburger di Scottona 220gr, Melanzane, Pom. semi secchi, Provola, Maionese, Patate arrosto (Nuovo)" },
+                    { name: "CURACAO", price: 14.00, desc: "Hamburger di Pollo 150gr, Maionese, Lattuga, Pomodoro, Verdure pastellate (Nuovo)" },
+                    { name: "PETTO DI POLLO ALLA GRIGLIA", price: 12.00, desc: "Con contorno a scelta e Torta al Testo (Nuovo)" },
+                    { name: "HAMBURGER AL PIATTO", price: 14.00, desc: "Chianina 220gr con contorno a scelta e torta al testo." },
+                    { name: "ANNIVERSARY BURGER", price: 15.00, desc: "Angus 220gr, Cheddar, Bacon, Pomodoro, Cipolla, Lattuga, Salsa B&B, Maionese." },
+                    { name: "ALESSIA'S BURGER", price: 15.00, desc: "Manzo 150gr, Burrata, Pom. semi secchi, Mortadella, Maionese, Rucola, Olio al basilico." },
+                    { name: "BEEF BURGER", price: 13.00, desc: "Manzo 150gr, Ragù di manzo, Melanzane, Zucchine, Mozzarella alla piastra, Lattuga." },
+                    { name: "ANTONIO'S", price: 15.00, desc: "Chianina 220gr, Mozzarella fresca, 4 formaggi, Salsa rosa, Bacon, Rucola." },
+                    { name: "PETER'S", price: 15.00, desc: "Chianina 220gr, Salsa piccante, Sottiletta, Cipolla fritta, Cetrioli, Pomodoro, Ketchup." },
+                    { name: "DOUBLE BACON BURGER", price: 15.00, desc: "Fassona 200gr, Doppio bacon, Cheddar, Cipolla caramellata, Insalata, Pomodoro, Beconaise." },
+                    { name: "CABOTO", price: 9.00, desc: "Manzo 150gr, Salsa 4 formaggi, Harissa, Sottiletta, Salsa rosa, Crauti." },
+                    { name: "CABRAL", price: 9.00, desc: "Manzo 150gr, Bacon, Salsa Harissa, Maionese." },
+                    { name: "CHEESEBURGER", price: 10.00, desc: "Manzo 150gr, Pomodoro, Lattuga, Cipolla, Maionese, 4 formaggi, Cheddar, Gorgonzola." },
+                    { name: "HAMBURGER GALLEON", price: 9.50, desc: "Manzo 150gr, Amatriciana, Pecorino, Uovo, Pomodoro, Lattuga, Crema di mais." },
+                    { name: "NUNEZ", price: 9.00, desc: "Manzo 150gr, Pomodoro, Lattuga, Ketchup, Maionese." }
+                ]
+            },
+            {
+                category: "Tagliere & Panini",
+                items: [
+                    { name: "TAGLIERE NOSTRANO", price: 10.00, desc: "Affettati e formaggi nostrani con Torta al Testo." },
+                    { name: "EL PERUGINO", price: 9.00, desc: "Doppia salsiccia, Cipolla caramellata, Peperoni, Salsa piccante, Maionese, Emmental (con patate arrosto e bacon)." },
+                    { name: "BRIGANTINO", price: 7.00, desc: "Cotoletta di pollo, Lattuga, Pomodoro, Maionese (con patate fritte)." }
+                ]
+            },
+            {
+                category: "Piadine & Hot Dog",
+                items: [
+                    { name: "PIADINA con MORTADELLA", price: 12.00, desc: "Manzo 150gr, Burrata, Pom. semi secchi, Rucola, Mortadella, Maionese, Olio al basilico (Nuovo)" },
+                    { name: "CAPITANO", price: 6.50, desc: "Mozzarella fior di latte, Prosciutto crudo." },
+                    { name: "CHIANINA", price: 10.00, desc: "Chianina 100gr, Bacon, Cheddar, Insalata, Pomodoro, Cipolla, Ketchup, Maionese." },
+                    { name: "TEDESCO (Hot Dog)", price: 8.00, desc: "Wurstel di suino 90gr, Cipolla caramellata, Crauti, Ketchup, Maionese, Emmental." },
+                    { name: "A GONFIE VELE (Hot Dog)", price: 7.00, desc: "Wurstel di suino 90gr, Ketchup, Maionese (con patate fritte)." }
                 ]
             },
             {
@@ -206,24 +274,31 @@
                 items: [
                     { name: "JALAPENO PICCANTI VERDI", price: 6.00, desc: "5 Pezzi con cheddar (Nuovo)" },
                     { name: "FIORI DI ZUCCA", price: 6.00, desc: "4 Pz Fiori di zucca con alici (Nuovo)" },
+                    { name: "PATATE ARROSTO CON BACON", price: 4.00, desc: "Nuovo (Gluten Free)" },
                     { name: "ALETTE DI POLLO", price: 6.00, desc: "6 Pezzi" },
-                    { name: "PATATINE", price: 4.00, desc: "Patatine fritte classiche" }
+                    { name: "ANELLI DI CIPOLLA", price: 5.00, desc: "Anelli di cipolla fritti" },
+                    { name: "FATTO DA NOI", price: 10.00, desc: "2 Roll piccanti, 2 crocchette piccanti, 2 polpette al cheddar, 2 corn dog, patate scavate." },
+                    { name: "GRAN MIX", price: 10.00, desc: "Olive ascolane, mozzarelline, crocchette, chele di granchio, patatine fritte." },
+                    { name: "PATATINE", price: 4.00, desc: "Patatine fritte" },
+                    { name: "SUPPLI", price: 2.00, desc: "Al pezzo singolo" }
                 ]
             },
             {
                 category: "Dolci",
                 items: [
                     { name: "TORTA CHEESECAKE", price: 5.50, desc: "Frutti di bosco / Caramello / Nutella / Pistacchio" },
-                    { name: "SEMIFREDDO al PISTACCHIO", price: 6.00, desc: "Semifreddo artigianale al pistacchio (Nuovo)" },
-                    { name: "TIRAMISU'", price: 5.50, desc: "Tiramisù artigianale" }
+                    { name: "SEMIFREDDO al PISTACCHIO", price: 6.00, desc: "Semifreddo artigianale (Nuovo)" },
+                    { name: "TIRAMISU'", price: 5.50, desc: "Tiramisù artigianale" },
+                    { name: "TORTINO AL CIOCCOLATO", price: 5.50, desc: "Sufflé al cioccolato con cuore caldo" }
                 ]
             },
             {
                 category: "Bibite & Birre",
                 items: [
+                    { name: "ACQUA 1 L", price: 2.50, desc: "Acqua naturale o frizzante 1 Litro" },
                     { name: "COCA COLA 0,33 L", price: 3.00, desc: "Bottiglia 0,33 L" },
-                    { name: "ACQUA DA 1 LITRO N/F", price: 2.50, desc: "Acqua Naturale o Frizzante 1L" },
-                    { name: "CARLSBERG 0.4 L", price: 5.00, desc: "Birra alla spina Lager 0,4 L" }
+                    { name: "CARLSBERG 0.4 L", price: 5.00, desc: "Birra alla spina Lager 0,4 L" },
+                    { name: "CAFFÈ ESPRESSO", price: 1.50, desc: "Caffè espresso" }
                 ]
             }
         ];
@@ -233,7 +308,6 @@
         let currentSelectedProduct = null;
         let activeCategoryIndex = 0;
 
-        // Gestione Login Cliente
         document.getElementById("user-form").addEventListener("submit", function(e) {
             e.preventDefault();
             const name = document.getElementById("client-name").value.trim();
@@ -261,7 +335,6 @@
             document.getElementById("main-app").classList.remove("hidden");
         }
 
-        // Inizializzazione Menu
         function initMenu() {
             const nav = document.getElementById("category-nav");
             nav.innerHTML = "";
@@ -292,19 +365,19 @@
                         </div>
                         <p class="text-xs text-gray-500 mb-4">${item.desc}</p>
                     </div>
-                    <button onclick="openVariationModal(${catIndex}, ${itemIndex})" class="w-full bg-gray-50 hover:bg-orange-600 hover:text-white text-orange-600 border border-orange-200 font-semibold py-2.5 rounded-xl text-sm transition flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-plus"><span>Aggiungi con Variazione</span></i>
+                    <button onclick="openVariationModal(${catIndex}, ${itemIndex})" class="w-full bg-orange-50 hover:bg-orange-600 hover:text-white text-orange-600 border border-orange-200 font-semibold py-2.5 rounded-xl text-sm transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-plus"></i> <span>Aggiungi / Quantità / Variazioni</span>
                     </button>
                 `;
                 container.appendChild(card);
             });
         }
 
-        // Modale Variazioni
         function openVariationModal(catIdx, itemIdx) {
             currentSelectedProduct = menuData[catIdx].items[itemIdx];
             document.getElementById("modal-product-title").innerText = currentSelectedProduct.name;
-            document.getElementById("modal-product-price").innerText = `€ ${currentSelectedProduct.price.toFixed(2)}`;
+            document.getElementById("modal-product-price").innerText = `€ ${currentSelectedProduct.price.toFixed(2)} cad.`;
+            document.getElementById("product-qty").value = 1;
             document.getElementById("product-notes").value = "";
             document.getElementById("variation-modal").classList.remove("hidden");
         }
@@ -314,10 +387,25 @@
             currentSelectedProduct = null;
         }
 
+        function incrementQty() {
+            const input = document.getElementById("product-qty");
+            input.value = parseInt(input.value || 1) + 1;
+        }
+
+        function decrementQty() {
+            const input = document.getElementById("product-qty");
+            let val = parseInt(input.value || 1) - 1;
+            if (val < 1) val = 1;
+            input.value = val;
+        }
+
         function confirmAddToCart() {
+            const qty = parseInt(document.getElementById("product-qty").value) || 1;
             const notes = document.getElementById("product-notes").value.trim();
+
             cart.push({
                 ...currentSelectedProduct,
+                qty: qty,
                 notes: notes || "Nessuna variazione"
             });
             updateCartCount();
@@ -325,10 +413,10 @@
         }
 
         function updateCartCount() {
-            document.getElementById("cart-count").innerText = cart.length;
+            const totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
+            document.getElementById("cart-count").innerText = totalItems;
         }
 
-        // Carrello
         function openCart() {
             const container = document.getElementById("cart-items");
             container.innerHTML = "";
@@ -338,16 +426,22 @@
                 container.innerHTML = `<p class="text-center text-gray-400 py-10">Il tuo carrello è vuoto</p>`;
             } else {
                 cart.forEach((item, index) => {
-                    total += item.price;
+                    const subtotal = item.price * item.qty;
+                    total += subtotal;
                     const div = document.createElement("div");
-                    div.className = "bg-gray-50 p-3 rounded-xl border border-gray-200 flex justify-between items-start";
+                    div.className = "bg-gray-50 p-3 rounded-xl border border-gray-200 flex justify-between items-center";
                     div.innerHTML = `
                         <div>
-                            <h4 class="font-bold text-sm text-gray-900">${item.name}</h4>
-                            <p class="text-xs text-orange-600 font-medium">Nota: ${item.notes}</p>
-                            <p class="text-xs font-bold text-gray-700 mt-1">€ ${item.price.toFixed(2)}</p>
+                            <h4 class="font-bold text-sm text-gray-900">${item.qty}x ${item.name}</h4>
+                            <p class="text-xs text-orange-600 font-medium">Note: ${item.notes}</p>
+                            <p class="text-xs font-bold text-gray-700 mt-1">€ ${subtotal.toFixed(2)}</p>
                         </div>
-                        <button onclick="removeFromCart(${index})" class="text-red-500 hover:text-red-700 p-1"><i class="fa-solid fa-trash text-xs"></i></button>
+                        <div class="flex items-center gap-2">
+                            <button onclick="decreaseCartItem(${index})" class="bg-gray-200 hover:bg-gray-300 text-gray-800 w-7 h-7 rounded-lg font-bold text-sm">-</button>
+                            <span class="text-sm font-bold">${item.qty}</span>
+                            <button onclick="increaseCartItem(${index})" class="bg-gray-200 hover:bg-gray-300 text-gray-800 w-7 h-7 rounded-lg font-bold text-sm">+</button>
+                            <button onclick="removeFromCart(${index})" class="text-red-500 hover:text-red-700 ml-2 p-1"><i class="fa-solid fa-trash text-sm"></i></button>
+                        </div>
                     `;
                     container.appendChild(div);
                 });
@@ -359,6 +453,21 @@
 
         function closeCart() {
             document.getElementById("cart-modal").classList.add("hidden");
+        }
+
+        function increaseCartItem(index) {
+            cart[index].qty++;
+            updateCartCount();
+            openCart();
+        }
+
+        function decreaseCartItem(index) {
+            cart[index].qty--;
+            if (cart[index].qty <= 0) {
+                cart.splice(index, 1);
+            }
+            updateCartCount();
+            openCart();
         }
 
         function removeFromCart(index) {
@@ -375,7 +484,7 @@
                 client: currentUser.name,
                 table: currentUser.table,
                 items: [...cart],
-                total: cart.reduce((sum, item) => sum + item.price, 0),
+                total: cart.reduce((sum, item) => sum + (item.price * item.qty), 0),
                 status: 'In attesa',
                 time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
             };
@@ -390,7 +499,6 @@
             alert("Ordine inviato con successo alla Regia!");
         }
 
-        // Regia / Sincronizzazione in Tempo Reale
         function loadRegiaOrders() {
             const grid = document.getElementById("orders-grid");
             const orders = JSON.parse(localStorage.getItem('restaurant_orders') || '[]');
@@ -408,8 +516,8 @@
                 let itemsHtml = order.items.map(i => `
                     <div class="text-sm py-1 border-b border-gray-100 last:border-none">
                         <div class="flex justify-between font-semibold text-gray-800">
-                            <span>1x ${i.name}</span>
-                            <span>€ ${i.price.toFixed(2)}</span>
+                            <span>${i.qty}x ${i.name}</span>
+                            <span>€ ${(i.price * i.qty).toFixed(2)}</span>
                         </div>
                         <p class="text-xs text-orange-600 bg-orange-50 px-2 py-0.5 rounded mt-1 inline-block">Var: ${i.notes}</p>
                     </div>
@@ -465,14 +573,13 @@
             text += `Ora: ${order.time}%0A%0A`;
             text += `*Prodotti:*%0A`;
             order.items.forEach(i => {
-                text += `- ${i.name} (€ ${i.price.toFixed(2)})%0A  _Note: ${i.notes}_%0A`;
+                text += `- ${i.qty}x ${i.name} (€ ${(i.price * i.qty).toFixed(2)})%0A  _Note: ${i.notes}_%0A`;
             });
             text += `%0A*Totale: € ${order.total.toFixed(2)}*`;
 
             window.open(`https://wa.me/${WHATSAPP_REGIA_NUMBER}?text=${text}`, '_blank');
         }
 
-        // Aggiornamento automatico della regia ogni 2 secondi
         setInterval(() => {
             if(!document.getElementById("regia-app").classList.contains("hidden")) {
                 loadRegiaOrders();
