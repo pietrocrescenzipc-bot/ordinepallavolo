@@ -18,13 +18,13 @@
 <body class="bg-slate-50 text-slate-900 font-sans antialiased selection:bg-orange-500 selection:text-white">
 
     <!-- SCHERMATA LOGIN / BENVENUTO -->
-    <div id="login-screen" class="fixed inset-0 bg-slate-900/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
+    <div id="login-screen" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl border border-slate-100 text-center">
-            <div class="inline-block bg-orange-500 text-white text-[11px] font-black uppercase tracking-widest px-3.5 py-1.5 rounded-full mb-3 shadow-sm">
-                Servizio Asporto & Cucina
+            <div class="inline-block bg-orange-500 text-white text-[11px] font-black uppercase tracking-widest px-3.5 py-1.5 rounded-full mb-3 shadow-xs">
+                Asporto & Cucina
             </div>
             <h1 class="text-3xl font-black text-slate-900 tracking-tight mb-1">PMU & The Galleon</h1>
-            <p class="text-xs text-slate-500 mb-6 font-medium">Scegli i tuoi piatti preferiti e ordina in un click</p>
+            <p class="text-xs text-slate-500 mb-6 font-medium">Inserisci il tuo nome per iniziare l'ordine</p>
 
             <form id="user-form" class="space-y-4 text-left">
                 <div>
@@ -32,7 +32,7 @@
                     <input type="text" id="client-name" required placeholder="Es. Mario Rossi" class="w-full px-4 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 focus:bg-white focus:ring-2 focus:ring-orange-500 focus:outline-none font-bold text-slate-800 transition">
                 </div>
                 <button type="submit" class="w-full bg-orange-600 hover:bg-orange-700 active:scale-[0.98] text-white font-black py-4 rounded-2xl transition shadow-xl shadow-orange-600/25 text-base uppercase tracking-wide text-center">
-                    Esplora il Menu 🍕
+                    Entra nel Menu 🍕
                 </button>
             </form>
 
@@ -42,19 +42,18 @@
                 </button>
                 <span class="text-slate-300">|</span>
                 <span class="text-emerald-600 font-bold flex items-center gap-1">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Live Active
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Live Sync
                 </span>
             </div>
         </div>
     </div>
 
     <!-- APP PRINCIPALE CLIENTE -->
-    <div id="main-app" class="hidden min-h-screen flex flex-col bg-slate-100/50">
-        <!-- HEADER PROFESSIONALE STILE DELIVERY -->
+    <div id="main-app" class="hidden min-h-screen flex flex-col bg-slate-100/60">
+        <!-- HEADER STILE DELIVERY PROFESSIONALE -->
         <header class="bg-white shadow-xs sticky top-0 z-30 border-b border-slate-200/80">
-            <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="max-w-5xl mx-auto px-4 py-3.5 flex justify-between items-center">
                 <div class="flex items-center gap-3">
-                    <!-- BOTTONE MENU CON SCRITTA ESPLICITA -->
                     <button onclick="toggleSidebar()" class="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-800 px-3.5 py-2.5 rounded-2xl font-black text-xs transition border border-slate-200">
                         <i class="fa-solid fa-bars text-sm text-orange-600"></i>
                         <span>MENU</span>
@@ -65,18 +64,15 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-2">
-                    <!-- ICONA CARRELLO GRANDE E IN EVIDENZA -->
-                    <button onclick="openCart()" class="relative bg-orange-600 hover:bg-orange-700 active:scale-95 text-white px-4.5 py-2.5 rounded-2xl font-black flex items-center gap-2.5 transition shadow-lg shadow-orange-600/30">
+                    <button onclick="openCart()" class="relative bg-orange-600 hover:bg-orange-700 active:scale-95 text-white px-5 py-3 rounded-2xl font-black flex items-center gap-2.5 transition shadow-lg shadow-orange-600/30">
                         <i class="fa-solid fa-basket-shopping text-base"></i>
                         <span class="text-xs uppercase tracking-wide hidden sm:inline">Carrello</span>
                         <span id="cart-count" class="bg-white text-orange-600 text-xs w-5 h-5 rounded-full flex items-center justify-center font-black shadow-inner">0</span>
                     </button>
-                    <!-- BOTTONE REGIA RAPIDO -->
-                    <button onclick="switchToRegia()" class="bg-slate-900 hover:bg-slate-800 text-white px-3 py-2.5 rounded-2xl text-xs font-bold transition flex items-center gap-1.5" title="Regia">
+                    <button onclick="switchToRegia()" class="bg-slate-900 hover:bg-slate-800 text-white px-3 py-3 rounded-2xl text-xs font-bold transition flex items-center gap-1.5" title="Regia">
                         <i class="fa-solid fa-desktop"></i>
                     </button>
-                    <!-- BOTTONE ESCI / CAMBIA UTENTE (PER PIU' ORDINI SLLO STESSO TELEFONO) -->
-                    <button onclick="logoutClient()" class="bg-red-50 hover:bg-red-100 text-red-600 px-3 py-2.5 rounded-2xl text-xs font-bold transition border border-red-100 flex items-center gap-1" title="Esci / Nuovo Cliente">
+                    <button onclick="logoutClient()" class="bg-red-50 hover:bg-red-100 text-red-600 px-3 py-3 rounded-2xl text-xs font-bold transition border border-red-100 flex items-center gap-1" title="Esci / Nuovo Cliente">
                         <i class="fa-solid fa-right-from-bracket"></i>
                     </button>
                 </div>
@@ -86,7 +82,7 @@
         <!-- LAYOUT PRINCIPALE -->
         <div class="flex-1 max-w-5xl w-full mx-auto flex p-3 sm:p-4 gap-6 relative">
             
-            <!-- SIDEBAR CATEGORIE (DRAWER) -->
+            <!-- SIDEBAR CATEGORIE -->
             <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-72 bg-white shadow-2xl p-5 transform -translate-x-full transition-transform duration-300 md:translate-x-0 md:static md:w-64 md:shadow-none md:border-r md:border-slate-200/80 md:bg-transparent flex flex-col">
                 <div class="flex justify-between items-center mb-4 md:hidden">
                     <h3 class="font-black text-base text-slate-900">Categorie Menu</h3>
@@ -94,14 +90,14 @@
                 </div>
                 <h3 class="hidden md:block font-black text-[11px] uppercase tracking-wider text-slate-400 mb-3">Categorie</h3>
                 <div id="sidebar-category-list" class="space-y-1.5 overflow-y-auto flex-1 pr-1 no-scrollbar">
-                    <!-- Generate via JS -->
+                    <!-- Generato via JS -->
                 </div>
             </aside>
 
             <!-- OVERLAY MOBILE -->
             <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-slate-900/50 backdrop-blur-2xs z-30 hidden md:hidden"></div>
 
-            <!-- CONTENUTO CATALOGO STILE DELIVERY -->
+            <!-- CATALOGO PRODOTTI -->
             <main class="flex-1 w-full">
                 <div class="mb-4 flex justify-between items-center px-1 bg-white p-4 rounded-2xl border border-slate-200/80 shadow-2xs">
                     <div>
@@ -111,7 +107,7 @@
                     <span class="text-[11px] font-bold text-orange-600 bg-orange-50 px-3 py-1.5 rounded-xl border border-orange-100 shadow-2xs">Tocca per variare</span>
                 </div>
                 <div id="products-container" class="grid grid-cols-1 md:grid-cols-2 gap-3.5 pb-24">
-                    <!-- Generati via JS -->
+                    <!-- Generato via JS -->
                 </div>
             </main>
         </div>
@@ -119,22 +115,27 @@
 
     <!-- DASHBOARD REGIA -->
     <div id="regia-app" class="hidden min-h-screen bg-slate-100 flex flex-col">
-        <header class="bg-slate-900 text-white shadow-md">
+        <header class="bg-slate-900 text-white shadow-md sticky top-0 z-30">
             <div class="max-w-5xl mx-auto px-4 py-3.5 flex justify-between items-center">
                 <div class="flex items-center gap-2.5">
                     <div class="bg-orange-600 p-2 rounded-xl text-white"><i class="fa-solid fa-desktop text-sm"></i></div>
                     <h1 class="text-base font-black">Regia & Cucina (Live Sync)</h1>
                 </div>
-                <button onclick="switchToClient()" class="bg-slate-800 hover:bg-slate-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold transition">
-                    Torna al Menu Cliente
-                </button>
+                <div class="flex items-center gap-2">
+                    <button onclick="sendAllOrdersToWhatsApp()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 shadow-md">
+                        <i class="fa-brands fa-whatsapp text-sm">+</i> Invia Tutti su WhatsApp 📱
+                    </button>
+                    <button onclick="switchToClient()" class="bg-slate-800 hover:bg-slate-700 text-white px-3.5 py-2.5 rounded-xl text-xs font-bold transition">
+                        Menu Cliente
+                    </button>
+                </div>
             </div>
         </header>
         <main class="flex-1 max-w-5xl w-full mx-auto p-4">
             <div class="flex justify-between items-center mb-3">
                 <h2 class="text-sm font-black uppercase tracking-wider text-slate-500">Ordini in tempo reale</h2>
                 <span class="text-[11px] bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full font-bold flex items-center gap-1.5">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span> Firebase Attivo
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span> Firebase Connesso
                 </span>
             </div>
             <div id="orders-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -143,7 +144,7 @@
         </main>
     </div>
 
-    <!-- MODALE CARRELLO & GESTIONE ORDINE -->
+    <!-- MODALE CARRELLO -->
     <div id="cart-modal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-2xs z-50 hidden flex justify-end">
         <div class="bg-white w-full max-w-md h-full flex flex-col shadow-2xl animate-in slide-in-from-right duration-200">
             <div class="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
@@ -169,7 +170,7 @@
         </div>
     </div>
 
-    <!-- MODALE QUANTITA' E VARIAZIONI -->
+    <!-- MODALE VARIAZIONI -->
     <div id="variation-modal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-2xs z-50 hidden flex items-end sm:items-center justify-center sm:p-4">
         <div class="bg-white rounded-t-3xl sm:rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100">
             <div class="flex justify-between items-start mb-2">
@@ -190,8 +191,8 @@
             </div>
 
             <div class="mb-6">
-                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Note / Variazioni personalizzate</label>
-                <textarea id="product-notes" rows="2.5" placeholder="Es. Senza cipolla, ben cotto, salsa a parte..." class="w-full px-4 py-3 rounded-2xl bg-slate-50 border border-slate-200 focus:bg-white focus:ring-2 focus:ring-orange-500 focus:outline-none text-xs font-medium text-slate-800"></textarea>
+                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Note / Variazioni (facoltativo)</label>
+                <textarea id="product-notes" rows="2.5" placeholder="Es. Senza cipolla, ben cotto..." class="w-full px-4 py-3 rounded-2xl bg-slate-50 border border-slate-200 focus:bg-white focus:ring-2 focus:ring-orange-500 focus:outline-none text-xs font-medium text-slate-800"></textarea>
             </div>
 
             <div class="flex gap-3">
@@ -435,10 +436,9 @@
             initApp();
         });
 
-        // Funzione per uscire / cambiare utente e fare un nuovo ordine sullo stesso dispositivo
         function logoutClient() {
             if(cart.length > 0) {
-                if(!confirm("Hai dei prodotti nel carrello. Vuoi davvero uscire e svuotare il carrello?")) return;
+                if(!confirm("Hai dei prodotti nel carrello. Vuoi uscire e svuotare il carrello?")) return;
             }
             cart = [];
             activeOrderId = null;
@@ -550,7 +550,7 @@
             cart.push({
                 ...currentSelectedProduct,
                 qty: qty,
-                notes: notes || "Nessuna variazione"
+                notes: notes // Se vuota, non stamperemo nulla
             });
             updateCartCount();
             closeVariationModal();
@@ -574,10 +574,13 @@
                     total += subtotal;
                     const div = document.createElement("div");
                     div.className = "bg-slate-50 p-4 rounded-2xl border border-slate-200/80 flex justify-between items-center";
+                    
+                    let noteHtml = item.notes ? `<p class="text-xs text-orange-600 font-bold mt-0.5">Nota: ${item.notes}</p>` : '';
+
                     div.innerHTML = `
                         <div class="flex-1 pr-2">
                             <h4 class="font-black text-sm text-slate-900">${item.qty}x ${item.name}</h4>
-                            <p class="text-xs text-orange-600 font-bold mt-0.5">Nota: ${item.notes}</p>
+                            ${noteHtml}
                             <p class="text-xs font-bold text-slate-700 mt-1">€ ${subtotal.toFixed(2)}</p>
                         </div>
                         <div class="flex items-center gap-1.5 bg-white p-1.5 rounded-xl border border-slate-200 shadow-2xs">
@@ -652,7 +655,7 @@
             db.ref('restaurant_orders/' + newOrderId).set(newOrder).then(() => {
                 activeOrderId = newOrderId;
                 closeCart();
-                alert("Ordine inviato con successo alla Regia! Puoi modificarlo in ogni momento dal carrello.");
+                alert("Ordine inviato con successo alla Regia!");
             }).catch(err => {
                 alert("Errore di invio, riprova.");
             });
@@ -669,7 +672,7 @@
 
             db.ref('restaurant_orders/' + activeOrderId).update(updatedData).then(() => {
                 closeCart();
-                alert("Ordine aggiornato con successo in Regia in tempo reale! 🔄");
+                alert("Ordine aggiornato in tempo reale con la Regia! 🔄");
             }).catch(err => {
                 alert("Errore nell'aggiornamento.");
             });
@@ -692,15 +695,18 @@
                     const card = document.createElement("div");
                     card.className = "bg-white rounded-3xl shadow-xs border border-slate-200/80 p-5 flex flex-col justify-between";
                     
-                    let itemsHtml = order.items.map(i => `
-                        <div class="text-xs py-1.5 border-b border-slate-100 last:border-none">
-                            <div class="flex justify-between font-bold text-slate-800">
-                                <span>${i.qty}x ${i.name}</span>
-                                <span>€ ${(i.price * i.qty).toFixed(2)}</span>
+                    let itemsHtml = order.items.map(i => {
+                        let noteBlock = i.notes ? `<p class="text-[11px] text-orange-600 bg-orange-50 px-2 py-0.5 rounded-md mt-1 inline-block font-semibold">Var: ${i.notes}</p>` : '';
+                        return `
+                            <div class="text-xs py-1.5 border-b border-slate-100 last:border-none">
+                                <div class="flex justify-between font-bold text-slate-800">
+                                    <span>${i.qty}x ${i.name}</span>
+                                    <span>€ ${(i.price * i.qty).toFixed(2)}</span>
+                                </div>
+                                ${noteBlock}
                             </div>
-                            <p class="text-[11px] text-orange-600 bg-orange-50 px-2 py-0.5 rounded-md mt-1 inline-block font-semibold">Var: ${i.notes}</p>
-                        </div>
-                    `).join('');
+                        `;
+                    }).join('');
 
                     card.innerHTML = `
                         <div>
@@ -720,14 +726,9 @@
                                 ${itemsHtml}
                             </div>
                         </div>
-                        <div>
-                            <div class="flex justify-between font-black text-slate-900 mb-3 pt-3 border-t border-slate-100 text-sm">
-                                <span>Totale:</span>
-                                <span class="text-orange-600 text-base">€ ${order.total.toFixed(2)}</span>
-                            </div>
-                            <button onclick="sendOrderToWhatsApp('${order.id}')" class="w-full bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] text-white font-bold py-3.5 rounded-2xl text-xs transition flex items-center justify-center gap-2 shadow-md">
-                                <i class="fa-brands fa-whatsapp text-base"></i> Invia a WhatsApp
-                            </button>
+                        <div class="flex justify-between font-black text-slate-900 pt-3 border-t border-slate-100 text-sm items-center">
+                            <span>Totale:</span>
+                            <span class="text-orange-600 text-base">€ ${order.total.toFixed(2)}</span>
                         </div>
                     `;
                     grid.appendChild(card);
@@ -739,20 +740,31 @@
             db.ref('restaurant_orders/' + orderId + '/status').set(newStatus);
         }
 
-        function sendOrderToWhatsApp(orderId) {
-            db.ref('restaurant_orders/' + orderId).once('value', snapshot => {
-                const order = snapshot.val();
-                if(!order) return;
+        // Funzione per inviare TUTTI gli ordini cumulativi su WhatsApp
+        function sendAllOrdersToWhatsApp() {
+            db.ref('restaurant_orders').once('value', snapshot => {
+                const data = snapshot.val();
+                if(!data) return alert("Nessun ordine presente da inviare.");
 
-                let text = `*NUOVO ORDINE ASPORTO*%0A`;
-                text += `ID: ${order.id}%0A`;
-                text += `Cliente: *${order.client}*%0A`;
-                text += `Ora: ${order.time}%0A%0A`;
-                text += `*Prodotti:*%0A`;
-                order.items.forEach(i => {
-                    text += `- ${i.qty}x ${i.name} (€ ${(i.price * i.qty).toFixed(2)})%0A  _Note: ${i.notes}_%0A`;
+                const orders = Object.values(data);
+                let text = `*riepilogo COMPLESSIVO ORDINI ASPORTO*%0A%0A`;
+                
+                let grandTotal = 0;
+                orders.forEach(order => {
+                    text += `-----------------------------------%0A`;
+                    text += `Cliente: *${order.client}* (${order.time}) [%id: ${order.id}]%0A`;
+                    order.items.forEach(i => {
+                        text += `• ${i.qty}x ${i.name} (€ ${(i.price * i.qty).toFixed(2)})%0A`;
+                        if(i.notes) {
+                            text += `  _Nota: ${i.notes}_%0A`;
+                        }
+                    });
+                    text += `*Totale Cliente: € ${order.total.toFixed(2)}*%0A`;
+                    grandTotal += order.total;
                 });
-                text += `%0A*Totale: € ${order.total.toFixed(2)}*`;
+                
+                text += `-----------------------------------%0A`;
+                text += `*TOTALE GENERALE: € ${grandTotal.toFixed(2)}*`;
 
                 window.open(`https://wa.me/${WHATSAPP_REGIA_NUMBER}?text=${text}`, '_blank');
             });
