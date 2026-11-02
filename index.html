@@ -106,6 +106,7 @@
                     </div>
                     <span class="text-[11px] font-bold text-orange-600 bg-orange-50 px-3 py-1.5 rounded-xl border border-orange-100">Tocca per variare</span>
                 </div>
+                <!-- BORDO FISSO SEMPRE ATTIVO (border-4 border-slate-300 shadow-md) -->
                 <div id="products-container" class="grid grid-cols-1 md:grid-cols-2 gap-4 pb-24">
                     <!-- Generato via JS -->
                 </div>
@@ -507,7 +508,8 @@
 
             cat.items.forEach((item, itemIndex) => {
                 const card = document.createElement("div");
-                card.className = "bg-white p-5 rounded-3xl border-4 border-slate-300 shadow-lg flex flex-col justify-between active:scale-[0.99] transition cursor-pointer hover:border-orange-500 group";
+                // BORDI SPESSI E FISSI SEMPRE ATTIVI (border-4 border-slate-300 shadow-md)
+                card.className = "bg-white p-5 rounded-3xl border-4 border-slate-300 shadow-md flex flex-col justify-between active:scale-[0.99] transition cursor-pointer hover:border-orange-500 group";
                 card.onclick = () => openVariationModal(catIndex, itemIndex);
                 card.innerHTML = `
                     <div>
@@ -758,7 +760,6 @@
             }
         }
 
-        // Funzione WhatsApp pulita, in colonna, senza prezzi e con variazioni in corsivo
         function sendAllOrdersToWhatsApp() {
             db.ref('restaurant_orders').once('value', snapshot => {
                 const data = snapshot.val();
