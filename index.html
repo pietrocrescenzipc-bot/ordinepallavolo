@@ -123,7 +123,7 @@
                 </div>
                 <div class="flex items-center gap-2">
                     <button onclick="sendAllOrdersToWhatsApp()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-2 shadow-md">
-                        <i class="fa-brands fa-whatsapp text-sm">+</i> Invia Tutti su WhatsApp 📱
+                        <i class="fa-brands fa-whatsapp text-sm"></i> Invia Tutti su WhatsApp 📱
                     </button>
                     <button onclick="switchToClient()" class="bg-slate-800 hover:bg-slate-700 text-white px-3.5 py-2.5 rounded-xl text-xs font-bold transition">
                         Menu Cliente
@@ -740,19 +740,18 @@
             db.ref('restaurant_orders/' + orderId + '/status').set(newStatus);
         }
 
-        // Funzione per inviare TUTTI gli ordini cumulativi su WhatsApp
         function sendAllOrdersToWhatsApp() {
             db.ref('restaurant_orders').once('value', snapshot => {
                 const data = snapshot.val();
                 if(!data) return alert("Nessun ordine presente da inviare.");
 
                 const orders = Object.values(data);
-                let text = `*riepilogo COMPLESSIVO ORDINI ASPORTO*%0A%0A`;
+                let text = `*RIEPILOGO COMPLESSIVO ORDINI ASPORTO*%0A%0A`;
                 
                 let grandTotal = 0;
                 orders.forEach(order => {
                     text += `-----------------------------------%0A`;
-                    text += `Cliente: *${order.client}* (${order.time}) [%id: ${order.id}]%0A`;
+                    text += `Cliente: *${order.client}* (${order.time}) [ID: ${order.id}]%0A`;
                     order.items.forEach(i => {
                         text += `• ${i.qty}x ${i.name} (€ ${(i.price * i.qty).toFixed(2)})%0A`;
                         if(i.notes) {
