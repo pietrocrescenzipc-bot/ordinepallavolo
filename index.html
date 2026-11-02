@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>PMU & The Galleon • Delivery & Asporto</title>
-    <!-- Tailwind CSS (Design System Flutter-like) -->
+    <!-- Tailwind CSS (Design System Flutter-like con bordi rinforzati) -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <!-- Firebase SDKs -->
@@ -106,6 +106,7 @@
                     </div>
                     <span class="text-[11px] font-bold text-orange-600 bg-orange-50 px-3 py-1.5 rounded-xl border border-orange-100">Tocca per variare</span>
                 </div>
+                <!-- QUI È STATO MODIFICATO: border-2 border-slate-200/90 e shadow-md per renderle molto più marcate e visibili -->
                 <div id="products-container" class="grid grid-cols-1 md:grid-cols-2 gap-4 pb-24">
                     <!-- Generato via JS -->
                 </div>
@@ -503,17 +504,18 @@
 
             cat.items.forEach((item, itemIndex) => {
                 const card = document.createElement("div");
-                card.className = "bg-white p-5 rounded-3xl border border-slate-200/60 shadow-2xs flex flex-col justify-between active:scale-[0.99] transition cursor-pointer hover:border-orange-400 group";
+                // QUI HO RESO IL BORDO E L'OMBRA MOLTO PIÙ FORTI E MARCATI (border-2 border-slate-200/90 shadow-md)
+                card.className = "bg-white p-5 rounded-3xl border-2 border-slate-200/90 shadow-md flex flex-col justify-between active:scale-[0.99] transition cursor-pointer hover:border-orange-500 group";
                 card.onclick = () => openVariationModal(catIndex, itemIndex);
                 card.innerHTML = `
                     <div>
                         <div class="flex justify-between items-start gap-2 mb-2">
                             <h3 class="font-black text-slate-900 text-sm sm:text-base tracking-tight group-hover:text-orange-600 transition">${item.name}</h3>
-                            <span class="bg-orange-50 text-orange-600 font-black px-3 py-1.5 rounded-xl text-xs sm:text-sm whitespace-nowrap">€ ${item.price.toFixed(2)}</span>
+                            <span class="bg-orange-50 text-orange-600 font-black px-3 py-1.5 rounded-xl text-xs sm:text-sm whitespace-nowrap border border-orange-100">€ ${item.price.toFixed(2)}</span>
                         </div>
                         <p class="text-xs text-slate-500 leading-relaxed mb-4">${item.desc}</p>
                     </div>
-                    <div class="w-full bg-orange-50 group-hover:bg-orange-600 group-hover:text-white text-orange-600 font-black py-3 rounded-2xl text-xs transition flex items-center justify-center gap-2 shadow-2xs">
+                    <div class="w-full bg-orange-50 group-hover:bg-orange-600 group-hover:text-white text-orange-600 font-black py-3 rounded-2xl text-xs transition flex items-center justify-center gap-2 shadow-xs border border-orange-100/60">
                         <i class="fa-solid fa-plus text-xs"></i> <span>Aggiungi al carrello</span>
                     </div>
                 `;
