@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ordini Asporto - Real Time</title>
+    <!-- Tailwind CSS per una grafica moderna e pulita -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased">
+
+    <!-- SCHERMATA LOGIN / NOME CLIENTE -->
+    <div id="login-screen" class="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl">
+            <div class="text-center mb-6">
+                <div class="bg-orange-100 text-orange-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-3 text-2xl font-bold">
+                    <i class="fa-solid fa-utensils"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-gray-900">Benvenuto!</h2>
+                <p class="text-sm text-gray-500">Inserisci i tuoi dati per procedere con l'ordine d'asporto</p>
+            </div>
+            <form id="user-form" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Il tuo Nome *</label>
+                    <input type="text" id="client-name" required placeholder="Es. Mario Rossi" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-orange-500 focus:outline-none">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Tavolo / Riferimento Asporto (Opzionale)</label>
+                    <input type="text" id="client-table" placeholder="Es. Asporto ore 20:30 o Tavolo 4" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-orange-500 focus:outline-none">
+                </div>
+                <button type="submit" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-3.5 rounded-xl transition shadow-lg shadow-orange-600/30">
+                    Entra nel Menu
+                </button>
+            </form>
+            <div class="mt-6 border-t pt-4 text-center">
+                <button onclick="switchToRegia()" class="text-xs text-gray-400 hover:text-gray-600 underline">
+                    Sei lo staff? Accedi alla Regia
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- APP PRINCIPALE -->
+    <div id="main-app" class="hidden min-h-screen flex flex-col">
+        <!-- HEADER -->
+        <header class="bg-white shadow-sm sticky top-0 z-30">
+            <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
+                <div>
+                    <h1 class="font-bold text-lg text-orange-600 flex items-center gap-2">
+                        <i class="fa-solid fa-fire"></i> Ordini Asporto
+                    </h1>
+                    <p class="text-xs text-gray-500">Cliente: <span id="display-client-name" class="font-semibold text-gray-700"></span></p>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button onclick="openCart()" class="relative bg-orange-50 text-orange-600 px-4 py-2 rounded-xl font-semibold flex items-center gap-2 border border-orange-200 hover:bg-orange-100 transition">
+                        <i class="fa-solid fa-shopping-bag"></i>
+                        <span id="cart-count" class="bg-orange-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">0</span>
+                    </button>
+                    <button onclick="switchToRegia()" class="bg-gray-800 text-white px-3 py-2 rounded-xl text-xs font-semibold hover:bg-gray-900 transition">
+                        Regia
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- CONTENUTO CATALOGO / MENU -->
+        <main class="flex-1 max-w-5xl w-full mx-auto p-4 pb-24">
+            <!-- Navigazione Categorie -->
+            <div id="category-nav" class="flex gap-2 overflow-x-auto pb-3 mb-4 scrollbar-none">
+                <!-- Generate via JS -->
+            </div>
+
+            <!-- Lista Prodotti -->
+            <div id="products-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Generati via JS -->
+            </div>
+        </main>
+    </div>
+
+    <!-- DASHBOARD REGIA -->
+    <div id="regia-app" class="hidden min-h-screen bg-gray-100 flex flex-col">
+        <header class="bg-gray-900 text-white shadow">
+            <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <div class="bg-orange-600 p-2 rounded-lg"><i class="fa-solid fa-desktop"></i></div>
+                    <h1 class="text-xl font-bold">Dashboard Regia & Cucina</h1>
+                </div>
+                <button onclick="switchToClient()" class="bg-gray-800 hover:bg-gray-700 text-white px-4 py-2 rounded-xl text-sm font-semibold transition">
+                    Torna al Menu Cliente
+                </button>
+            </div>
+        </header>
+        <main class="flex-1 max-w-6xl w-full mx-auto p-4">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-bold text-gray-700">Ordini in tempo reale</h2>
+                <span class="text-xs bg-green-100 text-green-700 px-3 py-1 rounded-full font-semibold flex items-center gap-1">
+                    <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span> Sincronizzato
+                </span>
+            </div>
+            <div id="orders-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Ordini dinamici -->
+            </div>
+        </main>
+    </div>
+
+    <!-- MODALE CARRELLO -->
+    <div id="cart-modal" class="fixed inset-0 bg-black/50 z-50 hidden flex justify-end">
+        <div class="bg-white w-full max-w-md h-full flex flex-col shadow-2xl">
+            <div class="p-4 border-b flex justify-between items-center bg-gray-50">
+                <h2 class="font-bold text-lg text-gray-800">Il tuo Carrello</h2>
+                <button onclick="closeCart()" class="text-gray-400 hover:text-gray-600 text-xl font-bold">&times;</button>
+            </div>
+            <div id="cart-items" class="flex-1 overflow-y-auto p-4 space-y-3">
+                <!-- Elementi carrello -->
+            </div>
+            <div class="p-4 border-t bg-gray-50 space-y-3">
+                <div class="flex justify-between text-lg font-bold text-gray-900">
+                    <span>Totale:</span>
+                    <span id="cart-total">€ 0.00</span>
+                </div>
+                <button onclick="submitOrder()" class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-3.5 rounded-xl transition shadow-lg shadow-orange-600/30">
+                    Invia Ordine alla Regia
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODALE VARIAZIONE PRODOTTO -->
+    <div id="variation-modal" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl">
+            <h3 id="modal-product-title" class="text-xl font-bold text-gray-900 mb-1"></h3>
+            <p id="modal-product-price" class="text-orange-600 font-semibold mb-4"></p>
+            
+            <div class="mb-4">
+                <label class="block text-sm font-semibold text-gray-700 mb-1">Note / Variazioni personalizzate</label>
+                <textarea id="product-notes" rows="3" placeholder="Es. Senza cipolla, ben cotto, salsa a parte..." class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-orange-500 focus:outline-none text-sm"></textarea>
+            </div>
+
+            <div class="flex gap-3">
+                <button onclick="closeVariationModal()" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-3 rounded-xl transition">Annulla</button>
+                <button onclick="confirmAddToCart()" class="flex-1 bg-orange-600 hover:bg-orange-700 text-white font-semibold py-3 rounded-xl transition">Aggiungi</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPT LOGICA APPLICATIVA -->
+    <script>
+        // CONFIGURAZIONE WHATSAPP DELLA REGIA (Inserisci qui il numero di telefono es. 393331234567 senza il +)
+        const WHATSAPP_REGIA_NUMBER = "393331234567";
+
+        // DATI DEL MENU ESTRAPOLATI
+        const menuData = [
+            {
+                category: "Antipasti",
+                items: [
+                    { name: "MARTINICA", price: 12.00, desc: "Antipasto vegetariano composto da: Verdure Grigliate, Verdure Fritte, Verdure Ripiene, Crostini Misti. Servito con Torta al Testo (Nuovo, Vegetariano)" },
+                    { name: "MONTSERRAT", price: 12.00, desc: "Bresaola, Rucola, Grana, Prosciutto Cotto, Funghi Champignon, Pomodoro Pachino. Servito con Torta al Testo (Nuovo)" },
+                    { name: "NICARAGUA", price: 9.00, desc: "Antipasto di sole bruschette composto da: 3 Bruschette (4 Formaggi, Tartufata, Speck) e 3 Bruschette (Mozzarella, Salsiccia, Zucchine, Olio aromatizzato) (Nuovo)" },
+                    { name: "TAGLIERE NOSTRANO", price: 10.00, desc: "Selezione di affettati e formaggi accompagnato da Torta al Testo." }
+                ]
+            },
+            {
+                category: "Torte al Testo",
+                items: [
+                    { name: "TORTA AL TESTO", price: 8.50, desc: "Tipica torta umbra della tradizione fatta con acqua e farina, farcita con salsiccia, erba cotta e pecorino." }
+                ]
+            },
+            {
+                category: "Pizza alla Pala",
+                items: [
+                    { name: "PALA ESTIVA", price: 10.00, desc: "Mozzarella fior di latte, Pomodoro pachino, Rucola, Mozzarella a crudo." },
+                    { name: "GENOVESE", price: 11.00, desc: "Mozzarella fior di latte, Crema di zucca, Alici, Pomodori secchi, Stracciatella fresca, Gocce di pesto." },
+                    { name: "MORTADELLA", price: 11.00, desc: "Mozzarella fior di latte, Mortadella al pistacchio, Granelle di pistacchio, Stracciatella fresca." },
+                    { name: "ALLE NOCI", price: 12.00, desc: "Mozzarella fior di latte, Gorgonzola, Speck, Pere, Noci." }
+                ]
+            },
+            {
+                category: "Pizze Rosse",
+                items: [
+                    { name: "CUBA", price: 10.00, desc: "Pomodoro, Mozzarella fior di latte, Cipolla rossa, Peperoni, Crema di 'nduja calabrese, Spolverata di peperoncino (Nuovo)" },
+                    { name: "GRENADA (PERUGINA)", price: 7.00, desc: "Pomodoro, Mozzarella fior di latte, Salsiccia." },
+                    { name: "LEVANTE (BISMARK)", price: 7.50, desc: "Pomodoro, Mozzarella fior di latte, Uovo alla coque, Speck." },
+                    { name: "MARGHERITA", price: 6.00, desc: "Pomodoro, Mozzarella fior di latte." }
+                ]
+            },
+            {
+                category: "Pizze Bianche",
+                items: [
+                    { name: "DOMINICA", price: 10.00, desc: "Mozzarella fior di latte, Mortadella al pistacchio, Granelle di pistacchio, Stracciatella Fresca (Nuovo)" },
+                    { name: "NASSAU", price: 7.00, desc: "Mozzarella fior di latte, Pachino, Rucola, Mozzarella fresca." },
+                    { name: "ANTIGUA", price: 7.50, desc: "Mozzarella fior di latte, 4 formaggi, Salsa tartufata." }
+                ]
+            },
+            {
+                category: "Hamburger",
+                items: [
+                    { name: "BOMBARDINO", price: 14.00, desc: "220gr di Chianina succosa, Cheddar fuso a cascata, Bacon croccante, Cipolla caramellata, Jalapeno, Pomodoro, Lattuga, Salsa Galleon (No contorno, Nuovo)" },
+                    { name: "ARUBA", price: 12.00, desc: "Cotoletta di petto di pollo alla Milanese. Contorno Patate Fritte (Nuovo)" },
+                    { name: "PETTO DI POLLO ALLA GRIGLIA", price: 12.00, desc: "Petto di Pollo al piatto servito con Torta al Testo (Nuovo)" },
+                    { name: "CHEESEBURGER", price: 10.00, desc: "Hamburger di manzo 150 gr alla griglia, Pomodoro, Lattuga, Cipolla, Maionese, Salsa 4 formaggi, Cheddar, Gorgonzola (Servito con patate fritte)" }
+                ]
+            },
+            {
+                category: "Friggitoria",
+                items: [
+                    { name: "JALAPENO PICCANTI VERDI", price: 6.00, desc: "5 Pezzi con cheddar (Nuovo)" },
+                    { name: "FIORI DI ZUCCA", price: 6.00, desc: "4 Pz Fiori di zucca con alici (Nuovo)" },
+                    { name: "ALETTE DI POLLO", price: 6.00, desc: "6 Pezzi" },
+                    { name: "PATATINE", price: 4.00, desc: "Patatine fritte classiche" }
+                ]
+            },
+            {
+                category: "Dolci",
+                items: [
+                    { name: "TORTA CHEESECAKE", price: 5.50, desc: "Frutti di bosco / Caramello / Nutella / Pistacchio" },
+                    { name: "SEMIFREDDO al PISTACCHIO", price: 6.00, desc: "Semifreddo artigianale al pistacchio (Nuovo)" },
+                    { name: "TIRAMISU'", price: 5.50, desc: "Tiramisù artigianale" }
+                ]
+            },
+            {
+                category: "Bibite & Birre",
+                items: [
+                    { name: "COCA COLA 0,33 L", price: 3.00, desc: "Bottiglia 0,33 L" },
+                    { name: "ACQUA DA 1 LITRO N/F", price: 2.50, desc: "Acqua Naturale o Frizzante 1L" },
+                    { name: "CARLSBERG 0.4 L", price: 5.00, desc: "Birra alla spina Lager 0,4 L" }
+                ]
+            }
+        ];
+
+        let currentUser = { name: "", table: "" };
+        let cart = [];
+        let currentSelectedProduct = null;
+        let activeCategoryIndex = 0;
+
+        // Gestione Login Cliente
+        document.getElementById("user-form").addEventListener("submit", function(e) {
+            e.preventDefault();
+            const name = document.getElementById("client-name").value.trim();
+            const table = document.getElementById("client-table").value.trim();
+            if(!name) return;
+
+            currentUser = { name, table: table || "Asporto" };
+            document.getElementById("display-client-name").innerText = `${currentUser.name} (${currentUser.table})`;
+            
+            document.getElementById("login-screen").classList.add("hidden");
+            document.getElementById("main-app").classList.remove("hidden");
+            
+            initMenu();
+        });
+
+        function switchToRegia() {
+            document.getElementById("login-screen").classList.add("hidden");
+            document.getElementById("main-app").classList.add("hidden");
+            document.getElementById("regia-app").classList.remove("hidden");
+            loadRegiaOrders();
+        }
+
+        function switchToClient() {
+            document.getElementById("regia-app").classList.add("hidden");
+            document.getElementById("main-app").classList.remove("hidden");
+        }
+
+        // Inizializzazione Menu
+        function initMenu() {
+            const nav = document.getElementById("category-nav");
+            nav.innerHTML = "";
+            menuData.forEach((cat, index) => {
+                const btn = document.createElement("button");
+                btn.className = `px-4 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition ${index === activeCategoryIndex ? 'bg-orange-600 text-white shadow-md' : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'}`;
+                btn.innerText = cat.category;
+                btn.onclick = () => { activeCategoryIndex = index; initMenu(); };
+                nav.appendChild(btn);
+            });
+
+            renderProducts(activeCategoryIndex);
+        }
+
+        function renderProducts(catIndex) {
+            const container = document.getElementById("products-container");
+            container.innerHTML = "";
+            const cat = menuData[catIndex];
+
+            cat.items.forEach((item, itemIndex) => {
+                const card = document.createElement("div");
+                card.className = "bg-white p-4 rounded-2xl border border-gray-200 shadow-sm flex flex-col justify-between hover:shadow-md transition";
+                card.innerHTML = `
+                    <div>
+                        <div class="flex justify-between items-start gap-2 mb-1">
+                            <h3 class="font-bold text-gray-900">${item.name}</h3>
+                            <span class="bg-orange-50 text-orange-600 font-bold px-2.5 py-1 rounded-lg text-sm">€ ${item.price.toFixed(2)}</span>
+                        </div>
+                        <p class="text-xs text-gray-500 mb-4">${item.desc}</p>
+                    </div>
+                    <button onclick="openVariationModal(${catIndex}, ${itemIndex})" class="w-full bg-gray-50 hover:bg-orange-600 hover:text-white text-orange-600 border border-orange-200 font-semibold py-2.5 rounded-xl text-sm transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-plus"><span>Aggiungi con Variazione</span></i>
+                    </button>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Modale Variazioni
+        function openVariationModal(catIdx, itemIdx) {
+            currentSelectedProduct = menuData[catIdx].items[itemIdx];
+            document.getElementById("modal-product-title").innerText = currentSelectedProduct.name;
+            document.getElementById("modal-product-price").innerText = `€ ${currentSelectedProduct.price.toFixed(2)}`;
+            document.getElementById("product-notes").value = "";
+            document.getElementById("variation-modal").classList.remove("hidden");
+        }
+
+        function closeVariationModal() {
+            document.getElementById("variation-modal").classList.add("hidden");
+            currentSelectedProduct = null;
+        }
+
+        function confirmAddToCart() {
+            const notes = document.getElementById("product-notes").value.trim();
+            cart.push({
+                ...currentSelectedProduct,
+                notes: notes || "Nessuna variazione"
+            });
+            updateCartCount();
+            closeVariationModal();
+        }
+
+        function updateCartCount() {
+            document.getElementById("cart-count").innerText = cart.length;
+        }
+
+        // Carrello
+        function openCart() {
+            const container = document.getElementById("cart-items");
+            container.innerHTML = "";
+            let total = 0;
+
+            if(cart.length === 0) {
+                container.innerHTML = `<p class="text-center text-gray-400 py-10">Il tuo carrello è vuoto</p>`;
+            } else {
+                cart.forEach((item, index) => {
+                    total += item.price;
+                    const div = document.createElement("div");
+                    div.className = "bg-gray-50 p-3 rounded-xl border border-gray-200 flex justify-between items-start";
+                    div.innerHTML = `
+                        <div>
+                            <h4 class="font-bold text-sm text-gray-900">${item.name}</h4>
+                            <p class="text-xs text-orange-600 font-medium">Nota: ${item.notes}</p>
+                            <p class="text-xs font-bold text-gray-700 mt-1">€ ${item.price.toFixed(2)}</p>
+                        </div>
+                        <button onclick="removeFromCart(${index})" class="text-red-500 hover:text-red-700 p-1"><i class="fa-solid fa-trash text-xs"></i></button>
+                    `;
+                    container.appendChild(div);
+                });
+            }
+
+            document.getElementById("cart-total").innerText = `€ ${total.toFixed(2)}`;
+            document.getElementById("cart-modal").classList.remove("hidden");
+        }
+
+        function closeCart() {
+            document.getElementById("cart-modal").classList.add("hidden");
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            updateCartCount();
+            openCart();
+        }
+
+        function submitOrder() {
+            if(cart.length === 0) return alert("Il carrello è vuoto!");
+
+            const newOrder = {
+                id: 'ORD-' + Math.floor(1000 + Math.random() * 9000),
+                client: currentUser.name,
+                table: currentUser.table,
+                items: [...cart],
+                total: cart.reduce((sum, item) => sum + item.price, 0),
+                status: 'In attesa',
+                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            };
+
+            let orders = JSON.parse(localStorage.getItem('restaurant_orders') || '[]');
+            orders.unshift(newOrder);
+            localStorage.setItem('restaurant_orders', JSON.stringify(orders));
+
+            cart = [];
+            updateCartCount();
+            closeCart();
+            alert("Ordine inviato con successo alla Regia!");
+        }
+
+        // Regia / Sincronizzazione in Tempo Reale
+        function loadRegiaOrders() {
+            const grid = document.getElementById("orders-grid");
+            const orders = JSON.parse(localStorage.getItem('restaurant_orders') || '[]');
+
+            if(orders.length === 0) {
+                grid.innerHTML = `<p class="text-center text-gray-400 col-span-full py-12">Nessun ordine ricevuto al momento.</p>`;
+                return;
+            }
+
+            grid.innerHTML = "";
+            orders.forEach((order, index) => {
+                const card = document.createElement("div");
+                card.className = "bg-white rounded-2xl shadow-sm border border-gray-200 p-4 flex flex-col justify-between";
+                
+                let itemsHtml = order.items.map(i => `
+                    <div class="text-sm py-1 border-b border-gray-100 last:border-none">
+                        <div class="flex justify-between font-semibold text-gray-800">
+                            <span>1x ${i.name}</span>
+                            <span>€ ${i.price.toFixed(2)}</span>
+                        </div>
+                        <p class="text-xs text-orange-600 bg-orange-50 px-2 py-0.5 rounded mt-1 inline-block">Var: ${i.notes}</p>
+                    </div>
+                `).join('');
+
+                card.innerHTML = `
+                    <div>
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <span class="text-xs font-bold text-gray-400">${order.id} - ${order.time}</span>
+                                <h3 class="font-bold text-lg text-gray-900">${order.client}</h3>
+                                <span class="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full font-medium">${order.table}</span>
+                            </div>
+                            <select onchange="updateOrderStatus(${index}, this.value)" class="text-xs font-semibold px-2.5 py-1.5 rounded-xl border border-gray-300 bg-white focus:outline-none">
+                                <option value="In attesa" ${order.status === 'In attesa' ? 'selected' : ''}>In attesa</option>
+                                <option value="In preparazione" ${order.status === 'In preparazione' ? 'selected' : ''}>In preparazione</option>
+                                <option value="Pronto" ${order.status === 'Pronto' ? 'selected' : ''}>Pronto</option>
+                                <option value="Inviato" ${order.status === 'Inviato' ? 'selected' : ''}>Inviato</option>
+                            </select>
+                        </div>
+                        <div class="my-3 space-y-1 bg-gray-50 p-3 rounded-xl max-h-40 overflow-y-auto">
+                            ${itemsHtml}
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between font-bold text-gray-900 mb-3 pt-2 border-t">
+                            <span>Totale Ordine:</span>
+                            <span class="text-orange-600">€ ${order.total.toFixed(2)}</span>
+                        </div>
+                        <button onclick="sendOrderToWhatsApp('${order.id}')" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2.5 rounded-xl text-sm transition flex items-center justify-center gap-2 shadow-sm">
+                            <i class="fa-brands fa-whatsapp text-lg"></i> Invia a WhatsApp
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function updateOrderStatus(index, newStatus) {
+            let orders = JSON.parse(localStorage.getItem('restaurant_orders') || '[]');
+            orders[index].status = newStatus;
+            localStorage.setItem('restaurant_orders', JSON.stringify(orders));
+        }
+
+        function sendOrderToWhatsApp(orderId) {
+            let orders = JSON.parse(localStorage.getItem('restaurant_orders') || '[]');
+            let order = orders.find(o => o.id === orderId);
+            if(!order) return;
+
+            let text = `*NUOVO ORDINE ASPORTO*%0A`;
+            text += `ID: ${order.id}%0A`;
+            text += `Cliente: *${order.client}* (${order.table})%0A`;
+            text += `Ora: ${order.time}%0A%0A`;
+            text += `*Prodotti:*%0A`;
+            order.items.forEach(i => {
+                text += `- ${i.name} (€ ${i.price.toFixed(2)})%0A  _Note: ${i.notes}_%0A`;
+            });
+            text += `%0A*Totale: € ${order.total.toFixed(2)}*`;
+
+            window.open(`https://wa.me/${WHATSAPP_REGIA_NUMBER}?text=${text}`, '_blank');
+        }
+
+        // Aggiornamento automatico della regia ogni 2 secondi
+        setInterval(() => {
+            if(!document.getElementById("regia-app").classList.contains("hidden")) {
+                loadRegiaOrders();
+            }
+        }, 2000);
+    </script>
+</body>
+</html>
