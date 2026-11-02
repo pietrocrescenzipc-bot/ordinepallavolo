@@ -15,28 +15,35 @@
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
-<body class="bg-stone-50 text-stone-900 font-sans antialiased selection:bg-orange-500 selection:text-white">
+<body class="bg-stone-100 text-stone-900 font-sans antialiased selection:bg-orange-500 selection:text-white">
 
-    <!-- SCHERMATA LOGIN (SOLO NOME) -->
-    <div id="login-screen" class="fixed inset-0 bg-stone-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-sm w-full p-6 sm:p-8 shadow-2xl border border-stone-100">
-            <div class="text-center mb-6">
-                <div class="bg-orange-50 text-orange-600 w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4 text-2xl shadow-sm border border-orange-100">
-                    <i class="fa-solid fa-utensils"></i>
-                </div>
-                <h2 class="text-2xl font-black text-stone-900 tracking-tight">Benvenuto</h2>
-                <p class="text-xs text-stone-500 mt-1">Inserisci il tuo nome per iniziare l'ordine</p>
+    <!-- SCHERMATA LOGIN STILE FAST FOOD (NOME LOCALE IN EVIDENZA) -->
+    <div id="login-screen" class="fixed inset-0 bg-stone-900/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-sm w-full p-8 shadow-2xl border border-stone-100 text-center">
+            <div class="inline-block bg-orange-500 text-white text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full mb-3 shadow-xs">
+                Asporto & Cucina
             </div>
+            <h1 class="text-3xl font-black text-stone-900 tracking-tight mb-1">PMU & The Galleon</h1>
+            <p class="text-xs text-stone-500 mb-6">Il menu digitale rapido e intuitivo</p>
+
+            <div class="bg-stone-50 p-4 rounded-2xl mb-6 border border-stone-200/60">
+                <div class="w-12 h-12 bg-orange-100 text-orange-600 rounded-xl flex items-center justify-center mx-auto mb-2 text-xl font-bold">
+                    <i class="fa-solid fa-burger"></i>
+                </div>
+                <h3 class="font-bold text-sm text-stone-800">Pronto a ordinare?</h3>
+                <p class="text-[11px] text-stone-500 mt-0.5">Inserisci il tuo nome per iniziare l'esperienza</p>
+            </div>
+
             <form id="user-form" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-stone-500 mb-1.5">Il tuo Nome *</label>
+                <div class="text-left">
+                    <label class="block text-[11px] font-bold uppercase tracking-wider text-stone-500 mb-1.5">Il tuo Nome *</label>
                     <input type="text" id="client-name" required placeholder="Es. Mario Rossi" class="w-full px-4 py-3.5 rounded-2xl bg-stone-50 border border-stone-200 focus:bg-white focus:ring-2 focus:ring-orange-500 focus:outline-none font-bold text-stone-800 transition">
                 </div>
-                <button type="submit" class="w-full bg-orange-600 hover:bg-orange-700 active:scale-[0.98] text-white font-bold py-4 rounded-2xl transition shadow-lg shadow-orange-600/25 text-base">
-                    Apri il Menu 🍕
+                <button type="submit" class="w-full bg-orange-600 hover:bg-orange-700 active:scale-[0.98] text-white font-black py-4 rounded-2xl transition shadow-lg shadow-orange-600/30 text-base uppercase tracking-wide">
+                    Ordina Ora 🚀
                 </button>
             </form>
-            <div class="mt-6 border-t border-stone-100 pt-4 text-center">
+            <div class="mt-6 border-t border-stone-100 pt-4">
                 <button onclick="switchToRegia()" class="text-xs font-bold text-stone-400 hover:text-stone-700 transition">
                     🔒 Accesso Staff / Regia Cucina
                 </button>
@@ -46,24 +53,25 @@
 
     <!-- APP PRINCIPALE CLIENTE -->
     <div id="main-app" class="hidden min-h-screen flex flex-col">
-        <!-- HEADER FISSO -->
-        <header class="bg-white/90 backdrop-blur-md shadow-xs sticky top-0 z-30 border-b border-stone-100">
+        <!-- HEADER STILE FAST FOOD CON CARRELLO GRANDE -->
+        <header class="bg-white shadow-xs sticky top-0 z-30 border-b border-stone-200/60">
             <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
                 <div class="flex items-center gap-3">
-                    <button onclick="toggleSidebar()" class="text-stone-700 hover:text-orange-600 p-2 rounded-xl text-lg transition bg-stone-100/80">
+                    <button onclick="toggleSidebar()" class="bg-stone-100 hover:bg-stone-200 text-stone-800 w-11 h-11 rounded-2xl flex items-center justify-center text-lg transition">
                         <i class="fa-solid fa-bars"></i>
                     </button>
                     <div>
-                        <h1 class="font-black text-sm text-stone-900 leading-tight">Asporto</h1>
-                        <p class="text-[11px] text-stone-500 font-medium">Cliente: <span id="display-client-name" class="font-bold text-orange-600"></span></p>
+                        <span class="text-[10px] font-black text-orange-600 uppercase tracking-widest block">Ordini Online</span>
+                        <h1 class="font-black text-base text-stone-900 leading-tight">PMU & The Galleon</h1>
                     </div>
                 </div>
                 <div class="flex items-center gap-2">
-                    <button onclick="openCart()" class="relative bg-orange-50 text-orange-600 px-4 py-2.5 rounded-xl font-bold flex items-center gap-2 border border-orange-100 hover:bg-orange-100 transition shadow-xs">
-                        <i class="fa-solid fa-bag-shopping"></i>
-                        <span id="cart-count" class="bg-orange-600 text-white text-[11px] w-5 h-5 rounded-full flex items-center justify-center font-black">0</span>
+                    <button onclick="openCart()" class="relative bg-orange-600 hover:bg-orange-700 text-white px-5 py-3 rounded-2xl font-black flex items-center gap-3 transition shadow-md shadow-orange-600/30 active:scale-95">
+                        <i class="fa-solid fa-basket-shopping text-lg"></i>
+                        <span class="text-xs tracking-wide uppercase hidden sm:inline">Carrello</span>
+                        <span id="cart-count" class="bg-white text-orange-600 text-xs w-6 h-6 rounded-full flex items-center justify-center font-black shadow-inner">0</span>
                     </button>
-                    <button onclick="switchToRegia()" class="bg-stone-900 text-white px-3 py-2.5 rounded-xl text-xs font-bold hover:bg-stone-800 transition">
+                    <button onclick="switchToRegia()" class="bg-stone-900 hover:bg-stone-800 text-white px-3.5 py-3 rounded-2xl text-xs font-bold transition hidden sm:block">
                         Regia
                     </button>
                 </div>
@@ -74,7 +82,7 @@
         <div class="flex-1 max-w-5xl w-full mx-auto flex p-4 gap-6 relative">
             
             <!-- SIDEBAR CATEGORIE (DRAWER) -->
-            <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-72 bg-white shadow-2xl p-5 transform -translate-x-full transition-transform duration-300 md:translate-x-0 md:static md:w-64 md:shadow-none md:border-r md:border-stone-100 md:bg-transparent flex flex-col">
+            <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-72 bg-white shadow-2xl p-5 transform -translate-x-full transition-transform duration-300 md:translate-x-0 md:static md:w-64 md:shadow-none md:border-r md:border-stone-200/60 md:bg-transparent flex flex-col">
                 <div class="flex justify-between items-center mb-4 md:hidden">
                     <h3 class="font-black text-base text-stone-900">Categorie Menu</h3>
                     <button onclick="toggleSidebar()" class="text-stone-400 hover:text-stone-700 text-2xl font-bold">&times;</button>
@@ -91,10 +99,10 @@
             <!-- CONTENUTO PRODOTTI -->
             <main class="flex-1 w-full">
                 <div class="mb-4 flex justify-between items-center px-1">
-                    <h2 id="current-category-title" class="text-xl font-black text-stone-900">Antipasti</h2>
-                    <span class="text-[11px] font-bold text-stone-400 bg-stone-200/60 px-2.5 py-1 rounded-full">Tocca per ordinare</span>
+                    <h2 id="current-category-title" class="text-2xl font-black text-stone-900 tracking-tight">Antipasti</h2>
+                    <span class="text-[11px] font-bold text-stone-500 bg-white px-3 py-1.5 rounded-xl border border-stone-200/60 shadow-2xs">Tocca per personalizzare</span>
                 </div>
-                <div id="products-container" class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pb-24">
+                <div id="products-container" class="grid grid-cols-1 sm:grid-cols-2 gap-4 pb-24">
                     <!-- Generati via JS -->
                 </div>
             </main>
@@ -127,12 +135,12 @@
         </main>
     </div>
 
-    <!-- MODALE CARRELLO -->
+    <!-- MODALE CARRELLO & GESTIONE ORDINE ATTIVO -->
     <div id="cart-modal" class="fixed inset-0 bg-stone-900/70 backdrop-blur-xs z-50 hidden flex justify-end">
         <div class="bg-white w-full max-w-md h-full flex flex-col shadow-2xl animate-in slide-in-from-right duration-200">
-            <div class="p-4 border-b border-stone-100 flex justify-between items-center bg-stone-50/50">
+            <div class="p-4 border-b border-stone-100 flex justify-between items-center bg-stone-50">
                 <h2 class="font-black text-base text-stone-900 flex items-center gap-2">
-                    <i class="fa-solid fa-bag-shopping text-orange-600"></i> Il tuo Carrello
+                    <i class="fa-solid fa-basket-shopping text-orange-600"></i> Il tuo Carrello
                 </h2>
                 <button onclick="closeCart()" class="text-stone-400 hover:text-stone-700 text-2xl font-bold w-8 h-8 flex items-center justify-center">&times;</button>
             </div>
@@ -140,13 +148,15 @@
                 <!-- Elementi carrello -->
             </div>
             <div class="p-4 border-t border-stone-100 bg-stone-50 space-y-3">
-                <div class="flex justify-between text-base font-black text-stone-900">
+                <div class="flex justify-between text-lg font-black text-stone-900">
                     <span>Totale:</span>
-                    <span id="cart-total" class="text-orange-600 text-lg">€ 0.00</span>
+                    <span id="cart-total" class="text-orange-600">€ 0.00</span>
                 </div>
-                <button onclick="submitOrder()" class="w-full bg-orange-600 hover:bg-orange-700 active:scale-[0.98] text-white font-bold py-4 rounded-2xl transition shadow-lg shadow-orange-600/25 text-base">
-                    Invia Ordine alla Regia 🚀
-                </button>
+                <div id="cart-action-buttons" class="space-y-2">
+                    <button onclick="submitOrder()" class="w-full bg-orange-600 hover:bg-orange-700 active:scale-[0.98] text-white font-black py-4 rounded-2xl transition shadow-lg shadow-orange-600/30 text-base uppercase tracking-wide">
+                        Invia Ordine alla Regia 🚀
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -183,11 +193,10 @@
         </div>
     </div>
 
-    <!-- SCRIPT APPLICATIVO CON FIREBASE -->
+    <!-- SCRIPT APPLICATIVO -->
     <script>
         const WHATSAPP_REGIA_NUMBER = "393391318613";
 
-        // Configurazione Firebase
         const firebaseConfig = { databaseURL: "https://tombola-galleon-default-rtdb.firebaseio.com" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
@@ -289,7 +298,7 @@
             {
                 category: "Taglieri & Panini",
                 items: [
-                    { name: "TAGLIERE NOSTRANO", price: 10.00, desc: "Affettati e formaggi nostrani con Torta al Testo." },
+                    { name: "TAGLIERE NOSTRANO", price: 10.00, desc: "Affettati e formaggi nostrani (Prosciutto crudo, Sella, Capocollo, Salame, Salsiccia, Pecorino, Caciotta, Gorgonzola) con Torta al Testo." },
                     { name: "EL PERUGINO", price: 9.00, desc: "Doppia salsiccia, Cipolla caramellata, Peperoni, Salsa piccante, Maionese, Emmental (con patate arrosto e bacon)." },
                     { name: "BRIGANTINO", price: 7.00, desc: "Cotoletta di pollo, Lattuga, Pomodoro, Maionese (con patate fritte)." }
                 ]
@@ -404,6 +413,7 @@
         let cart = [];
         let currentSelectedProduct = null;
         let activeCategoryIndex = 0;
+        let activeOrderId = null; // Memorizza l'ID se l'utente ha già inviato un ordine e vuole modificarlo
 
         document.getElementById("user-form").addEventListener("submit", function(e) {
             e.preventDefault();
@@ -411,8 +421,6 @@
             if(!name) return;
 
             currentUser = name;
-            document.getElementById("display-client-name").innerText = currentUser;
-            
             document.getElementById("login-screen").classList.add("hidden");
             document.getElementById("main-app").classList.remove("hidden");
             
@@ -448,7 +456,7 @@
             list.innerHTML = "";
             menuData.forEach((cat, index) => {
                 const btn = document.createElement("button");
-                btn.className = `w-full text-left px-4 py-3 rounded-xl text-xs font-bold transition flex justify-between items-center ${index === activeCategoryIndex ? 'bg-orange-600 text-white shadow-sm shadow-orange-600/30' : 'text-stone-600 hover:bg-stone-100'}`;
+                btn.className = `w-full text-left px-4 py-3.5 rounded-2xl text-xs font-bold transition flex justify-between items-center ${index === activeCategoryIndex ? 'bg-orange-600 text-white shadow-sm shadow-orange-600/30' : 'text-stone-600 hover:bg-stone-100'}`;
                 btn.innerHTML = `<span>${cat.category}</span> <i class="fa-solid fa-chevron-right text-[10px] opacity-60"></i>`;
                 btn.onclick = () => {
                     activeCategoryIndex = index;
@@ -468,18 +476,18 @@
 
             cat.items.forEach((item, itemIndex) => {
                 const card = document.createElement("div");
-                card.className = "bg-white p-4 rounded-2xl border border-stone-200/80 shadow-2xs flex flex-col justify-between active:scale-[0.99] transition cursor-pointer hover:border-orange-300";
+                card.className = "bg-white p-5 rounded-3xl border border-stone-200/80 shadow-2xs flex flex-col justify-between active:scale-[0.99] transition cursor-pointer hover:border-orange-400 group";
                 card.onclick = () => openVariationModal(catIndex, itemIndex);
                 card.innerHTML = `
                     <div>
-                        <div class="flex justify-between items-start gap-2 mb-1.5">
-                            <h3 class="font-black text-stone-900 text-sm tracking-tight">${item.name}</h3>
-                            <span class="bg-orange-50 text-orange-600 font-black px-2.5 py-1 rounded-lg text-xs whitespace-nowrap">€ ${item.price.toFixed(2)}</span>
+                        <div class="flex justify-between items-start gap-2 mb-2">
+                            <h3 class="font-black text-stone-900 text-base tracking-tight group-hover:text-orange-600 transition">${item.name}</h3>
+                            <span class="bg-orange-50 text-orange-600 font-black px-3 py-1.5 rounded-xl text-sm whitespace-nowrap">€ ${item.price.toFixed(2)}</span>
                         </div>
-                        <p class="text-[11px] text-stone-500 leading-relaxed mb-3">${item.desc}</p>
+                        <p class="text-xs text-stone-500 leading-relaxed mb-4">${item.desc}</p>
                     </div>
-                    <div class="w-full bg-stone-50 text-orange-600 font-bold py-2 rounded-xl text-xs transition flex items-center justify-center gap-1.5 border border-orange-100/60">
-                        <i class="fa-solid fa-plus text-[10px]"></i> <span>Ordina / Varia</span>
+                    <div class="w-full bg-orange-50 group-hover:bg-orange-600 group-hover:text-white text-orange-600 font-black py-3 rounded-2xl text-xs transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-plus text-xs"></i> <span>Aggiungi al carrello</span>
                     </div>
                 `;
                 container.appendChild(card);
@@ -489,7 +497,7 @@
         function openVariationModal(catIdx, itemIdx) {
             currentSelectedProduct = menuData[catIdx].items[itemIdx];
             document.getElementById("modal-product-title").innerText = currentSelectedProduct.name;
-            document.getElementById("modal-product-price").innerText = `Prezzo: € ${currentSelectedProduct.price.toFixed(2)}`;
+            document.getElementById("modal-product-price").innerText = `Prezzo unitario: € ${currentSelectedProduct.price.toFixed(2)}`;
             document.getElementById("product-qty").value = 1;
             document.getElementById("product-notes").value = "";
             document.getElementById("variation-modal").classList.remove("hidden");
@@ -542,14 +550,14 @@
                     const subtotal = item.price * item.qty;
                     total += subtotal;
                     const div = document.createElement("div");
-                    div.className = "bg-stone-50 p-3 rounded-2xl border border-stone-200/60 flex justify-between items-center";
+                    div.className = "bg-stone-50 p-4 rounded-2xl border border-stone-200/60 flex justify-between items-center";
                     div.innerHTML = `
                         <div class="flex-1 pr-2">
-                            <h4 class="font-black text-xs text-stone-900">${item.qty}x ${item.name}</h4>
-                            <p class="text-[11px] text-orange-600 font-bold mt-0.5">Nota: ${item.notes}</p>
+                            <h4 class="font-black text-sm text-stone-900">${item.qty}x ${item.name}</h4>
+                            <p class="text-xs text-orange-600 font-bold mt-0.5">Nota: ${item.notes}</p>
                             <p class="text-xs font-bold text-stone-700 mt-1">€ ${subtotal.toFixed(2)}</p>
                         </div>
-                        <div class="flex items-center gap-1.5 bg-white p-1 rounded-xl border border-stone-200 shadow-2xs">
+                        <div class="flex items-center gap-1.5 bg-white p-1.5 rounded-xl border border-stone-200 shadow-2xs">
                             <button onclick="decreaseCartItem(${index})" class="bg-stone-100 text-stone-800 w-7 h-7 rounded-lg font-bold text-xs flex items-center justify-center">-</button>
                             <span class="text-xs font-black px-1">${item.qty}</span>
                             <button onclick="increaseCartItem(${index})" class="bg-stone-100 text-stone-800 w-7 h-7 rounded-lg font-bold text-xs flex items-center justify-center">+</button>
@@ -561,6 +569,23 @@
             }
 
             document.getElementById("cart-total").innerText = `€ ${total.toFixed(2)}`;
+            
+            // Cambia la dicitura del pulsante se l'utente ha già un ordine attivo da aggiornare
+            const actionContainer = document.getElementById("cart-action-buttons");
+            if(activeOrderId) {
+                actionContainer.innerHTML = `
+                    <button onclick="updateExistingOrder()" class="w-full bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] text-white font-black py-4 rounded-2xl transition shadow-lg shadow-emerald-600/30 text-base uppercase tracking-wide">
+                        Aggiorna Ordine in Regia 🔄
+                    </button>
+                `;
+            } else {
+                actionContainer.innerHTML = `
+                    <button onclick="submitOrder()" class="w-full bg-orange-600 hover:bg-orange-700 active:scale-[0.98] text-white font-black py-4 rounded-2xl transition shadow-lg shadow-orange-600/30 text-base uppercase tracking-wide">
+                        Invia Ordine alla Regia 🚀
+                    </button>
+                `;
+            }
+
             document.getElementById("cart-modal").classList.remove("hidden");
         }
 
@@ -589,12 +614,12 @@
             openCart();
         }
 
-        // --- GESTIONE ORDINI CON FIREBASE ---
         function submitOrder() {
             if(cart.length === 0) return alert("Il carrello è vuoto!");
 
+            const newOrderId = 'ORD-' + Math.floor(1000 + Math.random() * 9000);
             const newOrder = {
-                id: 'ORD-' + Math.floor(1000 + Math.random() * 9000),
+                id: newOrderId,
                 client: currentUser,
                 items: [...cart],
                 total: cart.reduce((sum, item) => sum + (item.price * item.qty), 0),
@@ -602,13 +627,29 @@
                 time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
             };
 
-            db.ref('restaurant_orders/' + newOrder.id).set(newOrder).then(() => {
-                cart = [];
-                updateCartCount();
+            db.ref('restaurant_orders/' + newOrderId).set(newOrder).then(() => {
+                activeOrderId = newOrderId; // Memorizza l'ID per future modifiche in tempo reale
                 closeCart();
-                alert("Ordine inviato con successo alla Regia!");
+                alert("Ordine inviato con successo alla Regia! Puoi modificarlo in ogni momento dal carrello.");
             }).catch(err => {
                 alert("Errore di invio, riprova.");
+            });
+        }
+
+        function updateExistingOrder() {
+            if(!activeOrderId) return submitOrder();
+            if(cart.length === 0) return alert("Il carrello è vuoto!");
+
+            const updatedData = {
+                items: [...cart],
+                total: cart.reduce((sum, item) => sum + (item.price * item.qty), 0)
+            };
+
+            db.ref('restaurant_orders/' + activeOrderId).update(updatedData).then(() => {
+                closeCart();
+                alert("Ordine aggiornato con successo in Regia in tempo reale! 🔄");
+            }).catch(err => {
+                alert("Errore nell'aggiornamento.");
             });
         }
 
@@ -627,7 +668,7 @@
 
                 orders.forEach((order) => {
                     const card = document.createElement("div");
-                    card.className = "bg-white rounded-3xl shadow-xs border border-stone-200/80 p-4 flex flex-col justify-between";
+                    card.className = "bg-white rounded-3xl shadow-xs border border-stone-200/80 p-5 flex flex-col justify-between";
                     
                     let itemsHtml = order.items.map(i => `
                         <div class="text-xs py-1.5 border-b border-stone-100 last:border-none">
@@ -644,25 +685,25 @@
                             <div class="flex justify-between items-start mb-3">
                                 <div>
                                     <span class="text-[10px] font-black text-stone-400">${order.id} • ${order.time}</span>
-                                    <h3 class="font-black text-base text-stone-900">${order.client}</h3>
+                                    <h3 class="font-black text-lg text-stone-900">${order.client}</h3>
                                 </div>
-                                <select onchange="updateOrderStatus('${order.id}', this.value)" class="text-xs font-bold px-2.5 py-1.5 rounded-xl border border-stone-200 bg-stone-50 focus:outline-none">
+                                <select onchange="updateOrderStatus('${order.id}', this.value)" class="text-xs font-bold px-3 py-2 rounded-xl border border-stone-200 bg-stone-50 focus:outline-none shadow-xs">
                                     <option value="In attesa" ${order.status === 'In attesa' ? 'selected' : ''}>In attesa</option>
                                     <option value="In preparazione" ${order.status === 'In preparazione' ? 'selected' : ''}>In preparazione</option>
                                     <option value="Pronto" ${order.status === 'Pronto' ? 'selected' : ''}>Pronto</option>
                                     <option value="Inviato" ${order.status === 'Inviato' ? 'selected' : ''}>Inviato</option>
                                 </select>
                             </div>
-                            <div class="my-2.5 space-y-1 bg-stone-50 p-3 rounded-2xl max-h-44 overflow-y-auto border border-stone-100">
+                            <div class="my-3 space-y-1 bg-stone-50 p-3.5 rounded-2xl max-h-44 overflow-y-auto border border-stone-100">
                                 ${itemsHtml}
                             </div>
                         </div>
                         <div>
-                            <div class="flex justify-between font-black text-stone-900 mb-3 pt-2.5 border-t border-stone-100 text-sm">
+                            <div class="flex justify-between font-black text-stone-900 mb-3 pt-3 border-t border-stone-100 text-sm">
                                 <span>Totale:</span>
-                                <span class="text-orange-600">€ ${order.total.toFixed(2)}</span>
+                                <span class="text-orange-600 text-base">€ ${order.total.toFixed(2)}</span>
                             </div>
-                            <button onclick="sendOrderToWhatsApp('${order.id}')" class="w-full bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] text-white font-bold py-3 rounded-xl text-xs transition flex items-center justify-center gap-2 shadow-sm">
+                            <button onclick="sendOrderToWhatsApp('${order.id}')" class="w-full bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] text-white font-bold py-3.5 rounded-2xl text-xs transition flex items-center justify-center gap-2 shadow-md">
                                 <i class="fa-brands fa-whatsapp text-base"></i> Invia a WhatsApp
                             </button>
                         </div>
