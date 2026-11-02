@@ -54,7 +54,7 @@
         <header class="bg-white shadow-xs sticky top-0 z-30 border-b border-slate-200/80">
             <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
                 <div class="flex items-center gap-3">
-                    <!-- BOTTONE MENU CON SCRITTA ESPLICITA COME RICHIESTO -->
+                    <!-- BOTTONE MENU CON SCRITTA ESPLICITA -->
                     <button onclick="toggleSidebar()" class="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-800 px-3.5 py-2.5 rounded-2xl font-black text-xs transition border border-slate-200">
                         <i class="fa-solid fa-bars text-sm text-orange-600"></i>
                         <span>MENU</span>
@@ -64,7 +64,7 @@
                         <h1 class="font-black text-sm sm:text-base text-slate-900 leading-tight">PMU & The Galleon</h1>
                     </div>
                 </div>
-                <div class="flex items-center gap-2.5">
+                <div class="flex items-center gap-2">
                     <!-- ICONA CARRELLO GRANDE E IN EVIDENZA -->
                     <button onclick="openCart()" class="relative bg-orange-600 hover:bg-orange-700 active:scale-95 text-white px-4.5 py-2.5 rounded-2xl font-black flex items-center gap-2.5 transition shadow-lg shadow-orange-600/30">
                         <i class="fa-solid fa-basket-shopping text-base"></i>
@@ -72,8 +72,12 @@
                         <span id="cart-count" class="bg-white text-orange-600 text-xs w-5 h-5 rounded-full flex items-center justify-center font-black shadow-inner">0</span>
                     </button>
                     <!-- BOTTONE REGIA RAPIDO -->
-                    <button onclick="switchToRegia()" class="bg-slate-900 hover:bg-slate-800 text-white px-3 py-2.5 rounded-2xl text-xs font-bold transition flex items-center gap-1.5">
-                        <i class="fa-solid fa-desktop"></i> <span class="hidden sm:inline">Regia</span>
+                    <button onclick="switchToRegia()" class="bg-slate-900 hover:bg-slate-800 text-white px-3 py-2.5 rounded-2xl text-xs font-bold transition flex items-center gap-1.5" title="Regia">
+                        <i class="fa-solid fa-desktop"></i>
+                    </button>
+                    <!-- BOTTONE ESCI / CAMBIA UTENTE (PER PIU' ORDINI SLLO STESSO TELEFONO) -->
+                    <button onclick="logoutClient()" class="bg-red-50 hover:bg-red-100 text-red-600 px-3 py-2.5 rounded-2xl text-xs font-bold transition border border-red-100 flex items-center gap-1" title="Esci / Nuovo Cliente">
+                        <i class="fa-solid fa-right-from-bracket"></i>
                     </button>
                 </div>
             </div>
@@ -430,6 +434,21 @@
             
             initApp();
         });
+
+        // Funzione per uscire / cambiare utente e fare un nuovo ordine sullo stesso dispositivo
+        function logoutClient() {
+            if(cart.length > 0) {
+                if(!confirm("Hai dei prodotti nel carrello. Vuoi davvero uscire e svuotare il carrello?")) return;
+            }
+            cart = [];
+            activeOrderId = null;
+            currentUser = "";
+            document.getElementById("client-name").value = "";
+            updateCartCount();
+            document.getElementById("main-app").classList.add("hidden");
+            document.getElementById("regia-app").classList.add("hidden");
+            document.getElementById("login-screen").classList.remove("hidden");
+        }
 
         function toggleSidebar() {
             const sidebar = document.getElementById("sidebar");
