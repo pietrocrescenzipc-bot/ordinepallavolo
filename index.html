@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>PMU & The Galleon • Delivery & Asporto</title>
-    <!-- Tailwind CSS (Design System Flutter-like con bordi rinforzati) -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <!-- Firebase SDKs -->
@@ -20,25 +20,25 @@
 
     <!-- SCHERMATA LOGIN / BENVENUTO -->
     <div id="login-screen" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-[2.5rem] max-w-sm w-full p-8 shadow-2xl border border-slate-100 text-center animate-in fade-in zoom-in-95 duration-200">
+        <div class="bg-white rounded-[2.5rem] max-w-sm w-full p-8 shadow-2xl border border-slate-100 text-center">
             <div class="w-16 h-16 bg-orange-50 text-orange-600 rounded-2xl flex items-center justify-center mx-auto mb-4 text-2xl font-bold shadow-inner">
                 <i class="fa-solid fa-utensils"></i>
             </div>
             <h1 class="text-2xl font-black text-slate-900 tracking-tight mb-1">PMU & The Galleon</h1>
             <p class="text-xs text-slate-500 mb-6 font-medium">Inserisci il tuo nome per iniziare l'ordine</p>
 
-            <form id="user-form" class="space-y-4 text-left" onsubmit="handleLogin(event)">
+            <div class="space-y-4 text-left">
                 <div>
                     <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5 ml-1">Il tuo Nome *</label>
-                    <input type="text" id="client-name" required placeholder="Es. Mario Rossi" class="w-full px-4 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 focus:bg-white focus:ring-2 focus:ring-orange-500 focus:outline-none font-bold text-slate-800 transition text-sm">
+                    <input type="text" id="client-name" placeholder="Es. Mario Rossi" class="w-full px-4 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 focus:bg-white focus:ring-2 focus:ring-orange-500 focus:outline-none font-bold text-slate-800 transition text-sm">
                 </div>
-                <button type="submit" class="w-full bg-orange-600 hover:bg-orange-700 active:scale-[0.98] text-white font-black py-4 rounded-2xl transition shadow-lg shadow-orange-600/30 text-sm uppercase tracking-wider text-center">
+                <button type="button" onclick="handleLoginManual()" class="w-full bg-orange-600 hover:bg-orange-700 active:scale-[0.98] text-white font-black py-4 rounded-2xl transition shadow-lg shadow-orange-600/30 text-sm uppercase tracking-wider text-center cursor-pointer">
                     Accedi al Menu 🚀
                 </button>
-            </form>
+            </div>
 
             <div class="mt-6 border-t border-slate-100 pt-4 flex justify-between items-center text-xs">
-                <button type="button" onclick="switchToRegia()" class="font-bold text-slate-500 hover:text-orange-600 transition flex items-center gap-1.5">
+                <button type="button" onclick="switchToRegia()" class="font-bold text-slate-500 hover:text-orange-600 transition flex items-center gap-1.5 cursor-pointer">
                     <i class="fa-solid fa-desktop text-sm"></i> Area Regia / Staff
                 </button>
                 <span class="text-emerald-600 font-bold flex items-center gap-1">
@@ -51,10 +51,10 @@
     <!-- APP PRINCIPALE CLIENTE -->
     <div id="main-app" class="hidden min-h-screen flex flex-col bg-slate-50">
         <!-- APPBAR -->
-        <header class="bg-white/80 backdrop-blur-md shadow-xs sticky top-0 z-30 border-b border-slate-200/60">
+        <header class="bg-white/90 backdrop-blur-md shadow-xs sticky top-0 z-30 border-b border-slate-200/60">
             <div class="max-w-5xl mx-auto px-4 py-3.5 flex justify-between items-center">
                 <div class="flex items-center gap-3">
-                    <button type="button" onclick="toggleSidebar()" class="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-800 px-3.5 py-2 rounded-2xl font-black text-xs transition border border-slate-200/60 active:scale-95">
+                    <button type="button" onclick="toggleSidebar()" class="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-800 px-3.5 py-2 rounded-2xl font-black text-xs transition border border-slate-200/60 active:scale-95 cursor-pointer">
                         <i class="fa-solid fa-bars text-sm text-orange-600"></i>
                         <span>MENU</span>
                     </button>
@@ -64,15 +64,15 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-2">
-                    <button type="button" onclick="openCart()" class="relative bg-orange-600 hover:bg-orange-700 active:scale-95 text-white px-4.5 py-2.5 rounded-2xl font-black flex items-center gap-2 transition shadow-md shadow-orange-600/25">
+                    <button type="button" onclick="openCart()" class="relative bg-orange-600 hover:bg-orange-700 active:scale-95 text-white px-4.5 py-2.5 rounded-2xl font-black flex items-center gap-2 transition shadow-md shadow-orange-600/25 cursor-pointer">
                         <i class="fa-solid fa-basket-shopping text-sm"></i>
                         <span class="text-xs uppercase tracking-wider hidden sm:inline">Carrello</span>
                         <span id="cart-count" class="bg-white text-orange-600 text-xs w-5 h-5 rounded-full flex items-center justify-center font-black shadow-inner">0</span>
                     </button>
-                    <button type="button" onclick="switchToRegia()" class="bg-slate-900 hover:bg-slate-800 text-white w-10 h-10 rounded-2xl text-xs font-bold transition flex items-center justify-center shadow-xs active:scale-95" title="Regia">
+                    <button type="button" onclick="switchToRegia()" class="bg-slate-900 hover:bg-slate-800 text-white w-10 h-10 rounded-2xl text-xs font-bold transition flex items-center justify-center shadow-xs active:scale-95 cursor-pointer" title="Regia">
                         <i class="fa-solid fa-desktop"></i>
                     </button>
-                    <button type="button" onclick="logoutClient()" class="bg-red-50 hover:bg-red-100 text-red-600 w-10 h-10 rounded-2xl text-xs font-bold transition border border-red-100 flex items-center justify-center active:scale-95" title="Esci / Nuovo Cliente">
+                    <button type="button" onclick="logoutClient()" class="bg-red-50 hover:bg-red-100 text-red-600 w-10 h-10 rounded-2xl text-xs font-bold transition border border-red-100 flex items-center justify-center active:scale-95 cursor-pointer" title="Esci / Nuovo Cliente">
                         <i class="fa-solid fa-right-from-bracket"></i>
                     </button>
                 </div>
@@ -86,7 +86,7 @@
             <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-72 bg-white shadow-2xl p-5 transform -translate-x-full transition-transform duration-300 md:translate-x-0 md:static md:w-64 md:shadow-none md:border-r md:border-slate-200/60 md:bg-transparent flex flex-col">
                 <div class="flex justify-between items-center mb-4 md:hidden">
                     <h3 class="font-black text-base text-slate-900">Categorie Menu</h3>
-                    <button type="button" onclick="toggleSidebar()" class="text-slate-400 hover:text-slate-700 text-2xl font-bold">&times;</button>
+                    <button type="button" onclick="toggleSidebar()" class="text-slate-400 hover:text-slate-700 text-2xl font-bold cursor-pointer">&times;</button>
                 </div>
                 <h3 class="hidden md:block font-black text-[11px] uppercase tracking-wider text-slate-400 mb-3">Categorie</h3>
                 <div id="sidebar-category-list" class="space-y-1.5 overflow-y-auto flex-1 pr-1 no-scrollbar">
@@ -106,7 +106,6 @@
                     </div>
                     <span class="text-[11px] font-bold text-orange-600 bg-orange-50 px-3 py-1.5 rounded-xl border border-orange-100">Tocca per variare</span>
                 </div>
-                <!-- QUI È STATO MODIFICATO: border-2 border-slate-200/90 e shadow-md per renderle molto più marcate e visibili -->
                 <div id="products-container" class="grid grid-cols-1 md:grid-cols-2 gap-4 pb-24">
                     <!-- Generato via JS -->
                 </div>
@@ -123,13 +122,13 @@
                     <h1 class="text-base font-black">Regia & Cucina (Live Sync)</h1>
                 </div>
                 <div class="flex items-center gap-2 flex-wrap">
-                    <button type="button" onclick="sendAllOrdersToWhatsApp()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-md active:scale-95">
+                    <button type="button" onclick="sendAllOrdersToWhatsApp()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-md active:scale-95 cursor-pointer">
                         <i class="fa-brands fa-whatsapp text-sm"></i> Invia Tutti 📱
                     </button>
-                    <button type="button" onclick="clearAllOrders()" class="bg-red-600 hover:bg-red-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-md active:scale-95">
+                    <button type="button" onclick="clearAllOrders()" class="bg-red-600 hover:bg-red-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-md active:scale-95 cursor-pointer">
                         <i class="fa-solid fa-trash text-sm"></i> Azzera 🗑️
                     </button>
-                    <button type="button" onclick="switchToClient()" class="bg-slate-800 hover:bg-slate-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold transition active:scale-95">
+                    <button type="button" onclick="switchToClient()" class="bg-slate-800 hover:bg-slate-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold transition active:scale-95 cursor-pointer">
                         Menu
                     </button>
                 </div>
@@ -155,7 +154,7 @@
                 <h2 class="font-black text-base text-slate-900 flex items-center gap-2">
                     <i class="fa-solid fa-basket-shopping text-orange-600"></i> Il tuo Carrello
                 </h2>
-                <button type="button" onclick="closeCart()" class="text-slate-400 hover:text-slate-700 text-2xl font-bold w-8 h-8 flex items-center justify-center">&times;</button>
+                <button type="button" onclick="closeCart()" class="text-slate-400 hover:text-slate-700 text-2xl font-bold w-8 h-8 flex items-center justify-center cursor-pointer">&times;</button>
             </div>
             <div id="cart-items" class="flex-1 overflow-y-auto p-4 space-y-3">
                 <!-- Elementi carrello -->
@@ -166,7 +165,7 @@
                     <span id="cart-total" class="text-orange-600">€ 0.00</span>
                 </div>
                 <div id="cart-action-buttons" class="space-y-2">
-                    <button type="button" onclick="submitOrder()" class="w-full bg-orange-600 hover:bg-orange-700 active:scale-[0.98] text-white font-black py-4 rounded-2xl transition shadow-lg shadow-orange-600/30 text-sm uppercase tracking-wider">
+                    <button type="button" onclick="submitOrder()" class="w-full bg-orange-600 hover:bg-orange-700 active:scale-[0.98] text-white font-black py-4 rounded-2xl transition shadow-lg shadow-orange-600/30 text-sm uppercase tracking-wider cursor-pointer">
                         Invia Ordine alla Regia 🚀
                     </button>
                 </div>
@@ -182,15 +181,15 @@
                     <h3 id="modal-product-title" class="text-lg font-black text-slate-900 tracking-tight"></h3>
                     <p id="modal-product-price" class="text-orange-600 font-bold text-xs mt-0.5"></p>
                 </div>
-                <button type="button" onclick="closeVariationModal()" class="text-slate-400 hover:text-slate-600 text-xl font-bold p-1">&times;</button>
+                <button type="button" onclick="closeVariationModal()" class="text-slate-400 hover:text-slate-600 text-xl font-bold p-1 cursor-pointer">&times;</button>
             </div>
             
             <div class="my-4">
                 <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2">Quantità</label>
                 <div class="flex items-center gap-3">
-                    <button type="button" onclick="decrementQty()" class="bg-slate-100 hover:bg-slate-200 text-slate-800 font-black w-12 h-12 rounded-2xl text-lg flex items-center justify-center active:scale-95 transition">-</button>
+                    <button type="button" onclick="decrementQty()" class="bg-slate-100 hover:bg-slate-200 text-slate-800 font-black w-12 h-12 rounded-2xl text-lg flex items-center justify-center active:scale-95 transition cursor-pointer">-</button>
                     <input type="number" id="product-qty" value="1" min="1" class="flex-1 text-center py-3 rounded-2xl bg-slate-50 border border-slate-200 font-black text-lg focus:outline-none">
-                    <button type="button" onclick="incrementQty()" class="bg-slate-100 hover:bg-slate-200 text-slate-800 font-black w-12 h-12 rounded-2xl text-lg flex items-center justify-center active:scale-95 transition">+</button>
+                    <button type="button" onclick="incrementQty()" class="bg-slate-100 hover:bg-slate-200 text-slate-800 font-black w-12 h-12 rounded-2xl text-lg flex items-center justify-center active:scale-95 transition cursor-pointer">+</button>
                 </div>
             </div>
 
@@ -200,13 +199,13 @@
             </div>
 
             <div class="flex gap-3">
-                <button type="button" onclick="closeVariationModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3.5 rounded-2xl transition text-sm active:scale-95">Annulla</button>
-                <button type="button" onclick="confirmAddToCart()" class="flex-1 bg-orange-600 hover:bg-orange-700 active:scale-[0.98] text-white font-bold py-3.5 rounded-2xl transition shadow-md shadow-orange-600/20 text-sm">Aggiungi</button>
+                <button type="button" onclick="closeVariationModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3.5 rounded-2xl transition text-sm active:scale-95 cursor-pointer">Annulla</button>
+                <button type="button" onclick="confirmAddToCart()" class="flex-1 bg-orange-600 hover:bg-orange-700 active:scale-[0.98] text-white font-bold py-3.5 rounded-2xl transition shadow-md shadow-orange-600/20 text-sm cursor-pointer">Aggiungi</button>
             </div>
         </div>
     </div>
 
-    <!-- SCRIPT LOGICA APPLICATIVA -->
+    <!-- SCRIPT APPLICATIVO -->
     <script>
         const WHATSAPP_REGIA_NUMBER = "393391318613";
 
@@ -428,10 +427,14 @@
         let activeCategoryIndex = 0;
         let activeOrderId = null;
 
-        function handleLogin(e) {
-            e.preventDefault();
-            const name = document.getElementById("client-name").value.trim();
-            if(!name) return;
+        function handleLoginManual() {
+            const nameInput = document.getElementById("client-name");
+            const name = nameInput.value.trim();
+            if(!name) {
+                alert("Inserisci il tuo nome per continuare!");
+                nameInput.focus();
+                return;
+            }
 
             currentUser = name;
             document.getElementById("login-screen").classList.add("hidden");
@@ -484,7 +487,7 @@
             menuData.forEach((cat, index) => {
                 const btn = document.createElement("button");
                 btn.type = "button";
-                btn.className = `w-full text-left px-4 py-3 rounded-2xl text-xs font-bold transition flex justify-between items-center ${index === activeCategoryIndex ? 'bg-orange-600 text-white shadow-md shadow-orange-600/25' : 'text-slate-600 hover:bg-slate-100'}`;
+                btn.className = `w-full text-left px-4 py-3 rounded-2xl text-xs font-bold transition flex justify-between items-center cursor-pointer ${index === activeCategoryIndex ? 'bg-orange-600 text-white shadow-md shadow-orange-600/25' : 'text-slate-600 hover:bg-slate-100'}`;
                 btn.innerHTML = `<span>${cat.category}</span> <i class="fa-solid fa-chevron-right text-[10px] opacity-60"></i>`;
                 btn.onclick = () => {
                     activeCategoryIndex = index;
@@ -504,18 +507,17 @@
 
             cat.items.forEach((item, itemIndex) => {
                 const card = document.createElement("div");
-                // QUI HO RESO IL BORDO E L'OMBRA MOLTO PIÙ FORTI E MARCATI (border-2 border-slate-200/90 shadow-md)
-                card.className = "bg-white p-5 rounded-3xl border-2 border-slate-200/90 shadow-md flex flex-col justify-between active:scale-[0.99] transition cursor-pointer hover:border-orange-500 group";
+                card.className = "bg-white p-5 rounded-3xl border-4 border-slate-300 shadow-lg flex flex-col justify-between active:scale-[0.99] transition cursor-pointer hover:border-orange-500 group";
                 card.onclick = () => openVariationModal(catIndex, itemIndex);
                 card.innerHTML = `
                     <div>
                         <div class="flex justify-between items-start gap-2 mb-2">
                             <h3 class="font-black text-slate-900 text-sm sm:text-base tracking-tight group-hover:text-orange-600 transition">${item.name}</h3>
-                            <span class="bg-orange-50 text-orange-600 font-black px-3 py-1.5 rounded-xl text-xs sm:text-sm whitespace-nowrap border border-orange-100">€ ${item.price.toFixed(2)}</span>
+                            <span class="bg-orange-50 text-orange-600 font-black px-3 py-1.5 rounded-xl text-xs sm:text-sm whitespace-nowrap border-2 border-orange-200">€ ${item.price.toFixed(2)}</span>
                         </div>
-                        <p class="text-xs text-slate-500 leading-relaxed mb-4">${item.desc}</p>
+                        <p class="text-xs text-slate-600 leading-relaxed mb-4">${item.desc}</p>
                     </div>
-                    <div class="w-full bg-orange-50 group-hover:bg-orange-600 group-hover:text-white text-orange-600 font-black py-3 rounded-2xl text-xs transition flex items-center justify-center gap-2 shadow-xs border border-orange-100/60">
+                    <div class="w-full bg-orange-50 group-hover:bg-orange-600 group-hover:text-white text-orange-600 font-black py-3.5 rounded-2xl text-xs transition flex items-center justify-center gap-2 shadow-xs border-2 border-orange-200">
                         <i class="fa-solid fa-plus text-xs"></i> <span>Aggiungi al carrello</span>
                     </div>
                 `;
@@ -556,7 +558,7 @@
             cart.push({
                 ...currentSelectedProduct,
                 qty: qty,
-                notes: notes // Vuota se non inserita
+                notes: notes
             });
             updateCartCount();
             closeVariationModal();
@@ -581,7 +583,6 @@
                     const div = document.createElement("div");
                     div.className = "bg-slate-50 p-4 rounded-2xl border border-slate-200/60 flex justify-between items-center";
                     
-                    // Stampa il blocco nota SOLO se esiste ed è valorizzato
                     let noteHtml = item.notes ? `<p class="text-xs text-orange-600 font-bold mt-0.5">Nota: ${item.notes}</p>` : '';
 
                     div.innerHTML = `
@@ -591,10 +592,10 @@
                             <p class="text-xs font-bold text-slate-700 mt-1">€ ${subtotal.toFixed(2)}</p>
                         </div>
                         <div class="flex items-center gap-1.5 bg-white p-1.5 rounded-xl border border-slate-200 shadow-2xs">
-                            <button type="button" onclick="decreaseCartItem(${index})" class="bg-slate-100 text-slate-800 w-7 h-7 rounded-lg font-bold text-xs flex items-center justify-center">-</button>
+                            <button type="button" onclick="decreaseCartItem(${index})" class="bg-slate-100 text-slate-800 w-7 h-7 rounded-lg font-bold text-xs flex items-center justify-center cursor-pointer">-</button>
                             <span class="text-xs font-black px-1">${item.qty}</span>
-                            <button type="button" onclick="increaseCartItem(${index})" class="bg-slate-100 text-slate-800 w-7 h-7 rounded-lg font-bold text-xs flex items-center justify-center">+</button>
-                            <button type="button" onclick="removeFromCart(${index})" class="text-red-500 ml-1 p-1"><i class="fa-solid fa-trash text-xs"></i></button>
+                            <button type="button" onclick="increaseCartItem(${index})" class="bg-slate-100 text-slate-800 w-7 h-7 rounded-lg font-bold text-xs flex items-center justify-center cursor-pointer">+</button>
+                            <button type="button" onclick="removeFromCart(${index})" class="text-red-500 ml-1 p-1 cursor-pointer"><i class="fa-solid fa-trash text-xs"></i></button>
                         </div>
                     `;
                     container.appendChild(div);
@@ -606,13 +607,13 @@
             const actionContainer = document.getElementById("cart-action-buttons");
             if(activeOrderId) {
                 actionContainer.innerHTML = `
-                    <button type="button" onclick="updateExistingOrder()" class="w-full bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] text-white font-black py-4 rounded-2xl transition shadow-lg shadow-emerald-600/30 text-sm uppercase tracking-wider">
+                    <button type="button" onclick="updateExistingOrder()" class="w-full bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] text-white font-black py-4 rounded-2xl transition shadow-lg shadow-emerald-600/30 text-sm uppercase tracking-wider cursor-pointer">
                         Aggiorna Ordine in Regia 🔄
                     </button>
                 `;
             } else {
                 actionContainer.innerHTML = `
-                    <button type="button" onclick="submitOrder()" class="w-full bg-orange-600 hover:bg-orange-700 active:scale-[0.98] text-white font-black py-4 rounded-2xl transition shadow-lg shadow-orange-600/30 text-sm uppercase tracking-wider">
+                    <button type="button" onclick="submitOrder()" class="w-full bg-orange-600 hover:bg-orange-700 active:scale-[0.98] text-white font-black py-4 rounded-2xl transition shadow-lg shadow-orange-600/30 text-sm uppercase tracking-wider cursor-pointer">
                         Invia Ordine alla Regia 🚀
                     </button>
                 `;
@@ -703,7 +704,6 @@
                     card.className = "bg-white rounded-3xl shadow-xs border border-slate-200/60 p-5 flex flex-col justify-between";
                     
                     let itemsHtml = order.items.map(i => {
-                        // Stampa la nota SOLO se esiste ed è valorizzata
                         let noteBlock = i.notes ? `<p class="text-[11px] text-orange-600 bg-orange-50 px-2 py-0.5 rounded-md mt-1 inline-block font-semibold">Var: ${i.notes}</p>` : '';
                         return `
                             <div class="text-xs py-1.5 border-b border-slate-100 last:border-none">
@@ -723,7 +723,7 @@
                                     <span class="text-[10px] font-black text-slate-400">${order.id} • ${order.time}</span>
                                     <h3 class="font-black text-lg text-slate-900">${order.client}</h3>
                                 </div>
-                                <select onchange="updateOrderStatus('${order.id}', this.value)" class="text-xs font-bold px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 focus:outline-none shadow-xs">
+                                <select onchange="updateOrderStatus('${order.id}', this.value)" class="text-xs font-bold px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 focus:outline-none shadow-xs cursor-pointer">
                                     <option value="In attesa" ${order.status === 'In attesa' ? 'selected' : ''}>In attesa</option>
                                     <option value="In preparazione" ${order.status === 'In preparazione' ? 'selected' : ''}>In preparazione</option>
                                     <option value="Pronto" ${order.status === 'Pronto' ? 'selected' : ''}>Pronto</option>
@@ -758,30 +758,28 @@
             }
         }
 
+        // Funzione WhatsApp pulita, in colonna, senza prezzi e con variazioni in corsivo
         function sendAllOrdersToWhatsApp() {
             db.ref('restaurant_orders').once('value', snapshot => {
                 const data = snapshot.val();
                 if(!data) return alert("Nessun ordine presente da inviare.");
 
                 const orders = Object.values(data);
-                let text = `*RIEPILOGO COMPLESSIVO ORDINI ASPORTO*%0A%0A`;
+                let text = `*RIEPILOGO ORDINI ASPORTO*%0A`;
                 
-                let grandTotal = 0;
                 orders.forEach(order => {
+                    text += `%0A-----------------------------------%0A`;
+                    text += `Cliente: *${order.client}* (${order.time})%0A`;
                     text += `-----------------------------------%0A`;
-                    text += `Cliente: *${order.client}* (${order.time}) [ID: ${order.id}]%0A`;
                     order.items.forEach(i => {
-                        text += `• ${i.qty}x ${i.name} (€ ${(i.price * i.qty).toFixed(2)})%0A`;
+                        text += `• ${i.qty}x ${i.name}%0A`;
                         if(i.notes) {
                             text += `  _Nota: ${i.notes}_%0A`;
                         }
                     });
-                    text += `*Totale Cliente: € ${order.total.toFixed(2)}*%0A`;
-                    grandTotal += order.total;
                 });
                 
-                text += `-----------------------------------%0A`;
-                text += `*TOTALE GENERALE: € ${grandTotal.toFixed(2)}*`;
+                text += `%0A-----------------------------------`;
 
                 window.open(`https://wa.me/${WHATSAPP_REGIA_NUMBER}?text=${text}`, '_blank');
             });
