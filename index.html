@@ -14,11 +14,12 @@
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         * { -webkit-tap-highlight-color: transparent; }
+        html, body { overscroll-behavior-y: none; } /* Blocca il trascinamento di ricarica pagina su mobile */
     </style>
 </head>
 <body class="bg-slate-100 text-slate-900 font-sans antialiased selection:bg-orange-500 selection:text-white">
 
-    <!-- SCHERMATA LOGIN / BENVENUTO (Isolata per evitare qualsiasi refresh) -->
+    <!-- SCHERMATA LOGIN / BENVENUTO -->
     <div id="login-screen" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
         <div class="bg-white rounded-[2.5rem] max-w-sm w-full p-8 shadow-2xl border border-slate-100 text-center">
             <div class="w-16 h-16 bg-orange-50 text-orange-600 rounded-2xl flex items-center justify-center mx-auto mb-4 text-2xl font-bold shadow-inner">
@@ -27,7 +28,7 @@
             <h1 class="text-2xl font-black text-slate-900 tracking-tight mb-1">PMU & The Galleon</h1>
             <p class="text-xs text-slate-500 mb-6 font-medium">Inserisci il tuo nome per iniziare l'ordine</p>
 
-            <div class="space-y-4 text-left" onsubmit="event.preventDefault();">
+            <div class="space-y-4 text-left">
                 <div>
                     <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5 ml-1">Il tuo Nome *</label>
                     <input type="text" id="client-name" placeholder="Es. Mario Rossi" class="w-full px-4 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 focus:bg-white focus:ring-2 focus:ring-orange-500 focus:outline-none font-bold text-slate-800 transition text-sm">
@@ -106,7 +107,7 @@
                     </div>
                     <span class="text-[11px] font-bold text-orange-600 bg-orange-50 px-3 py-1.5 rounded-xl border border-orange-100">Tocca per variare</span>
                 </div>
-                <!-- BORDO FISSO SEMPRE ATTIVO (border-4 border-slate-300 shadow-md) -->
+                <!-- BORDO FISSO SEMPRE ATTIVO E ARANCIONE (border-4 border-orange-500) -->
                 <div id="products-container" class="grid grid-cols-1 md:grid-cols-2 gap-4 pb-24">
                     <!-- Generato via JS -->
                 </div>
@@ -428,6 +429,13 @@
         let activeCategoryIndex = 0;
         let activeOrderId = null;
 
+        // Impedisce a qualsiasi scroll o gesto di ricaricare la pagina o tornare al login
+        window.addEventListener('popstate', function (event) {
+            if (currentUser) {
+                history.pushState(null, null, window.location.href);
+            }
+        });
+
         function handleLoginManual() {
             const nameInput = document.getElementById("client-name");
             const name = nameInput.value.trim();
@@ -438,6 +446,7 @@
             }
 
             currentUser = name;
+            history.pushState(null, null, window.location.href);
             document.getElementById("login-screen").classList.add("hidden");
             document.getElementById("main-app").classList.remove("hidden");
             
@@ -508,8 +517,8 @@
 
             cat.items.forEach((item, itemIndex) => {
                 const card = document.createElement("div");
-                // BORDI SPESSI E FISSI SEMPRE ATTIVI (border-4 border-slate-300 shadow-md)
-                card.className = "bg-white p-5 rounded-3xl border-4 border-slate-300 shadow-md flex flex-col justify-between transition cursor-pointer hover:border-orange-500 group";
+                // BORDO FISSO SEMPRE ATTIVO E ARANCIONE (border-4 border-orange-500 shadow-md)
+                card.className = "bg-white p-5 rounded-3xl border-4 border-orange-500 shadow-md flex flex-col justify-between transition cursor-pointer hover:bg-orange-50/30 group";
                 card.onclick = () => openVariationModal(catIndex, itemIndex);
                 card.innerHTML = `
                     <div>
@@ -519,7 +528,7 @@
                         </div>
                         <p class="text-xs text-slate-600 leading-relaxed mb-4">${item.desc}</p>
                     </div>
-                    <div class="w-full bg-orange-50 group-hover:bg-orange-600 group-hover:text-white text-orange-600 font-black py-3.5 rounded-2xl text-xs transition flex items-center justify-center gap-2 shadow-xs border-2 border-orange-200">
+                    <div class="w-full bg-orange-600 text-white font-black py-3.5 rounded-2xl text-xs transition flex items-center justify-center gap-2 shadow-xs">
                         <i class="fa-solid fa-plus text-xs"></i> <span>Aggiungi al carrello</span>
                     </div>
                 `;
