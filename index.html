@@ -14,7 +14,7 @@
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         * { -webkit-tap-highlight-color: transparent; }
-        html, body { overscroll-behavior-y: none; } /* Blocca il trascinamento di ricarica pagina su mobile */
+        html, body { overscroll-behavior-y: none; }
     </style>
 </head>
 <body class="bg-slate-100 text-slate-900 font-sans antialiased selection:bg-orange-500 selection:text-white">
@@ -51,30 +51,30 @@
 
     <!-- APP PRINCIPALE CLIENTE -->
     <div id="main-app" class="hidden min-h-screen flex flex-col bg-slate-50">
-        <!-- APPBAR -->
-        <header class="bg-white/90 backdrop-blur-md shadow-xs sticky top-0 z-30 border-b border-slate-200/60">
-            <div class="max-w-5xl mx-auto px-4 py-3.5 flex justify-between items-center">
-                <div class="flex items-center gap-3">
-                    <button type="button" onclick="toggleSidebar()" class="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-800 px-3.5 py-2 rounded-2xl font-black text-xs transition border border-slate-200/60 active:scale-95 cursor-pointer">
-                        <i class="fa-solid fa-bars text-sm text-orange-600"></i>
-                        <span>MENU</span>
+        <!-- APPBAR CON PULSANTI EXTRA CLICCABILI -->
+        <header class="bg-white/95 backdrop-blur-md shadow-xs sticky top-0 z-30 border-b border-slate-200/60">
+            <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center gap-2">
+                <div class="flex items-center gap-2">
+                    <button type="button" onclick="toggleSidebar()" class="flex items-center gap-2 bg-orange-50 hover:bg-orange-100 text-orange-700 px-4 py-3 rounded-2xl font-black text-xs transition border-2 border-orange-200 active:scale-95 cursor-pointer shadow-xs">
+                        <i class="fa-solid fa-bars text-base text-orange-600"></i>
+                        <span class="tracking-wider">MENU</span>
                     </button>
-                    <div>
+                    <div class="hidden sm:block">
                         <span class="text-[9px] font-black text-orange-600 uppercase tracking-widest block leading-none mb-0.5">Asporto Online</span>
                         <h1 class="font-black text-sm sm:text-base text-slate-900 leading-tight">PMU & The Galleon</h1>
                     </div>
                 </div>
                 <div class="flex items-center gap-2">
-                    <button type="button" onclick="openCart()" class="relative bg-orange-600 hover:bg-orange-700 active:scale-95 text-white px-4.5 py-2.5 rounded-2xl font-black flex items-center gap-2 transition shadow-md shadow-orange-600/25 cursor-pointer">
-                        <i class="fa-solid fa-basket-shopping text-sm"></i>
-                        <span class="text-xs uppercase tracking-wider hidden sm:inline">Carrello</span>
+                    <button type="button" onclick="openCart()" class="relative bg-orange-600 hover:bg-orange-700 active:scale-95 text-white px-4.5 py-3 rounded-2xl font-black flex items-center gap-2.5 transition shadow-md shadow-orange-600/30 cursor-pointer">
+                        <i class="fa-solid fa-basket-shopping text-base"></i>
+                        <span class="text-xs uppercase tracking-wider">Carrello</span>
                         <span id="cart-count" class="bg-white text-orange-600 text-xs w-5 h-5 rounded-full flex items-center justify-center font-black shadow-inner">0</span>
                     </button>
-                    <button type="button" onclick="switchToRegia()" class="bg-slate-900 hover:bg-slate-800 text-white w-10 h-10 rounded-2xl text-xs font-bold transition flex items-center justify-center shadow-xs active:scale-95 cursor-pointer" title="Regia">
-                        <i class="fa-solid fa-desktop"></i>
+                    <button type="button" onclick="switchToRegia()" class="bg-slate-900 hover:bg-slate-800 text-white px-3.5 py-3 rounded-2xl text-xs font-black transition flex items-center gap-1.5 shadow-xs active:scale-95 cursor-pointer" title="Regia">
+                        <i class="fa-solid fa-desktop text-sm"></i> <span class="hidden sm:inline">Regia</span>
                     </button>
-                    <button type="button" onclick="logoutClient()" class="bg-red-50 hover:bg-red-100 text-red-600 w-10 h-10 rounded-2xl text-xs font-bold transition border border-red-100 flex items-center justify-center active:scale-95 cursor-pointer" title="Esci / Nuovo Cliente">
-                        <i class="fa-solid fa-right-from-bracket"></i>
+                    <button type="button" onclick="logoutClient()" class="bg-red-50 hover:bg-red-100 text-red-600 px-3 py-3 rounded-2xl text-xs font-bold transition border border-red-200 flex items-center justify-center active:scale-95 cursor-pointer" title="Esci">
+                        <i class="fa-solid fa-right-from-bracket text-sm"></i>
                     </button>
                 </div>
             </div>
@@ -107,7 +107,7 @@
                     </div>
                     <span class="text-[11px] font-bold text-orange-600 bg-orange-50 px-3 py-1.5 rounded-xl border border-orange-100">Tocca per variare</span>
                 </div>
-                <!-- BORDO FISSO SEMPRE ATTIVO E ARANCIONE (border-4 border-orange-500) -->
+                <!-- BORDO FISSO SEMPRE ATTIVO E ARANCIONE -->
                 <div id="products-container" class="grid grid-cols-1 md:grid-cols-2 gap-4 pb-24">
                     <!-- Generato via JS -->
                 </div>
@@ -124,13 +124,13 @@
                     <h1 class="text-base font-black">Regia & Cucina (Live Sync)</h1>
                 </div>
                 <div class="flex items-center gap-2 flex-wrap">
-                    <button type="button" onclick="sendAllOrdersToWhatsApp()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-md active:scale-95 cursor-pointer">
-                        <i class="fa-brands fa-whatsapp text-sm"></i> Invia Tutti 📱
+                    <button type="button" onclick="sendAllOrdersToWhatsApp()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-md active:scale-95 cursor-pointer">
+                        <i class="fa-brands fa-whatsapp text-sm"></i> Invia Nuovi a WhatsApp 📱
                     </button>
-                    <button type="button" onclick="clearAllOrders()" class="bg-red-600 hover:bg-red-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-md active:scale-95 cursor-pointer">
+                    <button type="button" onclick="clearAllOrders()" class="bg-red-600 hover:bg-red-700 text-white px-3.5 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-md active:scale-95 cursor-pointer">
                         <i class="fa-solid fa-trash text-sm"></i> Azzera 🗑️
                     </button>
-                    <button type="button" onclick="switchToClient()" class="bg-slate-800 hover:bg-slate-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold transition active:scale-95 cursor-pointer">
+                    <button type="button" onclick="switchToClient()" class="bg-slate-800 hover:bg-slate-700 text-white px-4 py-2.5 rounded-xl text-xs font-bold transition active:scale-95 cursor-pointer">
                         Menu
                     </button>
                 </div>
@@ -429,7 +429,6 @@
         let activeCategoryIndex = 0;
         let activeOrderId = null;
 
-        // Impedisce a qualsiasi scroll o gesto di ricaricare la pagina o tornare al login
         window.addEventListener('popstate', function (event) {
             if (currentUser) {
                 history.pushState(null, null, window.location.href);
@@ -497,7 +496,7 @@
             menuData.forEach((cat, index) => {
                 const btn = document.createElement("button");
                 btn.type = "button";
-                btn.className = `w-full text-left px-4 py-3 rounded-2xl text-xs font-bold transition flex justify-between items-center cursor-pointer ${index === activeCategoryIndex ? 'bg-orange-600 text-white shadow-md shadow-orange-600/25' : 'text-slate-600 hover:bg-slate-100'}`;
+                btn.className = `w-full text-left px-4 py-3.5 rounded-2xl text-xs font-bold transition flex justify-between items-center cursor-pointer ${index === activeCategoryIndex ? 'bg-orange-600 text-white shadow-md shadow-orange-600/25' : 'text-slate-600 hover:bg-slate-100'}`;
                 btn.innerHTML = `<span>${cat.category}</span> <i class="fa-solid fa-chevron-right text-[10px] opacity-60"></i>`;
                 btn.onclick = () => {
                     activeCategoryIndex = index;
@@ -517,7 +516,6 @@
 
             cat.items.forEach((item, itemIndex) => {
                 const card = document.createElement("div");
-                // BORDO FISSO SEMPRE ATTIVO E ARANCIONE (border-4 border-orange-500 shadow-md)
                 card.className = "bg-white p-5 rounded-3xl border-4 border-orange-500 shadow-md flex flex-col justify-between transition cursor-pointer hover:bg-orange-50/30 group";
                 card.onclick = () => openVariationModal(catIndex, itemIndex);
                 card.innerHTML = `
@@ -603,10 +601,10 @@
                             <p class="text-xs font-bold text-slate-700 mt-1">€ ${subtotal.toFixed(2)}</p>
                         </div>
                         <div class="flex items-center gap-1.5 bg-white p-1.5 rounded-xl border border-slate-200 shadow-2xs">
-                            <button type="button" onclick="decreaseCartItem(${index})" class="bg-slate-100 text-slate-800 w-7 h-7 rounded-lg font-bold text-xs flex items-center justify-center cursor-pointer">-</button>
+                            <button type="button" onclick="decreaseCartItem(${index})" class="bg-slate-100 text-slate-800 w-8 h-8 rounded-lg font-bold text-xs flex items-center justify-center cursor-pointer">-</button>
                             <span class="text-xs font-black px-1">${item.qty}</span>
-                            <button type="button" onclick="increaseCartItem(${index})" class="bg-slate-100 text-slate-800 w-7 h-7 rounded-lg font-bold text-xs flex items-center justify-center cursor-pointer">+</button>
-                            <button type="button" onclick="removeFromCart(${index})" class="text-red-500 ml-1 p-1 cursor-pointer"><i class="fa-solid fa-trash text-xs"></i></button>
+                            <button type="button" onclick="increaseCartItem(${index})" class="bg-slate-100 text-slate-800 w-8 h-8 rounded-lg font-bold text-xs flex items-center justify-center cursor-pointer">+</button>
+                            <button type="button" onclick="removeFromCart(${index})" class="text-red-500 ml-1.5 p-1 cursor-pointer"><i class="fa-solid fa-trash text-sm"></i></button>
                         </div>
                     `;
                     container.appendChild(div);
@@ -668,6 +666,7 @@
                 items: [...cart],
                 total: cart.reduce((sum, item) => sum + (item.price * item.qty), 0),
                 status: 'In attesa',
+                sentToWhatsApp: false, // Traccia se l'ordine è stato inviato su WhatsApp
                 time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
             };
 
@@ -686,7 +685,8 @@
 
             const updatedData = {
                 items: [...cart],
-                total: cart.reduce((sum, item) => sum + (item.price * item.qty), 0)
+                total: cart.reduce((sum, item) => sum + (item.price * item.qty), 0),
+                sentToWhatsApp: false // Se viene modificato, torna da inviare
             };
 
             db.ref('restaurant_orders/' + activeOrderId).update(updatedData).then(() => {
@@ -712,7 +712,15 @@
 
                 orders.forEach((order) => {
                     const card = document.createElement("div");
-                    card.className = "bg-white rounded-3xl shadow-xs border border-slate-200/60 p-5 flex flex-col justify-between";
+                    
+                    // Evidenziazione visiva in Regia: Bordo verde e sfondo leggero se già inviato, altrimenti arancione/giallo se è da inviare
+                    const isSent = order.sentToWhatsApp;
+                    const cardBorderClass = isSent ? "border-2 border-emerald-400 bg-white" : "border-4 border-amber-500 bg-amber-50/30 shadow-md";
+                    const statusBadge = isSent 
+                        ? `<span class="bg-emerald-100 text-emerald-700 text-[10px] font-black px-2.5 py-1 rounded-full"><i class="fa-brands fa-whatsapp"></i> Inviato a WhatsApp</span>`
+                        : `<span class="bg-amber-100 text-amber-800 text-[10px] font-black px-2.5 py-1 rounded-full animate-pulse"><i class="fa-solid fa-triangle-exclamation"></i> Da Inviare a WhatsApp</span>`;
+
+                    card.className = `rounded-3xl p-5 flex flex-col justify-between ${cardBorderClass}`;
                     
                     let itemsHtml = order.items.map(i => {
                         let noteBlock = i.notes ? `<p class="text-[11px] text-orange-600 bg-orange-50 px-2 py-0.5 rounded-md mt-1 inline-block font-semibold">Var: ${i.notes}</p>` : '';
@@ -729,19 +737,20 @@
 
                     card.innerHTML = `
                         <div>
-                            <div class="flex justify-between items-start mb-3">
+                            <div class="flex justify-between items-start mb-2">
                                 <div>
                                     <span class="text-[10px] font-black text-slate-400">${order.id} • ${order.time}</span>
                                     <h3 class="font-black text-lg text-slate-900">${order.client}</h3>
                                 </div>
-                                <select onchange="updateOrderStatus('${order.id}', this.value)" class="text-xs font-bold px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 focus:outline-none shadow-xs cursor-pointer">
+                                <select onchange="updateOrderStatus('${order.id}', this.value)" class="text-xs font-bold px-3 py-2 rounded-xl border border-slate-200 bg-white focus:outline-none shadow-xs cursor-pointer">
                                     <option value="In attesa" ${order.status === 'In attesa' ? 'selected' : ''}>In attesa</option>
                                     <option value="In preparazione" ${order.status === 'In preparazione' ? 'selected' : ''}>In preparazione</option>
                                     <option value="Pronto" ${order.status === 'Pronto' ? 'selected' : ''}>Pronto</option>
                                     <option value="Inviato" ${order.status === 'Inviato' ? 'selected' : ''}>Inviato</option>
                                 </select>
                             </div>
-                            <div class="my-3 space-y-1 bg-slate-50 p-3.5 rounded-2xl max-h-44 overflow-y-auto border border-slate-100">
+                            <div class="mb-3">${statusBadge}</div>
+                            <div class="my-3 space-y-1 bg-white p-3.5 rounded-2xl max-h-44 overflow-y-auto border border-slate-100">
                                 ${itemsHtml}
                             </div>
                         </div>
@@ -769,15 +778,23 @@
             }
         }
 
+        // Invia su WhatsApp SOLTANTO i nuovi ordini non ancora inviati (Evita doppioni)
         function sendAllOrdersToWhatsApp() {
             db.ref('restaurant_orders').once('value', snapshot => {
                 const data = snapshot.val();
-                if(!data) return alert("Nessun ordine presente da inviare.");
+                if(!data) return alert("Nessun ordine presente.");
 
                 const orders = Object.values(data);
+                // Filtra solo quelli non ancora inviati
+                const pendingOrders = orders.filter(o => !o.sentToWhatsApp);
+
+                if(pendingOrders.length === 0) {
+                    return alert("Tutti gli ordini presenti sono già stati inviati su WhatsApp in precedenza! Nessun nuovo ordine da inviare.");
+                }
+
                 let text = `*RIEPILOGO ORDINI ASPORTO*%0A`;
                 
-                orders.forEach(order => {
+                pendingOrders.forEach(order => {
                     text += `%0A-----------------------------------%0A`;
                     text += `Cliente: *${order.client}* (${order.time})%0A`;
                     text += `-----------------------------------%0A`;
@@ -791,7 +808,16 @@
                 
                 text += `%0A-----------------------------------`;
 
+                // Apre WhatsApp
                 window.open(`https://wa.me/${WHATSAPP_REGIA_NUMBER}?text=${text}`, '_blank');
+
+                // Segna automaticamente nel database che questi ordini sono stati inviati
+                const updates = {};
+                pendingOrders.forEach(order => {
+                    updates[order.id + '/sentToWhatsApp'] = true;
+                });
+
+                db.ref('restaurant_orders').update(updates);
             });
         }
     </script>
