@@ -236,7 +236,7 @@
                 items: [
                     { name: "PALA ESTIVA", price: 10.00, desc: "Mozzarella fior di latte, Pomodoro pachino, Rucola, Mozzarella a crudo." },
                     { name: "GENOVESE", price: 11.00, desc: "Mozzarella fior di latte, Crema di zucca, Alici, Pomodori semi secchi, Stracciatella fresca, Gocce di pesto." },
-                    { name: "MORTADELLA", price: 11.00, desc: "Mozzarella fior di latte, Mortadella al pistacchio, Granelle di pistacchio, Stracciatella fresca." },
+                    { name: "MORTADELLA", price: 11.00, desc: "Mozzarella fior di latte, Mortadella al pistacchio, Granella di pistacchio, Stracciatella fresca." },
                     { name: "ALLE NOCI", price: 12.00, desc: "Mozzarella fior di latte, Gorgonzola, Speck, Pere, Noci." },
                     { name: "BROCCOLI", price: 11.00, desc: "Mozzarella fior di latte, Provola affumicata, Broccoli saltati in padella, Salsiccia, Patate aromatizzate." },
                     { name: "LA FONTINA", price: 11.00, desc: "Mozzarella fior di latte, Crema di zucca gialla, Fontina valdostana, Sella di San Venanzo." },
@@ -490,7 +490,6 @@
             renderProducts(activeCategoryIndex);
         }
 
-        // Renderizza il menu laterale con pulsanti fissi colorati in blu chiaro, grassi e tutti maiuscoli
         function renderSidebar() {
             const list = document.getElementById("sidebar-category-list");
             list.innerHTML = "";
@@ -682,7 +681,7 @@
                 closeCart();
                 alert("Ordine inviato con successo alla Regia!");
             }).catch(err => {
-                alert("Errore di invio, riprova: " + err.message);
+                alert("Errore di invio: " + err.message);
             });
         }
 
@@ -715,16 +714,21 @@
                 }
 
                 grid.innerHTML = "";
-                // Protezione totale contro dati non validi o vuoti da Firebase
+                
+                // Conversione sicura al 100% per evitare qualsiasi errore di lettura (map/forEach)
                 let orders = [];
-                if (Array.isArray(data)) {
-                    orders = data.filter(o => o && o.items);
-                } else {
-                    orders = Object.values(data).filter(o => o && o.items).reverse();
+                try {
+                    if (Array.isArray(data)) {
+                        orders = data.filter(o => o && o.items);
+                    } else if (typeof data === 'object') {
+                        orders = Object.values(data).filter(o => o && o.items).reverse();
+                    }
+                } catch(e) {
+                    console.error("Errore elaborazione ordini:", e);
                 }
 
                 if (orders.length === 0) {
-                    grid.innerHTML = `<p class="text-center text-slate-400 col-span-full py-16 font-medium text-sm">Nessun ordine valido trovato.</p>`;
+                    grid.innerHTML = `<p class="text-center text-slate-400 col-span-full py-16 font-medium text-sm">Nessun ordine valido trovato nel database.</p>`;
                     return;
                 }
 
@@ -802,7 +806,7 @@
                 let orders = [];
                 if (Array.isArray(data)) {
                     orders = data.filter(o => o && o.items);
-                } else {
+                } else if (typeof data === 'object') {
                     orders = Object.values(data).filter(o => o && o.items);
                 }
 
