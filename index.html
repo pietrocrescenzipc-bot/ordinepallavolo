@@ -211,7 +211,7 @@
     <script>
         const WHATSAPP_REGIA_NUMBER = "393391318613";
 
-        // CONFIGURAZIONE FIREBASE DEDICATA
+        // URL CORRETTO PUNTATO AL PROGETTO "ordine-pallavolo"
         const firebaseConfig = { databaseURL: "https://ordine-pallavolo-default-rtdb.europe-west1.firebasedatabase.app" };
         if (!firebase.apps.length) {
             firebase.initializeApp(firebaseConfig);
@@ -665,7 +665,6 @@
             openCart();
         }
 
-        // FUNZIONE DI INVIO SICURA (Testata per Mobile e PC)
         function submitOrder() {
             if(cart.length === 0) return alert("Il carrello è vuoto!");
 
@@ -673,7 +672,7 @@
             const newOrder = {
                 id: newOrderId,
                 client: currentUser,
-                items: JSON.parse(JSON.stringify(cart)), // Serializzazione sicura per evitare problemi di riferimento su mobile
+                items: JSON.parse(JSON.stringify(cart)),
                 total: cart.reduce((sum, item) => sum + (item.price * item.qty), 0),
                 status: 'In attesa',
                 sentToWhatsApp: false,
@@ -688,7 +687,6 @@
                 })
                 .catch(err => {
                     alert("Errore di invio Firebase: " + err.message);
-                    console.error("Firebase write error:", err);
                 });
         }
 
@@ -712,7 +710,6 @@
                 });
         }
 
-        // LISTENER REGIA BLINDATO (Sincronizzazione Live bidirezionale PC/Mobile)
         function loadRegiaOrders() {
             const grid = document.getElementById("orders-grid");
             
