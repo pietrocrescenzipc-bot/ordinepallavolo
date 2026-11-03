@@ -91,7 +91,7 @@
                 </div>
                 <h3 class="hidden md:block font-black text-xs uppercase tracking-wider text-slate-400 mb-3">Categorie</h3>
                 <div id="sidebar-category-list" class="space-y-3 overflow-y-auto flex-1 pr-1 no-scrollbar">
-                    <!-- Generato via JS con pulsanti colorati fissi, maiuscoli e grandi -->
+                    <!-- Generato via JS -->
                 </div>
             </aside>
 
@@ -211,7 +211,8 @@
     <script>
         const WHATSAPP_REGIA_NUMBER = "393391318613";
 
-        const firebaseConfig = { databaseURL: "https://tombola-galleon-default-rtdb.firebaseio.com" };
+        // CONFIGURAZIONE NUOVO FIREBASE DEDICATO (ordine-pallavolo)
+        const firebaseConfig = { databaseURL: "https://ordine-pallavolo-default-rtdb.europe-west1.firebasedatabase.app" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
@@ -490,7 +491,7 @@
             renderProducts(activeCategoryIndex);
         }
 
-        // Renderizza il menu laterale con pulsanti fissi colorati in blu chiaro, GRASSI e TUTTI MAIUSCOLI
+        // Renderizza il menu laterale con pulsanti fissi colorati in blu chiaro, grassi e tutti maiuscoli
         function renderSidebar() {
             const list = document.getElementById("sidebar-category-list");
             list.innerHTML = "";
@@ -499,10 +500,8 @@
                 btn.type = "button";
                 
                 if (index === activeCategoryIndex) {
-                    // Categoria selezionata: Blu chiaro intenso, rientrata, con bordo marcato
                     btn.className = "w-full text-left px-5 py-4 rounded-2xl text-sm font-black uppercase tracking-wide transition flex justify-between items-center cursor-pointer bg-sky-600 text-white shadow-inner border-2 border-sky-700 transform scale-[0.98]";
                 } else {
-                    // Categorie non selezionate: Rimangono colorate di blu chiaro leggero e fisso con scritta in grassetto maiuscola
                     btn.className = "w-full text-left px-5 py-4 rounded-2xl text-sm font-black uppercase tracking-wide transition flex justify-between items-center cursor-pointer bg-sky-100/90 text-sky-900 border-2 border-sky-200 shadow-sm hover:bg-sky-200 active:scale-95";
                 }
 
@@ -720,6 +719,8 @@
                 const orders = Object.values(data).reverse();
 
                 orders.forEach((order) => {
+                    if (!order || !order.items) return;
+
                     const card = document.createElement("div");
                     const isSent = order.sentToWhatsApp;
                     const cardBorderClass = isSent ? "border-2 border-emerald-400 bg-white" : "border-4 border-amber-500 bg-amber-50/30 shadow-md";
@@ -763,7 +764,7 @@
                         </div>
                         <div class="flex justify-between font-black text-slate-900 pt-3 border-t border-slate-100 text-sm items-center">
                             <span>Totale:</span>
-                            <span class="text-sky-600 text-base">€ ${order.total.toFixed(2)}</span>
+                            <span class="text-sky-600 text-base">€ ${order.total ? order.total.toFixed(2) : '0.00'}</span>
                         </div>
                     `;
                     grid.appendChild(card);
@@ -791,7 +792,7 @@
                 if(!data) return alert("Nessun ordine presente.");
 
                 const orders = Object.values(data);
-                const pendingOrders = orders.filter(o => !o.sentToWhatsApp);
+                const pendingOrders = orders.filter(o => o && !o.sentToWhatsApp && o.items);
 
                 if(pendingOrders.length === 0) {
                     return alert("Tutti gli ordini presenti sono già stati inviati su WhatsApp in precedenza! Nessun nuovo ordine da inviare.");
