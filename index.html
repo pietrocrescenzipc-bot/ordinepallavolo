@@ -211,7 +211,7 @@
     <script>
         const WHATSAPP_REGIA_NUMBER = "393391318613";
 
-        // URL CORRETTO PUNTATO AL PROGETTO "ordine-pallavolo"
+        // CONFIGURAZIONE FIREBASE PROGETTO "ordine-pallavolo"
         const firebaseConfig = { databaseURL: "https://ordine-pallavolo-default-rtdb.europe-west1.firebasedatabase.app" };
         if (!firebase.apps.length) {
             firebase.initializeApp(firebaseConfig);
@@ -710,11 +710,14 @@
                 });
         }
 
+        // GESTORE SICURO AL 100% CONTRO IL CRASH DEL MAP
         function loadRegiaOrders() {
             const grid = document.getElementById("orders-grid");
             
             db.ref('restaurant_orders').on('value', snapshot => {
                 const data = snapshot.val();
+                
+                // Se i dati sono nulli o vuoti, mostra il messaggio senza generare errori
                 if(!data) {
                     grid.innerHTML = `<p class="text-center text-slate-400 col-span-full py-16 font-medium text-sm">Nessun ordine ricevuto al momento.</p>`;
                     return;
@@ -730,7 +733,7 @@
                         orders = Object.values(data).filter(o => o && o.items && Array.isArray(o.items)).reverse();
                     }
                 } catch(e) {
-                    console.error("Errore di parsing dei dati:", e);
+                    console.error("Errore di parsing:", e);
                 }
 
                 if (orders.length === 0) {
