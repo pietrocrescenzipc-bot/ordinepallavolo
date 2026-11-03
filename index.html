@@ -211,7 +211,6 @@
     <script>
         const WHATSAPP_REGIA_NUMBER = "393391318613";
 
-        // CONFIGURAZIONE NUOVO FIREBASE DEDICATO (ordine-pallavolo)
         const firebaseConfig = { databaseURL: "https://ordine-pallavolo-default-rtdb.europe-west1.firebasedatabase.app" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
@@ -683,7 +682,7 @@
                 closeCart();
                 alert("Ordine inviato con successo alla Regia!");
             }).catch(err => {
-                alert("Errore di invio, riprova.");
+                alert("Errore di invio, riprova: " + err.message);
             });
         }
 
@@ -716,11 +715,20 @@
                 }
 
                 grid.innerHTML = "";
-                const orders = Object.values(data).reverse();
+                // Protezione totale contro dati non validi o vuoti da Firebase
+                let orders = [];
+                if (Array.isArray(data)) {
+                    orders = data.filter(o => o && o.items);
+                } else {
+                    orders = Object.values(data).filter(o => o && o.items).reverse();
+                }
+
+                if (orders.length === 0) {
+                    grid.innerHTML = `<p class="text-center text-slate-400 col-span-full py-16 font-medium text-sm">Nessun ordine valido trovato.</p>`;
+                    return;
+                }
 
                 orders.forEach((order) => {
-                    if (!order || !order.items) return;
-
                     const card = document.createElement("div");
                     const isSent = order.sentToWhatsApp;
                     const cardBorderClass = isSent ? "border-2 border-emerald-400 bg-white" : "border-4 border-amber-500 bg-amber-50/30 shadow-md";
@@ -747,8 +755,8 @@
                         <div>
                             <div class="flex justify-between items-start mb-2">
                                 <div>
-                                    <span class="text-[10px] font-black text-slate-400">${order.id} • ${order.time}</span>
-                                    <h3 class="font-black text-lg text-slate-900">${order.client}</h3>
+                                    <span class="text-[10px] font-black text-slate-400">${order.id || 'ORD'} • ${order.time || ''}</span>
+                                    <h3 class="font-black text-lg text-slate-900">${order.client || 'Ospite'}</h3>
                                 </div>
                                 <select onchange="updateOrderStatus('${order.id}', this.value)" class="text-xs font-bold px-3 py-2 rounded-xl border border-slate-200 bg-white focus:outline-none shadow-xs cursor-pointer">
                                     <option value="In attesa" ${order.status === 'In attesa' ? 'selected' : ''}>In attesa</option>
@@ -791,8 +799,14 @@
                 const data = snapshot.val();
                 if(!data) return alert("Nessun ordine presente.");
 
-                const orders = Object.values(data);
-                const pendingOrders = orders.filter(o => o && !o.sentToWhatsApp && o.items);
+                let orders = [];
+                if (Array.isArray(data)) {
+                    orders = data.filter(o => o && o.items);
+                } else {
+                    orders = Object.values(data).filter(o => o && o.items);
+                }
+
+                const pendingOrders = orders.filter(o => !o.sentToWhatsApp);
 
                 if(pendingOrders.length === 0) {
                     return alert("Tutti gli ordini presenti sono già stati inviati su WhatsApp in precedenza! Nessun nuovo ordine da inviare.");
