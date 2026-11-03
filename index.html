@@ -211,7 +211,7 @@
     <script>
         const WHATSAPP_REGIA_NUMBER = "393391318613";
 
-        // CONFIGURAZIONE FIREBASE CORRETTA
+        // CONFIGURAZIONE FIREBASE DEDICATA
         const firebaseConfig = { databaseURL: "https://ordine-pallavolo-default-rtdb.europe-west1.firebasedatabase.app" };
         if (!firebase.apps.length) {
             firebase.initializeApp(firebaseConfig);
@@ -665,6 +665,7 @@
             openCart();
         }
 
+        // FUNZIONE DI INVIO SICURA (Testata per Mobile e PC)
         function submitOrder() {
             if(cart.length === 0) return alert("Il carrello è vuoto!");
 
@@ -672,20 +673,23 @@
             const newOrder = {
                 id: newOrderId,
                 client: currentUser,
-                items: [...cart],
+                items: JSON.parse(JSON.stringify(cart)), // Serializzazione sicura per evitare problemi di riferimento su mobile
                 total: cart.reduce((sum, item) => sum + (item.price * item.qty), 0),
                 status: 'In attesa',
                 sentToWhatsApp: false,
                 time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
             };
 
-            db.ref('restaurant_orders/' + newOrderId).set(newOrder).then(() => {
-                activeOrderId = newOrderId;
-                closeCart();
-                alert("Ordine inviato con successo alla Regia! 🚀");
-            }).catch(err => {
-                alert("Errore di invio Firebase: " + err.message);
-            });
+            db.ref('restaurant_orders/' + newOrderId).set(newOrder)
+                .then(() => {
+                    activeOrderId = newOrderId;
+                    closeCart();
+                    alert("Ordine inviato con successo alla Regia! 🚀");
+                })
+                .catch(err => {
+                    alert("Errore di invio Firebase: " + err.message);
+                    console.error("Firebase write error:", err);
+                });
         }
 
         function updateExistingOrder() {
@@ -693,20 +697,22 @@
             if(cart.length === 0) return alert("Il carrello è vuoto!");
 
             const updatedData = {
-                items: [...cart],
+                items: JSON.parse(JSON.stringify(cart)),
                 total: cart.reduce((sum, item) => sum + (item.price * item.qty), 0),
                 sentToWhatsApp: false
             };
 
-            db.ref('restaurant_orders/' + activeOrderId).update(updatedData).then(() => {
-                closeCart();
-                alert("Ordine aggiornato in tempo reale con la Regia! 🔄");
-            }).catch(err => {
-                alert("Errore nell'aggiornamento.");
-            });
+            db.ref('restaurant_orders/' + activeOrderId).update(updatedData)
+                .then(() => {
+                    closeCart();
+                    alert("Ordine aggiornato in tempo reale con la Regia! 🔄");
+                })
+                .catch(err => {
+                    alert("Errore nell'aggiornamento: " + err.message);
+                });
         }
 
-        // FUNZIONE REGIA BLINDATA DA PROGRAMMATORE (Mai più crash su map/forEach)
+        // LISTENER REGIA BLINDATO (Sincronizzazione Live bidirezionale PC/Mobile)
         function loadRegiaOrders() {
             const grid = document.getElementById("orders-grid");
             
@@ -727,7 +733,7 @@
                         orders = Object.values(data).filter(o => o && o.items && Array.isArray(o.items)).reverse();
                     }
                 } catch(e) {
-                    console.error("Errore parsing:", e);
+                    console.error("Errore di parsing dei dati:", e);
                 }
 
                 if (orders.length === 0) {
@@ -784,6 +790,8 @@
                     `;
                     grid.appendChild(card);
                 });
+            }, error => {
+                console.error("Errore di connessione Firebase Realtime:", error);
             });
         }
 
