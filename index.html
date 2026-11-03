@@ -211,8 +211,11 @@
     <script>
         const WHATSAPP_REGIA_NUMBER = "393391318613";
 
+        // CONFIGURAZIONE FIREBASE CORRETTA
         const firebaseConfig = { databaseURL: "https://ordine-pallavolo-default-rtdb.europe-west1.firebasedatabase.app" };
-        firebase.initializeApp(firebaseConfig);
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
         const db = firebase.database();
 
         const menuData = [
@@ -236,7 +239,7 @@
                 items: [
                     { name: "PALA ESTIVA", price: 10.00, desc: "Mozzarella fior di latte, Pomodoro pachino, Rucola, Mozzarella a crudo." },
                     { name: "GENOVESE", price: 11.00, desc: "Mozzarella fior di latte, Crema di zucca, Alici, Pomodori semi secchi, Stracciatella fresca, Gocce di pesto." },
-                    { name: "MORTADELLA", price: 11.00, desc: "Mozzarella fior di latte, Mortadella al pistacchio, Granella di pistacchio, Stracciatella fresca." },
+                    { name: "MORTADELLA", price: 11.00, desc: "Mozzarella fior di latte, Mortadella al pistacchio, Granelle di pistacchio, Stracciatella fresca." },
                     { name: "ALLE NOCI", price: 12.00, desc: "Mozzarella fior di latte, Gorgonzola, Speck, Pere, Noci." },
                     { name: "BROCCOLI", price: 11.00, desc: "Mozzarella fior di latte, Provola affumicata, Broccoli saltati in padella, Salsiccia, Patate aromatizzate." },
                     { name: "LA FONTINA", price: 11.00, desc: "Mozzarella fior di latte, Crema di zucca gialla, Fontina valdostana, Sella di San Venanzo." },
@@ -679,9 +682,9 @@
             db.ref('restaurant_orders/' + newOrderId).set(newOrder).then(() => {
                 activeOrderId = newOrderId;
                 closeCart();
-                alert("Ordine inviato con successo alla Regia!");
+                alert("Ordine inviato con successo alla Regia! 🚀");
             }).catch(err => {
-                alert("Errore di invio: " + err.message);
+                alert("Errore di invio Firebase: " + err.message);
             });
         }
 
@@ -703,6 +706,7 @@
             });
         }
 
+        // FUNZIONE REGIA BLINDATA DA PROGRAMMATORE (Mai più crash su map/forEach)
         function loadRegiaOrders() {
             const grid = document.getElementById("orders-grid");
             
@@ -714,21 +718,20 @@
                 }
 
                 grid.innerHTML = "";
-                
-                // Conversione sicura al 100% per evitare qualsiasi errore di lettura (map/forEach)
                 let orders = [];
+                
                 try {
                     if (Array.isArray(data)) {
-                        orders = data.filter(o => o && o.items);
+                        orders = data.filter(o => o && o.items && Array.isArray(o.items));
                     } else if (typeof data === 'object') {
-                        orders = Object.values(data).filter(o => o && o.items).reverse();
+                        orders = Object.values(data).filter(o => o && o.items && Array.isArray(o.items)).reverse();
                     }
                 } catch(e) {
-                    console.error("Errore elaborazione ordini:", e);
+                    console.error("Errore parsing:", e);
                 }
 
                 if (orders.length === 0) {
-                    grid.innerHTML = `<p class="text-center text-slate-400 col-span-full py-16 font-medium text-sm">Nessun ordine valido trovato nel database.</p>`;
+                    grid.innerHTML = `<p class="text-center text-slate-400 col-span-full py-16 font-medium text-sm">Nessun ordine valido nel database.</p>`;
                     return;
                 }
 
@@ -747,8 +750,8 @@
                         return `
                             <div class="text-xs py-1.5 border-b border-slate-100 last:border-none">
                                 <div class="flex justify-between font-bold text-slate-800">
-                                    <span>${i.qty}x ${i.name}</span>
-                                    <span>€ ${(i.price * i.qty).toFixed(2)}</span>
+                                    <span>${i.qty || 1}x ${i.name || 'Prodotto'}</span>
+                                    <span>€ ${( (i.price || 0) * (i.qty || 1) ).toFixed(2)}</span>
                                 </div>
                                 ${noteBlock}
                             </div>
@@ -789,11 +792,9 @@
         }
 
         function clearAllOrders() {
-            if(confirm("Sei sicuro di voler azzerare ed eliminare TUTTI gli ordini dalla Regia? L'operazione è irreversibile.")) {
+            if(confirm("Sei sicuro di voler azzerare ed eliminare TUTTI gli ordini dalla Regia?")) {
                 db.ref('restaurant_orders').remove().then(() => {
                     alert("Tutti gli ordini sono stati azzerati con successo!");
-                }).catch(err => {
-                    alert("Errore durante l'azzeramento.");
                 });
             }
         }
@@ -813,7 +814,7 @@
                 const pendingOrders = orders.filter(o => !o.sentToWhatsApp);
 
                 if(pendingOrders.length === 0) {
-                    return alert("Tutti gli ordini presenti sono già stati inviati su WhatsApp in precedenza! Nessun nuovo ordine da inviare.");
+                    return alert("Tutti gli ordini presenti sono già stati inviati su WhatsApp!");
                 }
 
                 let text = `*RIEPILOGO ORDINI ASPORTO*%0A`;
