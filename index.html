@@ -3,13 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PMU & The Galleon • Delivery & Asporto</title>
+    <title>PMU & The Galleon • Spogliatoio & Asporto</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <!-- Icona per PWA / Schermata Home -->
+    <link rel="apple-touch-icon" href="icon.png">
+    <link rel="icon" type="image/png" href="icon.png">
     <style>
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
@@ -40,7 +43,7 @@
 
             <div class="mt-6 border-t border-slate-100 pt-4 flex justify-between items-center text-xs">
                 <button type="button" onclick="switchToRegia()" class="font-bold text-slate-500 hover:text-sky-600 transition flex items-center gap-1.5 cursor-pointer">
-                    <i class="fa-solid fa-desktop text-sm"></i> Area Regia / Staff
+                    <i class="fa-solid fa-desktop text-sm"></i> Il Capitano in Regia
                 </button>
                 <span class="text-emerald-600 font-bold flex items-center gap-1">
                     <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Live
@@ -60,7 +63,7 @@
                         <span class="tracking-wider">MENU</span>
                     </button>
                     <div class="hidden sm:block">
-                        <span class="text-[9px] font-black text-sky-600 uppercase tracking-widest block leading-none mb-0.5">Asporto Online</span>
+                        <span class="text-[9px] font-black text-sky-600 uppercase tracking-widest block leading-none mb-0.5">Spogliatoio Online</span>
                         <h1 class="font-black text-sm sm:text-base text-slate-900 leading-tight">PMU & The Galleon</h1>
                     </div>
                 </div>
@@ -70,8 +73,8 @@
                         <span class="text-xs uppercase tracking-wider">Carrello</span>
                         <span id="cart-count" class="bg-white text-sky-600 text-xs w-5 h-5 rounded-full flex items-center justify-center font-black shadow-inner">0</span>
                     </button>
-                    <button type="button" onclick="switchToRegia()" class="bg-slate-900 hover:bg-slate-800 text-white px-3.5 py-3 rounded-2xl text-xs font-black transition flex items-center gap-1.5 shadow-xs active:scale-95 cursor-pointer" title="Regia">
-                        <i class="fa-solid fa-desktop text-sm"></i> <span class="hidden sm:inline">Regia</span>
+                    <button type="button" onclick="switchToRegia()" class="bg-slate-900 hover:bg-slate-800 text-white px-3.5 py-3 rounded-2xl text-xs font-black transition flex items-center gap-1.5 shadow-xs active:scale-95 cursor-pointer" title="Il Capitano in Regia">
+                        <i class="fa-solid fa-desktop text-sm"></i> <span class="hidden sm:inline">Il Capitano in Regia</span>
                     </button>
                     <button type="button" onclick="logoutClient()" class="bg-red-50 hover:bg-red-100 text-red-600 px-3 py-3 rounded-2xl text-xs font-bold transition border border-red-200 flex items-center justify-center active:scale-95 cursor-pointer" title="Esci">
                         <i class="fa-solid fa-right-from-bracket text-sm"></i>
@@ -100,6 +103,14 @@
 
             <!-- CATALOGO PRODOTTI -->
             <main class="flex-1 w-full">
+                <!-- BANNER ORDINE ATTIVO -->
+                <div id="active-order-banner" class="hidden mb-4 p-4 bg-emerald-50 border-2 border-emerald-300 rounded-2xl flex justify-between items-center shadow-xs">
+                    <div>
+                        <span class="text-[10px] font-black text-emerald-700 uppercase tracking-widest block">Stato Ordine</span>
+                        <p class="text-xs font-bold text-emerald-900">Hai un ordine attivo in corso. Puoi aggiungere altri piatti o modificare il carrello!</p>
+                    </div>
+                </div>
+
                 <div class="mb-4 flex justify-between items-center px-4 py-3 bg-white rounded-2xl border border-slate-200/60 shadow-2xs">
                     <div>
                         <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block">Categoria</span>
@@ -115,20 +126,20 @@
         </div>
     </div>
 
-    <!-- DASHBOARD REGIA -->
+    <!-- DASHBOARD IL CAPITANO IN REGIA -->
     <div id="regia-app" class="hidden min-h-screen bg-slate-100 flex flex-col">
         <header class="bg-slate-900 text-white shadow-md sticky top-0 z-30">
             <div class="max-w-5xl mx-auto px-4 py-3.5 flex justify-between items-center">
                 <div class="flex items-center gap-2.5">
                     <div class="bg-sky-600 p-2 rounded-xl text-white shadow-inner"><i class="fa-solid fa-desktop text-sm"></i></div>
-                    <h1 class="text-base font-black">Regia & Cucina (Live Sync)</h1>
+                    <h1 class="text-base font-black">Il Capitano in Regia (Live Sync)</h1>
                 </div>
                 <div class="flex items-center gap-2 flex-wrap">
                     <button type="button" onclick="sendAllOrdersToWhatsApp()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-md active:scale-95 cursor-pointer">
-                        <i class="fa-brands fa-whatsapp text-sm"></i> Invia Nuovi a WhatsApp 📱
+                        <i class="fa-brands fa-whatsapp text-sm"></i> Invia a WhatsApp 📱
                     </button>
                     <button type="button" onclick="clearAllOrders()" class="bg-red-600 hover:bg-red-700 text-white px-3.5 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-md active:scale-95 cursor-pointer">
-                        <i class="fa-solid fa-trash text-sm"></i> Azzera 🗑️
+                        <i class="fa-solid fa-trash text-sm"></i> Azzera Tutti 🗑️
                     </button>
                     <button type="button" onclick="switchToClient()" class="bg-slate-800 hover:bg-slate-700 text-white px-4 py-2.5 rounded-xl text-xs font-bold transition active:scale-95 cursor-pointer">
                         Menu
@@ -138,7 +149,7 @@
         </header>
         <main class="flex-1 max-w-5xl w-full mx-auto p-4">
             <div class="flex justify-between items-center mb-3">
-                <h2 class="text-xs font-black uppercase tracking-wider text-slate-500">Ordini in tempo reale</h2>
+                <h2 class="text-xs font-black uppercase tracking-wider text-slate-500">Ordini dello spogliatoio in tempo reale</h2>
                 <span class="text-[11px] bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full font-bold flex items-center gap-1.5 shadow-2xs">
                     <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span> Firebase Connesso
                 </span>
@@ -168,9 +179,12 @@
                 </div>
                 <div id="cart-action-buttons" class="space-y-2">
                     <button type="button" onclick="submitOrder()" class="w-full bg-sky-600 hover:bg-sky-700 active:scale-[0.98] text-white font-black py-4 rounded-2xl transition shadow-lg shadow-sky-600/30 text-sm uppercase tracking-wider cursor-pointer">
-                        Invia Ordine alla Regia 🚀
+                        Invia Ordine al Capitano in Regia 🚀
                     </button>
                 </div>
+                <button type="button" onclick="closeCart()" class="w-full bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold py-3 rounded-2xl transition text-xs uppercase tracking-wider cursor-pointer">
+                    🍕 Torna a Sfogliare il Menu
+                </button>
             </div>
         </div>
     </div>
@@ -211,7 +225,6 @@
     <script>
         const WHATSAPP_REGIA_NUMBER = "393391318613";
 
-        // CONFIGURAZIONE FIREBASE PROGETTO "ordine-pallavolo"
         const firebaseConfig = { databaseURL: "https://ordine-pallavolo-default-rtdb.europe-west1.firebasedatabase.app" };
         if (!firebase.apps.length) {
             firebase.initializeApp(firebaseConfig);
@@ -628,11 +641,14 @@
                     <button type="button" onclick="updateExistingOrder()" class="w-full bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] text-white font-black py-4 rounded-2xl transition shadow-lg shadow-emerald-600/30 text-sm uppercase tracking-wider cursor-pointer">
                         Aggiorna Ordine in Regia 🔄
                     </button>
+                    <button type="button" onclick="cancelExistingOrder()" class="w-full bg-red-50 hover:bg-red-100 text-red-600 active:scale-[0.98] font-bold py-3 rounded-2xl transition text-xs uppercase tracking-wider cursor-pointer border border-red-200">
+                        Annulla e Cancella Ordine 🗑️
+                    </button>
                 `;
             } else {
                 actionContainer.innerHTML = `
                     <button type="button" onclick="submitOrder()" class="w-full bg-sky-600 hover:bg-sky-700 active:scale-[0.98] text-white font-black py-4 rounded-2xl transition shadow-lg shadow-sky-600/30 text-sm uppercase tracking-wider cursor-pointer">
-                        Invia Ordine alla Regia 🚀
+                        Invia Ordine al Capitano in Regia 🚀
                     </button>
                 `;
             }
@@ -676,14 +692,17 @@
                 total: cart.reduce((sum, item) => sum + (item.price * item.qty), 0),
                 status: 'In attesa',
                 sentToWhatsApp: false,
+                isModified: false,
+                cancelledItems: [],
                 time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
             };
 
             db.ref('restaurant_orders/' + newOrderId).set(newOrder)
                 .then(() => {
                     activeOrderId = newOrderId;
+                    document.getElementById("active-order-banner").classList.remove("hidden");
                     closeCart();
-                    alert("Ordine inviato con successo alla Regia! 🚀");
+                    alert("Ordine inviato con successo a Il Capitano in Regia! 🚀 Puoi continuare a ordinare se vuoi.");
                 })
                 .catch(err => {
                     alert("Errore di invio Firebase: " + err.message);
@@ -692,32 +711,73 @@
 
         function updateExistingOrder() {
             if(!activeOrderId) return submitOrder();
-            if(cart.length === 0) return alert("Il carrello è vuoto!");
+            
+            if(cart.length === 0) {
+                return cancelExistingOrder();
+            }
 
-            const updatedData = {
-                items: JSON.parse(JSON.stringify(cart)),
-                total: cart.reduce((sum, item) => sum + (item.price * item.qty), 0),
-                sentToWhatsApp: false
-            };
+            db.ref('restaurant_orders/' + activeOrderId).once('value', snapshot => {
+                const existingOrder = snapshot.val() || {};
+                let existingCancelled = existingOrder.cancelledItems || [];
+                const oldItems = existingOrder.items || [];
 
-            db.ref('restaurant_orders/' + activeOrderId).update(updatedData)
-                .then(() => {
-                    closeCart();
-                    alert("Ordine aggiornato in tempo reale con la Regia! 🔄");
-                })
-                .catch(err => {
-                    alert("Errore nell'aggiornamento: " + err.message);
+                oldItems.forEach(oldItem => {
+                    const newItem = cart.find(i => i.name === oldItem.name);
+                    if (!newItem) {
+                        existingCancelled.push(oldItem);
+                    } else if (newItem.qty < oldItem.qty) {
+                        existingCancelled.push({ ...oldItem, qty: oldItem.qty - newItem.qty });
+                    }
                 });
+
+                const updatedData = {
+                    items: JSON.parse(JSON.stringify(cart)),
+                    total: cart.reduce((sum, item) => sum + (item.price * item.qty), 0),
+                    sentToWhatsApp: false,
+                    isModified: true,
+                    cancelledItems: existingCancelled
+                };
+
+                db.ref('restaurant_orders/' + activeOrderId).update(updatedData)
+                    .then(() => {
+                        closeCart();
+                        alert("Ordine aggiornato in tempo reale con Il Capitano in Regia! 🔄");
+                    })
+                    .catch(err => {
+                        alert("Errore nell'aggiornamento: " + err.message);
+                    });
+            });
         }
 
-        // GESTORE SICURO AL 100% CONTRO IL CRASH DEL MAP
+        function cancelExistingOrder() {
+            if(!activeOrderId) {
+                cart = [];
+                updateCartCount();
+                closeCart();
+                return;
+            }
+
+            if(confirm("Sei sicuro di voler cancellare definitivamente questo ordine?")) {
+                db.ref('restaurant_orders/' + activeOrderId).remove()
+                    .then(() => {
+                        activeOrderId = null;
+                        document.getElementById("active-order-banner").classList.add("hidden");
+                        cart = [];
+                        updateCartCount();
+                        closeCart();
+                        alert("Ordine cancellato con successo.");
+                    })
+                    .catch(err => {
+                        alert("Errore nella cancellazione: " + err.message);
+                    });
+            }
+        }
+
         function loadRegiaOrders() {
             const grid = document.getElementById("orders-grid");
             
             db.ref('restaurant_orders').on('value', snapshot => {
                 const data = snapshot.val();
-                
-                // Se i dati sono nulli o vuoti, mostra il messaggio senza generare errori
                 if(!data) {
                     grid.innerHTML = `<p class="text-center text-slate-400 col-span-full py-16 font-medium text-sm">Nessun ordine ricevuto al momento.</p>`;
                     return;
@@ -733,7 +793,7 @@
                         orders = Object.values(data).filter(o => o && o.items && Array.isArray(o.items)).reverse();
                     }
                 } catch(e) {
-                    console.error("Errore di parsing:", e);
+                    console.error("Errore di parsing dei dati:", e);
                 }
 
                 if (orders.length === 0) {
@@ -744,10 +804,18 @@
                 orders.forEach((order) => {
                     const card = document.createElement("div");
                     const isSent = order.sentToWhatsApp;
-                    const cardBorderClass = isSent ? "border-2 border-emerald-400 bg-white" : "border-4 border-amber-500 bg-amber-50/30 shadow-md";
+                    const isMod = order.isModified;
+                    
+                    let cardBorderClass = isSent ? "border-2 border-emerald-400 bg-white" : "border-4 border-amber-500 bg-amber-50/30 shadow-md";
+                    if(isMod) cardBorderClass = "border-4 border-purple-500 bg-purple-50/30 shadow-lg";
+
                     const statusBadge = isSent 
                         ? `<span class="bg-emerald-100 text-emerald-700 text-[10px] font-black px-2.5 py-1 rounded-full"><i class="fa-brands fa-whatsapp"></i> Inviato a WhatsApp</span>`
                         : `<span class="bg-amber-100 text-amber-800 text-[10px] font-black px-2.5 py-1 rounded-full animate-pulse"><i class="fa-solid fa-triangle-exclamation"></i> Da Inviare a WhatsApp</span>`;
+
+                    const modBadge = isMod 
+                        ? `<span class="bg-purple-100 text-purple-700 text-[10px] font-black px-2.5 py-1 rounded-full ml-1"><i class="fa-solid fa-pen-to-square"></i> MODIFICATO</span>` 
+                        : '';
 
                     card.className = `rounded-3xl p-5 flex flex-col justify-between ${cardBorderClass}`;
                     
@@ -764,6 +832,23 @@
                         `;
                     }).join('');
 
+                    let cancelledHtml = '';
+                    if (order.cancelledItems && order.cancelledItems.length > 0) {
+                        let cancelledList = order.cancelledItems.map(i => `
+                            <div class="text-xs py-1 text-red-600 line-through font-bold flex justify-between">
+                                <span>❌ ${i.qty}x ${i.name}</span>
+                                <span>€ ${(i.price * i.qty).toFixed(2)}</span>
+                            </div>
+                        `).join('');
+
+                        cancelledHtml = `
+                            <div class="my-2 p-3 bg-red-50 rounded-2xl border border-red-200">
+                                <p class="text-[10px] font-black text-red-700 uppercase tracking-wider mb-1">❌ Prodotti Cancellati:</p>
+                                ${cancelledList}
+                            </div>
+                        `;
+                    }
+
                     card.innerHTML = `
                         <div>
                             <div class="flex justify-between items-start mb-2">
@@ -771,17 +856,23 @@
                                     <span class="text-[10px] font-black text-slate-400">${order.id || 'ORD'} • ${order.time || ''}</span>
                                     <h3 class="font-black text-lg text-slate-900">${order.client || 'Ospite'}</h3>
                                 </div>
-                                <select onchange="updateOrderStatus('${order.id}', this.value)" class="text-xs font-bold px-3 py-2 rounded-xl border border-slate-200 bg-white focus:outline-none shadow-xs cursor-pointer">
-                                    <option value="In attesa" ${order.status === 'In attesa' ? 'selected' : ''}>In attesa</option>
-                                    <option value="In preparazione" ${order.status === 'In preparazione' ? 'selected' : ''}>In preparazione</option>
-                                    <option value="Pronto" ${order.status === 'Pronto' ? 'selected' : ''}>Pronto</option>
-                                    <option value="Inviato" ${order.status === 'Inviato' ? 'selected' : ''}>Inviato</option>
-                                </select>
+                                <div class="flex items-center gap-1.5">
+                                    <select onchange="updateOrderStatus('${order.id}', this.value)" class="text-xs font-bold px-2.5 py-2 rounded-xl border border-slate-200 bg-white focus:outline-none shadow-xs cursor-pointer">
+                                        <option value="In attesa" ${order.status === 'In attesa' ? 'selected' : ''}>In attesa</option>
+                                        <option value="In preparazione" ${order.status === 'In preparazione' ? 'selected' : ''}>In preparazione</option>
+                                        <option value="Pronto" ${order.status === 'Pronto' ? 'selected' : ''}>Pronto</option>
+                                        <option value="Inviato" ${order.status === 'Inviato' ? 'selected' : ''}>Inviato</option>
+                                    </select>
+                                    <button type="button" onclick="deleteSingleOrder('${order.id}', '${order.client}')" class="bg-red-50 hover:bg-red-100 text-red-600 p-2 rounded-xl border border-red-200 transition active:scale-95 cursor-pointer" title="Elimina questo ordine">
+                                        <i class="fa-solid fa-trash text-sm"></i>
+                                    </button>
+                                </div>
                             </div>
-                            <div class="mb-3">${statusBadge}</div>
+                            <div class="mb-3 flex flex-wrap gap-1">${statusBadge} ${modBadge}</div>
                             <div class="my-3 space-y-1 bg-white p-3.5 rounded-2xl max-h-44 overflow-y-auto border border-slate-100">
                                 ${itemsHtml}
                             </div>
+                            ${cancelledHtml}
                         </div>
                         <div class="flex justify-between font-black text-slate-900 pt-3 border-t border-slate-100 text-sm items-center">
                             <span>Totale:</span>
@@ -799,8 +890,18 @@
             db.ref('restaurant_orders/' + orderId + '/status').set(newStatus);
         }
 
+        function deleteSingleOrder(orderId, clientName) {
+            if(confirm(`Sei sicuro di voler eliminare l'ordine di ${clientName} (${orderId})?`)) {
+                db.ref('restaurant_orders/' + orderId).remove()
+                    .then(() => {})
+                    .catch(err => {
+                        alert("Errore nella cancellazione: " + err.message);
+                    });
+            }
+        }
+
         function clearAllOrders() {
-            if(confirm("Sei sicuro di voler azzerare ed eliminare TUTTI gli ordini dalla Regia?")) {
+            if(confirm("Sei sicuro di voler azzerare ed eliminare TUTTI gli ordini da Il Capitano in Regia?")) {
                 db.ref('restaurant_orders').remove().then(() => {
                     alert("Tutti gli ordini sono stati azzerati con successo!");
                 });
@@ -825,11 +926,15 @@
                     return alert("Tutti gli ordini presenti sono già stati inviati su WhatsApp!");
                 }
 
-                let text = `*RIEPILOGO ORDINI ASPORTO*%0A`;
+                if (!confirm("Sei sicura che tutti hanno ordinato?")) {
+                    return;
+                }
+
+                let text = `*RIEPILOGO ORDINI SPOGLIATOIO*%0A`;
                 
                 pendingOrders.forEach(order => {
                     text += `%0A-----------------------------------%0A`;
-                    text += `Cliente: *${order.client}* (${order.time})%0A`;
+                    text += `Spogliatoio / ${order.client}: *${order.client}* (${order.time}) ${order.isModified ? '[MODIFICATO]' : ''}%0A`;
                     text += `-----------------------------------%0A`;
                     order.items.forEach(i => {
                         text += `• ${i.qty}x ${i.name}%0A`;
@@ -837,18 +942,26 @@
                             text += `  _Nota: ${i.notes}_%0A`;
                         }
                     });
+                    if (order.cancelledItems && order.cancelledItems.length > 0) {
+                        text += `*❌ CANCELLATI:*%0A`;
+                        order.cancelledItems.forEach(ci => {
+                            text += `• ~${ci.qty}x ${ci.name}~%0A`;
+                        });
+                    }
                 });
                 
                 text += `%0A-----------------------------------`;
-
-                window.open(`https://wa.me/${WHATSAPP_REGIA_NUMBER}?text=${text}`, '_blank');
 
                 const updates = {};
                 pendingOrders.forEach(order => {
                     updates[order.id + '/sentToWhatsApp'] = true;
                 });
 
-                db.ref('restaurant_orders').update(updates);
+                db.ref('restaurant_orders').update(updates).then(() => {
+                    window.open(`https://wa.me/${WHATSAPP_REGIA_NUMBER}?text=${text}`, '_blank');
+                }).catch(err => {
+                    alert("Errore nell'aggiornamento dello stato WhatsApp: " + err.message);
+                });
             });
         }
     </script>
