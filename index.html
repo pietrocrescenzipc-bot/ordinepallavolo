@@ -504,7 +504,6 @@
             deferredPrompt = null;
         });
 
-        // VERIFICA SE L'APP È GIÀ IN MODALITÀ PWA/STANDALONE
         if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
             window.addEventListener('load', () => {
                 const installBtn = document.getElementById('install-app-btn');
@@ -512,26 +511,21 @@
             });
         }
 
-        // INIZIALIZZAZIONE CRONOLOGIA BROWSER
         history.pushState({ page: 1 }, null, window.location.href);
 
-        // GESTIONE TASTO INDIETRO / SWIPE SU ANDROID E APPLE
         window.addEventListener('popstate', function (event) {
             if (cart.length > 0 && !activeOrderId) {
                 const confirmExit = confirm("⚠️ Attenzione! Hai dei prodotti nel carrello che NON sono ancora stati inviati in Regia!\n\nSe esci ora perderai l'ordine. Vuoi davvero uscire?");
-                
                 if (!confirmExit) {
                     history.pushState({ page: 1 }, null, window.location.href);
                     return;
                 }
             }
-            
             if (currentUser) {
                 history.pushState({ page: 1 }, null, window.location.href);
             }
         });
 
-        // PROTEZIONE CHIUSURA SCHEDA / SCHERMO
         window.addEventListener('beforeunload', function (e) {
             if (cart.length > 0 && !activeOrderId) {
                 e.preventDefault();
@@ -569,7 +563,6 @@
             history.pushState({ page: 1 }, null, window.location.href);
             document.getElementById("login-screen").classList.add("hidden");
             document.getElementById("main-app").classList.remove("hidden");
-            
             initApp();
         }
 
@@ -1094,22 +1087,19 @@
                 });
 
                 db.ref('restaurant_orders').update(updates).then(() => {
-                    const whatsappDirectUrl = `whatsapp://send?phone=${WHATSAPP_REGIA_NUMBER}&text=${text}`;
-                    const whatsappFallbackUrl = `https://wa.me/${WHATSAPP_REGIA_NUMBER}?text=${text}`;
-
-                    window.location.href = whatsappDirectUrl;
-
-                    setTimeout(() => {
-                        window.open(whatsappFallbackUrl, '_blank');
-                    }, 1000);
-
+                    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+                    
+                    if (isMobile) {
+                        window.location.href = `whatsapp://send?phone=${WHATSAPP_REGIA_NUMBER}&text=${text}`;
+                    } else {
+                        window.open(`https://wa.me/${WHATSAPP_REGIA_NUMBER}?text=${text}`, '_blank');
+                    }
                 }).catch(err => {
                     alert("Errore nell'aggiornamento dello stato WhatsApp: " + err.message);
                 });
             });
         }
 
-        // REGISTRAZIONE SERVICE WORKER PWA
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('./sw.js')
