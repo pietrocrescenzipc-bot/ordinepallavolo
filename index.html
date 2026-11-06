@@ -41,13 +41,18 @@
             <h1 class="text-2xl font-black text-slate-900 tracking-tight mb-1">PMU & The Galleon</h1>
             <p class="text-xs text-slate-500 mb-6 font-medium">Inserisci il tuo nome per iniziare l'ordine</p>
 
-            <div class="space-y-4 text-left">
+            <div class="space-y-3 text-left">
                 <div>
                     <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5 ml-1">Il tuo Nome *</label>
                     <input type="text" id="client-name" placeholder="Es. Mario Rossi" class="w-full px-4 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 focus:bg-white focus:ring-2 focus:ring-sky-500 focus:outline-none font-bold text-slate-800 transition text-sm">
                 </div>
                 <button type="button" onclick="handleLoginManual()" class="w-full bg-sky-600 hover:bg-sky-700 active:scale-[0.98] text-white font-black py-4 rounded-2xl transition shadow-lg shadow-sky-600/30 text-sm uppercase tracking-wider text-center cursor-pointer">
                     Accedi al Menu 🚀
+                </button>
+
+                <!-- PULSANTE INSTALLAZIONE PWA (Nascosto di default, visibile solo se non ancora installata) -->
+                <button type="button" id="install-app-btn" onclick="installPWA()" class="hidden w-full bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] text-white font-black py-3.5 rounded-2xl transition shadow-md shadow-emerald-600/20 text-xs uppercase tracking-wider text-center cursor-pointer flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-download text-sm"></i> Scarica App 📲
                 </button>
             </div>
 
@@ -468,6 +473,44 @@
         let currentSelectedProduct = null;
         let activeCategoryIndex = 0;
         let activeOrderId = null;
+        let deferredPrompt = null;
+
+        // EVENTO INSTALLAZIONE PWA
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            const installBtn = document.getElementById('install-app-btn');
+            if (installBtn) {
+                installBtn.classList.remove('hidden');
+            }
+        });
+
+        function installPWA() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        const installBtn = document.getElementById('install-app-btn');
+                        if (installBtn) installBtn.classList.add('hidden');
+                    }
+                    deferredPrompt = null;
+                });
+            }
+        }
+
+        window.addEventListener('appinstalled', () => {
+            const installBtn = document.getElementById('install-app-btn');
+            if (installBtn) installBtn.classList.add('hidden');
+            deferredPrompt = null;
+        });
+
+        // VERIFICA SE L'APP È GIÀ IN MODALITÀ PWA/STANDALONE
+        if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+            window.addEventListener('load', () => {
+                const installBtn = document.getElementById('install-app-btn');
+                if (installBtn) installBtn.classList.add('hidden');
+            });
+        }
 
         // INIZIALIZZAZIONE CRONOLOGIA BROWSER
         history.pushState({ page: 1 }, null, window.location.href);
@@ -1022,19 +1065,16 @@
                 let text = `*RIEPILOGO ORDINI SPOGLIATOIO*%0A`;
                 
                 pendingOrders.forEach(order => {
-                    // Nome in grassetto, distanziato e senza orario o scritte extra
                     text += `%0A-----------------------------------%0A`;
                     text += `*${order.client.toUpperCase()}*%0A`;
                     text += `-----------------------------------%0A%0A`;
                     
                     order.items.forEach(i => {
-                        // Prodotto in grassetto e spaziatura generosa
                         text += `• *${i.qty}x ${i.name}*%0A`;
                         if(i.notes) {
-                            // Note con un carattere corsivo/speciale ben distinguibile e distanziato
                             text += `   _↪ Note: ${i.notes}_%0A`;
                         }
-                        text += `%0A`; // Spaziatura extra tra i prodotti
+                        text += `%0A`;
                     });
 
                     if (order.cancelledItems && order.cancelledItems.length > 0) {
