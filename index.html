@@ -1022,24 +1022,31 @@
                 let text = `*RIEPILOGO ORDINI SPOGLIATOIO*%0A`;
                 
                 pendingOrders.forEach(order => {
+                    // Nome in grassetto, distanziato e senza orario o scritte extra
                     text += `%0A-----------------------------------%0A`;
-                    text += `Spogliatoio / ${order.client}: *${order.client}* (${order.time}) ${order.isModified ? '[MODIFICATO]' : ''}%0A`;
-                    text += `-----------------------------------%0A`;
+                    text += `*${order.client.toUpperCase()}*%0A`;
+                    text += `-----------------------------------%0A%0A`;
+                    
                     order.items.forEach(i => {
-                        text += `• ${i.qty}x ${i.name}%0A`;
+                        // Prodotto in grassetto e spaziatura generosa
+                        text += `• *${i.qty}x ${i.name}*%0A`;
                         if(i.notes) {
-                            text += `  _Nota: ${i.notes}_%0A`;
+                            // Note con un carattere corsivo/speciale ben distinguibile e distanziato
+                            text += `   _↪ Note: ${i.notes}_%0A`;
                         }
+                        text += `%0A`; // Spaziatura extra tra i prodotti
                     });
+
                     if (order.cancelledItems && order.cancelledItems.length > 0) {
                         text += `*❌ CANCELLATI:*%0A`;
                         order.cancelledItems.forEach(ci => {
                             text += `• ~${ci.qty}x ${ci.name}~%0A`;
                         });
+                        text += `%0A`;
                     }
                 });
                 
-                text += `%0A-----------------------------------`;
+                text += `-----------------------------------`;
 
                 const updates = {};
                 pendingOrders.forEach(order => {
@@ -1047,7 +1054,15 @@
                 });
 
                 db.ref('restaurant_orders').update(updates).then(() => {
-                    window.open(`https://wa.me/${WHATSAPP_REGIA_NUMBER}?text=${text}`, '_blank');
+                    const whatsappDirectUrl = `whatsapp://send?phone=${WHATSAPP_REGIA_NUMBER}&text=${text}`;
+                    const whatsappFallbackUrl = `https://wa.me/${WHATSAPP_REGIA_NUMBER}?text=${text}`;
+
+                    window.location.href = whatsappDirectUrl;
+
+                    setTimeout(() => {
+                        window.open(whatsappFallbackUrl, '_blank');
+                    }, 1000);
+
                 }).catch(err => {
                     alert("Errore nell'aggiornamento dello stato WhatsApp: " + err.message);
                 });
