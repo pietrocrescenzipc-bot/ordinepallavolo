@@ -50,10 +50,22 @@
                     Accedi al Menu 🚀
                 </button>
 
-                <!-- PULSANTE INSTALLAZIONE PWA SUPER ACCATTIVANTE (Nascosto di default, visibile se non installata) -->
+                <!-- PULSANTE INSTALLAZIONE PWA (Per Android e PC) -->
                 <button type="button" id="install-app-btn" onclick="installPWA()" class="hidden w-full bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 hover:from-emerald-600 hover:to-teal-700 active:scale-[0.98] text-white font-black py-4 rounded-2xl transition-all shadow-xl shadow-emerald-500/40 text-xs uppercase tracking-wider text-center cursor-pointer flex items-center justify-center gap-2.5 border border-emerald-400/30 animate-pulse">
                     <i class="fa-solid fa-cloud-arrow-down text-base bg-white/20 p-1.5 rounded-xl"></i> Scarica Subito l'App 📲
                 </button>
+
+                <!-- AVVISO SPECIFICO PER UTENTI APPLE / iPHONE -->
+                <div id="ios-install-banner" class="hidden mt-2 p-4 bg-sky-50 border-2 border-sky-300 rounded-2xl text-left text-xs shadow-xs">
+                    <div class="flex items-center gap-2 mb-2">
+                        <i class="fa-brands fa-apple text-sky-700 text-base"></i>
+                        <span class="font-black uppercase tracking-wider text-sky-900">Come scaricare l'app su iPhone:</span>
+                    </div>
+                    <ol class="space-y-1 text-slate-700 font-medium pl-1">
+                        <li>1. Tocca l'icona <b>Condividi</b> <i class="fa-solid fa-arrow-up-from-bracket text-sky-600"></i> in basso in Safari.</li>
+                        <li>2. Scorri il menu e seleziona <br><b>"Aggiungi alla schermata Home"</b> ➕.</li>
+                    </ol>
+                </div>
             </div>
 
             <div class="mt-6 border-t border-slate-100 pt-4 flex justify-between items-center text-xs">
@@ -475,13 +487,25 @@
         let activeOrderId = null;
         let deferredPrompt = null;
 
-        // EVENTO INSTALLAZIONE PWA
+        // EVENTO INSTALLAZIONE PWA & RILEVAMENTO iOS
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
             const installBtn = document.getElementById('install-app-btn');
             if (installBtn) {
                 installBtn.classList.remove('hidden');
+            }
+        });
+
+        window.addEventListener('load', () => {
+            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+            const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+            
+            if (isIOS && !isStandalone) {
+                const iosBanner = document.getElementById('ios-install-banner');
+                if (iosBanner) {
+                    iosBanner.classList.remove('hidden');
+                }
             }
         });
 
