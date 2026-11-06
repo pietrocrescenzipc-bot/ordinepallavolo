@@ -81,6 +81,7 @@
                     <button type="button" onclick="openCart()" class="relative bg-sky-600 hover:bg-sky-700 active:scale-95 text-white px-4.5 py-3 rounded-2xl font-black flex items-center gap-2.5 transition shadow-md shadow-sky-600/30 cursor-pointer">
                         <i class="fa-solid fa-basket-shopping text-base"></i>
                         <span class="text-xs uppercase tracking-wider">Carrello</span>
+                        <!-- BADGE NUMERICO CON ANIMAZIONE DI ATTENZIONE -->
                         <span id="cart-count" class="bg-white text-sky-600 text-xs w-5 h-5 rounded-full flex items-center justify-center font-black shadow-inner">0</span>
                     </button>
                     <button type="button" onclick="switchToRegia()" class="bg-slate-900 hover:bg-slate-800 text-white px-3.5 py-3 rounded-2xl text-xs font-black transition flex items-center gap-1.5 shadow-xs active:scale-95 cursor-pointer" title="Il Capitano in Regia">
@@ -393,6 +394,7 @@
                     { name: "MOZZARELLINE", price: 5.00, desc: "7 Pezzi" },
                     { name: "OLIVE ASCOLANE", price: 5.00, desc: "7 Pezzi" },
                     { name: "PATATE SCAVATE (DIPPERS)", price: 4.50, desc: "Patate dippers" },
+                    { name: "PATATE & WURSTEL", price: 5.00, desc: "Patatine e wurstel" },
                     { name: "PATATINE FRITTE", price: 4.00, desc: "Patatine classiche" },
                     { name: "PATATINE CHIPS", price: 4.50, desc: "Patatine chips" },
                     { name: "SUPPLI", price: 2.00, desc: "Al pezzo singolo" },
@@ -473,6 +475,14 @@
             }
         });
 
+        // PROTEZIONE CHIUSURA APPLICAZIONE / SCHEDA SE CI SONO PRODOTTI NON INVIATI
+        window.addEventListener('beforeunload', function (e) {
+            if (cart.length > 0 && !activeOrderId) {
+                e.preventDefault();
+                e.returnValue = ''; // Standard per attivare l'avviso di uscita del browser
+            }
+        });
+
         function showToast(message) {
             const existing = document.getElementById("custom-toast");
             if(existing) existing.remove();
@@ -529,6 +539,11 @@
         }
 
         function switchToRegia() {
+            if (cart.length > 0 && !activeOrderId) {
+                if (!confirm("⚠️ Hai dei prodotti nel carrello non inviati in Regia! Vuoi passare comunque in Regia perdendo la visuale del carrello?")) {
+                    return;
+                }
+            }
             document.getElementById("login-screen").classList.add("hidden");
             document.getElementById("main-app").classList.add("hidden");
             document.getElementById("regia-app").classList.remove("hidden");
@@ -638,7 +653,15 @@
 
         function updateCartCount() {
             const totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
-            document.getElementById("cart-count").innerText = totalItems;
+            const countBadge = document.getElementById("cart-count");
+            countBadge.innerText = totalItems;
+
+            // Se ci sono articoli, facciamo lampeggiare/animare il badge per attirare l'attenzione
+            if (totalItems > 0) {
+                countBadge.classList.add("animate-bounce", "bg-amber-300", "text-slate-900");
+            } else {
+                countBadge.classList.remove("animate-bounce", "bg-amber-300", "text-slate-900");
+            }
         }
 
         function openCart() {
@@ -755,6 +778,7 @@
                     activeOrderId = newOrderId;
                     document.getElementById("active-order-banner").classList.remove("hidden");
                     document.getElementById("cart-modal").classList.add("hidden");
+                    updateCartCount();
                     alert("Ordine inviato con successo a Il Capitano in Regia! 🚀 Puoi continuare a ordinare se vuoi.");
                 })
                 .catch(err => {
