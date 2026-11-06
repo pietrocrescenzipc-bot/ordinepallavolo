@@ -81,7 +81,7 @@
                     <button type="button" onclick="openCart()" class="relative bg-sky-600 hover:bg-sky-700 active:scale-95 text-white px-4.5 py-3 rounded-2xl font-black flex items-center gap-2.5 transition shadow-md shadow-sky-600/30 cursor-pointer">
                         <i class="fa-solid fa-basket-shopping text-base"></i>
                         <span class="text-xs uppercase tracking-wider">Carrello</span>
-                        <!-- BADGE NUMERICO CON ANIMAZIONE DI ATTENZIONE -->
+                        <!-- BADGE NUMERICO ANIMATO -->
                         <span id="cart-count" class="bg-white text-sky-600 text-xs w-5 h-5 rounded-full flex items-center justify-center font-black shadow-inner">0</span>
                     </button>
                     <button type="button" onclick="switchToRegia()" class="bg-slate-900 hover:bg-slate-800 text-white px-3.5 py-3 rounded-2xl text-xs font-black transition flex items-center gap-1.5 shadow-xs active:scale-95 cursor-pointer" title="Il Capitano in Regia">
@@ -469,17 +469,30 @@
         let activeCategoryIndex = 0;
         let activeOrderId = null;
 
+        // INIZIALIZZAZIONE CRONOLOGIA BROWSER
+        history.pushState({ page: 1 }, null, window.location.href);
+
+        // GESTIONE TASTO INDIETRO / SWIPE SU ANDROID E APPLE
         window.addEventListener('popstate', function (event) {
+            if (cart.length > 0 && !activeOrderId) {
+                const confirmExit = confirm("⚠️ Attenzione! Hai dei prodotti nel carrello che NON sono ancora stati inviati in Regia!\n\nSe esci ora perderai l'ordine. Vuoi davvero uscire?");
+                
+                if (!confirmExit) {
+                    history.pushState({ page: 1 }, null, window.location.href);
+                    return;
+                }
+            }
+            
             if (currentUser) {
-                history.pushState(null, null, window.location.href);
+                history.pushState({ page: 1 }, null, window.location.href);
             }
         });
 
-        // PROTEZIONE CHIUSURA APPLICAZIONE / SCHEDA SE CI SONO PRODOTTI NON INVIATI
+        // PROTEZIONE CHIUSURA SCHEDA / SCHERMO
         window.addEventListener('beforeunload', function (e) {
             if (cart.length > 0 && !activeOrderId) {
                 e.preventDefault();
-                e.returnValue = ''; // Standard per attivare l'avviso di uscita del browser
+                e.returnValue = '';
             }
         });
 
@@ -510,7 +523,7 @@
             }
 
             currentUser = name;
-            history.pushState(null, null, window.location.href);
+            history.pushState({ page: 1 }, null, window.location.href);
             document.getElementById("login-screen").classList.add("hidden");
             document.getElementById("main-app").classList.remove("hidden");
             
@@ -656,7 +669,6 @@
             const countBadge = document.getElementById("cart-count");
             countBadge.innerText = totalItems;
 
-            // Se ci sono articoli, facciamo lampeggiare/animare il badge per attirare l'attenzione
             if (totalItems > 0) {
                 countBadge.classList.add("animate-bounce", "bg-amber-300", "text-slate-900");
             } else {
