@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <!-- maximum-scale=1: impedisce lo zoom automatico quando si tocca un campo (la pagina resta sempre a misura di schermo) -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <title>Sport & Galleon • Spogliatoio & Asporto</title>
     <meta name="application-name" content="Sport & Galleon">
 
@@ -135,7 +135,7 @@
                         <span class="conn-dot w-2 h-2 rounded-full bg-slate-300"></span><span class="conn-label">Connessione…</span>
                     </span>
                 </div>
-                <p class="mt-3 text-center text-[10px] text-slate-400">Versione 1.3 · 17/11/2026</p>
+                <p class="mt-3 text-center text-[10px] text-slate-400">Versione 1.4 · 17/11/2026</p>
             </div>
         </div>
     </div>
@@ -144,7 +144,7 @@
     <div id="main-app" class="hidden min-h-screen flex flex-col">
         <!-- APPBAR -->
         <header id="main-header" class="safe-top safe-x sticky top-0 z-30 bg-white/85 backdrop-blur-xl border-b border-slate-200/70">
-            <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between gap-3">
+            <div class="max-w-6xl mx-auto px-3 sm:px-4 min-h-[3.75rem] py-2 flex items-center justify-between gap-2 sm:gap-3">
                 <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
                     <!-- Pulsante MENU (tre lineette): apre il pannello con tutte le categorie -->
                     <button type="button" onclick="openCategoryDrawer()" aria-label="Apri il menu delle categorie" class="h-11 shrink-0 pl-3 pr-3.5 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-700 border border-sky-200 font-bold text-sm flex items-center gap-2 active:scale-95 transition cursor-pointer">
@@ -175,7 +175,7 @@
         </header>
 
         <!-- CATEGORIE (mobile/tablet): barra a chip orizzontale sempre visibile -->
-        <nav class="lg:hidden safe-x sticky z-20 bg-slate-50/90 backdrop-blur-xl border-b border-slate-200/70" style="top: calc(4rem + env(safe-area-inset-top));" aria-label="Categorie">
+        <nav class="lg:hidden bg-slate-50 border-b border-slate-200/70" aria-label="Categorie">
             <div id="category-chips" class="flex gap-2 overflow-x-auto no-scrollbar px-4 py-3 scroll-smooth"></div>
         </nav>
 
@@ -194,8 +194,8 @@
 
                 <!-- INVITO A INSTALLARE L'APP (chiudibile) -->
                 <div id="install-card" class="hidden mb-5 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-2xl p-4 shadow-lg shadow-emerald-500/20 flex items-center gap-3">
-                    <div class="w-11 h-11 shrink-0 rounded-xl bg-white/20 grid place-items-center text-xl"><i class="fa-solid fa-mobile-screen-button"></i></div>
-                    <div class="flex-1 min-w-0">
+                    <div class="hidden min-[400px]:grid w-11 h-11 shrink-0 rounded-xl bg-white/20 place-items-center text-xl"><i class="fa-solid fa-mobile-screen-button"></i></div>
+                    <div class="flex-1 min-w-0 break-words">
                         <p class="font-bold text-sm leading-tight">Installa l'app</p>
                         <p class="hidden min-[400px]:block text-xs text-white/85">La ritrovi sulla schermata Home</p>
                     </div>
@@ -298,7 +298,7 @@
                     <i class="fa-solid fa-right-from-bracket w-7 text-center text-lg"></i> Esci
                 </button>
             </div>
-            <p class="text-center text-[10px] text-slate-400 pt-1" style="padding-bottom: max(0.75rem, env(safe-area-inset-bottom));">Versione 1.3 · 17/11/2026</p>
+            <p class="text-center text-[10px] text-slate-400 pt-1" style="padding-bottom: max(0.75rem, env(safe-area-inset-bottom));">Versione 1.4 · 17/11/2026</p>
         </aside>
     </div>
 
@@ -336,7 +336,7 @@
     <div id="variation-modal" class="modal fixed inset-0 z-50 hidden" role="dialog" aria-modal="true" aria-labelledby="modal-product-title">
         <div class="anim-fade absolute inset-0 bg-slate-900/50 backdrop-blur-sm" onclick="closeVariationModal()"></div>
         <div class="absolute inset-x-0 bottom-0 sm:inset-0 sm:flex sm:items-center sm:justify-center sm:p-4 pointer-events-none">
-            <div class="anim-up pointer-events-auto bg-white rounded-t-[2rem] sm:rounded-[2rem] max-w-md w-full mx-auto shadow-2xl max-h-[92vh] overflow-y-auto" style="padding-bottom: env(safe-area-inset-bottom);">
+            <div class="anim-up pointer-events-auto bg-white rounded-t-[2rem] sm:rounded-[2rem] max-w-md w-full mx-auto shadow-2xl overflow-y-auto overscroll-contain" style="max-height: 88vh; max-height: 88dvh;">
                 <div class="sm:hidden w-10 h-1.5 rounded-full bg-slate-200 mx-auto mt-3"></div>
                 <div class="p-6">
                     <div class="flex justify-between items-start gap-3">
@@ -366,10 +366,12 @@
                         <textarea id="product-notes" rows="2" placeholder="Es. senza cipolla, ben cotto…" class="w-full px-4 py-3 rounded-2xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-sky-500 focus:ring-4 focus:ring-sky-500/15 focus:outline-none text-base text-slate-800 placeholder:text-slate-400 transition resize-none"></textarea>
                     </div>
 
-                    <div class="flex gap-2.5 mt-6">
-                        <button type="button" onclick="closeVariationModal()" class="px-5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-3.5 rounded-2xl transition active:scale-95 cursor-pointer">Annulla</button>
+                    <!-- Pulsanti sempre visibili in fondo alla finestra, anche su schermi bassi -->
+                    <div class="sticky bottom-0 -mx-6 -mb-6 mt-5 px-6 pt-3 pb-4 bg-white border-t border-slate-100 flex gap-2.5">
+                        <button type="button" onclick="closeVariationModal()" class="px-4 sm:px-5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-3.5 rounded-2xl transition active:scale-95 cursor-pointer">Annulla</button>
                         <button type="button" onclick="confirmAddToCart()" class="flex-1 bg-sky-600 hover:bg-sky-700 active:scale-[0.98] text-white font-bold py-3.5 rounded-2xl transition shadow-lg shadow-sky-600/25 flex items-center justify-center gap-2 cursor-pointer">
-                            <i class="fa-solid fa-plus text-sm"></i> Aggiungi · <span id="modal-total" class="tabular-nums"></span>
+                            <i class="fa-solid fa-plus text-sm"></i>
+                            <span class="flex flex-col items-start leading-tight"><span>Aggiungi</span><span id="modal-total" class="text-xs font-semibold opacity-90 tabular-nums"></span></span>
                         </button>
                     </div>
                 </div>
@@ -381,7 +383,7 @@
     <div id="install-modal" class="modal fixed inset-0 z-[55] hidden" role="dialog" aria-modal="true" aria-labelledby="install-title">
         <div class="anim-fade absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="closeInstallGuide()"></div>
         <div class="absolute inset-x-0 bottom-0 sm:inset-0 sm:flex sm:items-center sm:justify-center sm:p-4 pointer-events-none">
-            <div class="anim-up pointer-events-auto bg-white rounded-t-[2rem] sm:rounded-[2rem] max-w-md w-full mx-auto shadow-2xl max-h-[92vh] overflow-y-auto" style="padding-bottom: env(safe-area-inset-bottom);">
+            <div class="anim-up pointer-events-auto bg-white rounded-t-[2rem] sm:rounded-[2rem] max-w-md w-full mx-auto shadow-2xl overflow-y-auto overscroll-contain" style="max-height: 88vh; max-height: 88dvh;">
                 <div class="sm:hidden w-10 h-1.5 rounded-full bg-slate-200 mx-auto mt-3"></div>
                 <div class="p-6">
                     <div class="flex items-start justify-between gap-3 mb-5">
@@ -721,11 +723,12 @@
                 warning: "fa-triangle-exclamation text-amber-400"
             };
             const toast = document.createElement("div");
-            toast.className = "anim-toast pointer-events-auto max-w-sm w-fit bg-slate-900/95 backdrop-blur text-white pl-4 pr-5 py-3 rounded-2xl shadow-2xl text-sm font-medium flex items-center gap-2.5 transition-all duration-300";
-            toast.innerHTML = `<i class="fa-solid ${icons[type] || icons.info} text-base"></i><span>${esc(message)}</span>`;
+            // Un solo avviso alla volta, compatto e "trasparente" ai tocchi: non copre mai i pulsanti
+            toast.className = "anim-toast pointer-events-none max-w-sm w-fit bg-slate-900/90 backdrop-blur text-white pl-3.5 pr-4 py-2.5 rounded-2xl shadow-2xl text-sm font-medium flex items-center gap-2.5 transition-all duration-300";
+            toast.innerHTML = `<i class="fa-solid ${icons[type] || icons.info} text-base shrink-0"></i><span class="line-clamp-2">${esc(message)}</span>`;
             const stack = $("toast-stack");
+            stack.innerHTML = "";
             stack.appendChild(toast);
-            while (stack.children.length > 3) stack.firstChild.remove();
             setTimeout(() => {
                 toast.style.opacity = "0";
                 toast.style.transform = "translateY(-8px)";
