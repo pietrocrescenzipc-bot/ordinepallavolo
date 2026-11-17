@@ -2,7 +2,8 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <!-- maximum-scale=1: impedisce lo zoom automatico quando si tocca un campo (la pagina resta sempre a misura di schermo) -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
     <title>Sport & Galleon • Spogliatoio & Asporto</title>
     <meta name="application-name" content="Sport & Galleon">
 
@@ -11,7 +12,7 @@
     <meta name="theme-color" content="#0284c7">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="apple-mobile-web-app-title" content="Sport & Galleon">
     <link rel="apple-touch-icon" href="icon.png">
     <link rel="icon" type="image/png" href="icon.png">
@@ -47,7 +48,10 @@
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         * { -webkit-tap-highlight-color: transparent; }
         html, body { overscroll-behavior-y: none; }
-        body { font-feature-settings: "cv11", "ss01"; }
+        body { font-feature-settings: "cv11", "ss01"; overflow-x: clip; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+        /* Spazio per notch e barre di sistema (iPhone con app installata, telefono in orizzontale) */
+        .safe-top { padding-top: env(safe-area-inset-top); }
+        .safe-x { padding-left: env(safe-area-inset-left); padding-right: env(safe-area-inset-right); }
 
         @keyframes fadeIn   { from { opacity: 0 } to { opacity: 1 } }
         @keyframes slideUp  { from { opacity: 0; transform: translateY(18px) } to { opacity: 1; transform: none } }
@@ -88,7 +92,7 @@
             <div class="absolute -bottom-32 -right-24 w-[28rem] h-[28rem] rounded-full bg-indigo-600/20 blur-3xl"></div>
         </div>
 
-        <div class="relative min-h-full flex items-center justify-center p-4">
+        <div class="safe-top relative min-h-full flex items-center justify-center p-4">
             <div class="anim-up bg-white rounded-[2rem] max-w-sm w-full p-7 sm:p-8 shadow-2xl ring-1 ring-white/10">
                 <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-sky-500 to-sky-700 text-white grid place-items-center mx-auto mb-5 text-2xl shadow-lg shadow-sky-600/40">
                     <i class="fa-solid fa-utensils"></i>
@@ -131,6 +135,7 @@
                         <span class="conn-dot w-2 h-2 rounded-full bg-slate-300"></span><span class="conn-label">Connessione…</span>
                     </span>
                 </div>
+                <p class="mt-3 text-center text-[10px] text-slate-400">Versione 1.3 · 17/11/2026</p>
             </div>
         </div>
     </div>
@@ -138,11 +143,11 @@
     <!-- ============ APP CLIENTE ============ -->
     <div id="main-app" class="hidden min-h-screen flex flex-col">
         <!-- APPBAR -->
-        <header class="sticky top-0 z-30 bg-white/85 backdrop-blur-xl border-b border-slate-200/70">
+        <header id="main-header" class="safe-top safe-x sticky top-0 z-30 bg-white/85 backdrop-blur-xl border-b border-slate-200/70">
             <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between gap-3">
                 <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
                     <!-- Pulsante MENU (tre lineette): apre il pannello con tutte le categorie -->
-                    <button type="button" onclick="openCategoryDrawer()" aria-label="Apri il menu delle categorie" class="lg:hidden h-11 shrink-0 pl-3 pr-3.5 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-700 border border-sky-200 font-bold text-sm flex items-center gap-2 active:scale-95 transition cursor-pointer">
+                    <button type="button" onclick="openCategoryDrawer()" aria-label="Apri il menu delle categorie" class="h-11 shrink-0 pl-3 pr-3.5 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-700 border border-sky-200 font-bold text-sm flex items-center gap-2 active:scale-95 transition cursor-pointer">
                         <i class="fa-solid fa-bars text-base"></i><span>Menu</span>
                     </button>
                     <div class="hidden sm:grid w-10 h-10 shrink-0 rounded-xl bg-gradient-to-br from-sky-500 to-sky-700 text-white place-items-center shadow-md shadow-sky-600/30">
@@ -159,10 +164,10 @@
                         <span class="hidden sm:inline text-sm">Carrello</span>
                         <span id="cart-count" class="hidden absolute -top-1.5 -right-1.5 min-w-[1.375rem] h-[1.375rem] px-1 rounded-full bg-amber-400 text-slate-900 text-[11px] font-extrabold grid place-items-center ring-2 ring-white">0</span>
                     </button>
-                    <button type="button" onclick="switchToRegia()" title="Il Capitano in Regia" aria-label="Il Capitano in Regia" class="h-11 px-3 rounded-xl text-slate-600 hover:bg-slate-100 hover:text-slate-900 active:scale-95 transition flex items-center gap-2 cursor-pointer">
+                    <button type="button" onclick="switchToRegia()" title="Il Capitano in Regia" aria-label="Il Capitano in Regia" class="hidden sm:flex h-11 px-3 rounded-xl text-slate-600 hover:bg-slate-100 hover:text-slate-900 active:scale-95 transition items-center gap-2 cursor-pointer">
                         <i class="fa-solid fa-desktop"></i><span class="hidden md:inline text-sm font-semibold">Regia</span>
                     </button>
-                    <button type="button" onclick="logoutClient()" title="Esci" aria-label="Esci" class="h-11 w-11 rounded-xl text-slate-500 hover:bg-rose-50 hover:text-rose-600 active:scale-95 transition grid place-items-center cursor-pointer">
+                    <button type="button" onclick="logoutClient()" title="Esci" aria-label="Esci" class="hidden sm:grid h-11 w-11 rounded-xl text-slate-500 hover:bg-rose-50 hover:text-rose-600 active:scale-95 transition place-items-center cursor-pointer">
                         <i class="fa-solid fa-right-from-bracket"></i>
                     </button>
                 </div>
@@ -170,7 +175,7 @@
         </header>
 
         <!-- CATEGORIE (mobile/tablet): barra a chip orizzontale sempre visibile -->
-        <nav class="lg:hidden sticky top-16 z-20 bg-slate-50/90 backdrop-blur-xl border-b border-slate-200/70" aria-label="Categorie">
+        <nav class="lg:hidden safe-x sticky z-20 bg-slate-50/90 backdrop-blur-xl border-b border-slate-200/70" style="top: calc(4rem + env(safe-area-inset-top));" aria-label="Categorie">
             <div id="category-chips" class="flex gap-2 overflow-x-auto no-scrollbar px-4 py-3 scroll-smooth"></div>
         </nav>
 
@@ -191,8 +196,8 @@
                 <div id="install-card" class="hidden mb-5 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-2xl p-4 shadow-lg shadow-emerald-500/20 flex items-center gap-3">
                     <div class="w-11 h-11 shrink-0 rounded-xl bg-white/20 grid place-items-center text-xl"><i class="fa-solid fa-mobile-screen-button"></i></div>
                     <div class="flex-1 min-w-0">
-                        <p class="font-bold text-sm">Metti l'app sul telefono</p>
-                        <p class="text-xs text-white/85">La ritrovi sulla schermata Home, come un'app vera</p>
+                        <p class="font-bold text-sm leading-tight">Installa l'app</p>
+                        <p class="hidden min-[400px]:block text-xs text-white/85">La ritrovi sulla schermata Home</p>
                     </div>
                     <button type="button" onclick="openInstallGuide()" class="shrink-0 bg-white text-emerald-700 font-bold text-sm px-4 py-2.5 rounded-xl active:scale-95 transition cursor-pointer">Installa</button>
                     <button type="button" onclick="dismissInstallCard()" aria-label="Non ora" class="shrink-0 w-8 h-8 -mr-1 rounded-full text-white/80 hover:bg-white/15 grid place-items-center cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
@@ -238,7 +243,7 @@
 
     <!-- ============ DASHBOARD REGIA ============ -->
     <div id="regia-app" class="hidden min-h-screen bg-slate-100 flex flex-col">
-        <header class="bg-slate-900 text-white sticky top-0 z-30 shadow-lg">
+        <header class="safe-top safe-x bg-slate-900 text-white sticky top-0 z-30 shadow-lg">
             <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-3">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-xl bg-sky-600 grid place-items-center shadow-inner"><i class="fa-solid fa-desktop"></i></div>
@@ -272,7 +277,7 @@
     <!-- ============ MENU CATEGORIE (pannello laterale) ============ -->
     <div id="category-drawer" class="modal fixed inset-0 z-50 hidden" role="dialog" aria-modal="true" aria-labelledby="drawer-title">
         <div class="anim-fade absolute inset-0 bg-slate-900/50 backdrop-blur-sm" onclick="closeCategoryDrawer()"></div>
-        <aside class="anim-left absolute left-0 inset-y-0 bg-white w-[85%] max-w-xs flex flex-col shadow-2xl">
+        <aside class="anim-left safe-top absolute left-0 inset-y-0 bg-white w-[85%] max-w-xs flex flex-col shadow-2xl">
             <div class="px-5 h-16 border-b border-slate-100 flex justify-between items-center shrink-0">
                 <h2 id="drawer-title" class="font-extrabold text-lg text-slate-900 flex items-center gap-2.5">
                     <i class="fa-solid fa-bars text-sky-600"></i> Categorie
@@ -281,14 +286,26 @@
                     <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
-            <nav id="drawer-category-list" class="flex-1 overflow-y-auto p-3 space-y-1" style="padding-bottom: max(0.75rem, env(safe-area-inset-bottom));"></nav>
+            <nav id="drawer-category-list" class="flex-1 overflow-y-auto p-3 space-y-1"></nav>
+            <div class="border-t border-slate-100 p-3 space-y-1 shrink-0">
+                <button type="button" id="drawer-install" onclick="closeCategoryDrawer(); openInstallGuide()" class="w-full text-left px-4 py-3 rounded-2xl text-[15px] font-semibold text-emerald-700 bg-emerald-50 hover:bg-emerald-100 flex items-center gap-3 active:scale-[0.98] transition cursor-pointer">
+                    <i class="fa-solid fa-mobile-screen-button w-7 text-center text-lg"></i> Installa l'app sul telefono
+                </button>
+                <button type="button" onclick="closeCategoryDrawer(); switchToRegia()" class="w-full text-left px-4 py-3 rounded-2xl text-[15px] font-semibold text-slate-700 hover:bg-slate-100 flex items-center gap-3 active:scale-[0.98] transition cursor-pointer">
+                    <i class="fa-solid fa-desktop w-7 text-center text-lg text-slate-500"></i> Il Capitano in Regia
+                </button>
+                <button type="button" onclick="closeCategoryDrawer(); logoutClient()" class="w-full text-left px-4 py-3 rounded-2xl text-[15px] font-semibold text-rose-600 hover:bg-rose-50 flex items-center gap-3 active:scale-[0.98] transition cursor-pointer">
+                    <i class="fa-solid fa-right-from-bracket w-7 text-center text-lg"></i> Esci
+                </button>
+            </div>
+            <p class="text-center text-[10px] text-slate-400 pt-1" style="padding-bottom: max(0.75rem, env(safe-area-inset-bottom));">Versione 1.3 · 17/11/2026</p>
         </aside>
     </div>
 
     <!-- ============ CARRELLO (drawer) ============ -->
     <div id="cart-modal" class="modal fixed inset-0 z-50 hidden" role="dialog" aria-modal="true" aria-labelledby="cart-title">
         <div class="anim-fade absolute inset-0 bg-slate-900/50 backdrop-blur-sm" onclick="closeCart()"></div>
-        <div class="anim-right absolute right-0 inset-y-0 bg-white w-full max-w-md flex flex-col shadow-2xl">
+        <div class="anim-right safe-top absolute right-0 inset-y-0 bg-white w-full max-w-md flex flex-col shadow-2xl">
             <div class="px-5 h-16 border-b border-slate-100 flex justify-between items-center shrink-0">
                 <h2 id="cart-title" class="font-extrabold text-lg text-slate-900 flex items-center gap-2.5">
                     <i class="fa-solid fa-basket-shopping text-sky-600"></i> Il tuo carrello
@@ -814,6 +831,7 @@
         function refreshInstallUI() {
             const show = !isStandalone();
             $("install-login-box").classList.toggle("hidden", !show);
+            $("drawer-install").classList.toggle("hidden", !show);
             let dismissed = false;
             try { dismissed = localStorage.getItem("install_card_dismissed") === "1"; } catch (e) {}
             const mobile = device.ios || device.android;
@@ -835,7 +853,7 @@
                 if (choice.outcome === 'accepted') {
                     closeInstallGuide();
                     refreshInstallUI();
-                } else {
+                } else if (isOpen("install-modal")) {
                     renderInstallGuide();
                 }
             });
@@ -954,9 +972,25 @@
         }
 
         function openInstallGuide() {
+            // Android/PC con installazione automatica: si apre subito la finestra del telefono (1 tocco)
+            if (deferredPrompt) return installPWA();
             renderInstallGuide();
             openModal("install-modal");
         }
+
+        // Prima visita da telefono (app non installata): la guida si apre da sola, una volta sola
+        window.addEventListener("load", () => {
+            if (isStandalone() || !(device.ios || device.android)) return;
+            let shown = false;
+            try { shown = localStorage.getItem("install_guide_auto") === "1"; } catch (e) {}
+            if (shown) return;
+            setTimeout(() => {
+                if (currentUser || isOpen("install-modal") || isStandalone()) return;
+                try { localStorage.setItem("install_guide_auto", "1"); } catch (e) {}
+                renderInstallGuide();
+                openModal("install-modal");
+            }, 1500);
+        });
         function closeInstallGuide() { closeModal("install-modal"); }
 
         function copyAppLink() {
