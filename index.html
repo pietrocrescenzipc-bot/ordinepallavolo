@@ -2,8 +2,9 @@
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PMU & The Galleon • Spogliatoio & Asporto</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Sport & Galleon • Spogliatoio & Asporto</title>
+    <meta name="application-name" content="Sport & Galleon">
 
     <!-- METATAG PWA & ICONE -->
     <link rel="manifest" href="manifest.json">
@@ -11,258 +12,390 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="PMU & Galleon">
+    <meta name="apple-mobile-web-app-title" content="Sport & Galleon">
     <link rel="apple-touch-icon" href="icon.png">
     <link rel="icon" type="image/png" href="icon.png">
 
+    <!-- Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'] },
+                    boxShadow: {
+                        card: '0 1px 2px rgba(15,23,42,.04), 0 4px 16px -4px rgba(15,23,42,.08)',
+                        lift: '0 2px 4px rgba(15,23,42,.04), 0 16px 32px -8px rgba(2,132,199,.22)'
+                    }
+                }
+            }
+        };
+    </script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    
+
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-    
+
     <style>
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         * { -webkit-tap-highlight-color: transparent; }
         html, body { overscroll-behavior-y: none; }
+        body { font-feature-settings: "cv11", "ss01"; }
+
+        @keyframes fadeIn   { from { opacity: 0 } to { opacity: 1 } }
+        @keyframes slideUp  { from { opacity: 0; transform: translateY(18px) } to { opacity: 1; transform: none } }
+        @keyframes slideInR { from { transform: translateX(100%) } to { transform: none } }
+        @keyframes toastIn  { from { opacity: 0; transform: translateY(-12px) scale(.96) } to { opacity: 1; transform: none } }
+        @keyframes pop      { 0% { transform: scale(1) } 40% { transform: scale(1.35) } 100% { transform: scale(1) } }
+        @keyframes shake    { 0%,100% { transform: translateX(0) } 20%,60% { transform: translateX(-6px) } 40%,80% { transform: translateX(6px) } }
+
+        .anim-fade  { animation: fadeIn .2s ease-out both; }
+        .anim-up    { animation: slideUp .28s cubic-bezier(.2,.8,.2,1) both; }
+        .anim-right { animation: slideInR .3s cubic-bezier(.2,.8,.2,1) both; }
+        .anim-toast { animation: toastIn .25s cubic-bezier(.2,.8,.2,1) both; }
+        .anim-pop   { animation: pop .4s ease; }
+        .anim-shake { animation: shake .35s ease; }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation: none !important; transition: none !important; }
+        }
+
+        /* Rimuove le frecce degli input numerici */
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type=number] { -moz-appearance: textfield; }
     </style>
 </head>
-<body class="bg-slate-100 text-slate-900 font-sans antialiased selection:bg-sky-500 selection:text-white">
+<body class="bg-slate-50 text-slate-900 font-sans antialiased selection:bg-sky-500 selection:text-white">
 
-    <!-- SCHERMATA LOGIN / BENVENUTO -->
-    <div id="login-screen" class="fixed inset-0 bg-slate-950/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-[2.5rem] max-w-sm w-full p-8 shadow-2xl border border-slate-100 text-center">
-            <div class="w-16 h-16 bg-sky-50 text-sky-600 rounded-2xl flex items-center justify-center mx-auto mb-4 text-2xl font-bold shadow-inner">
-                <i class="fa-solid fa-utensils"></i>
-            </div>
-            <h1 class="text-2xl font-black text-slate-900 tracking-tight mb-1">PMU & The Galleon</h1>
-            <p class="text-xs text-slate-500 mb-6 font-medium">Inserisci il tuo nome per iniziare l'ordine</p>
+    <!-- ============ TOAST ============ -->
+    <div id="toast-stack" class="fixed top-3 inset-x-0 z-[70] flex flex-col items-center gap-2 px-4 pointer-events-none" aria-live="polite"></div>
 
-            <div class="space-y-3 text-left">
-                <div>
-                    <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5 ml-1">Il tuo Nome *</label>
-                    <input type="text" id="client-name" placeholder="Es. Mario Rossi" class="w-full px-4 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 focus:bg-white focus:ring-2 focus:ring-sky-500 focus:outline-none font-bold text-slate-800 transition text-sm">
+    <!-- ============ LOGIN / BENVENUTO ============ -->
+    <div id="login-screen" class="fixed inset-0 z-50 overflow-y-auto bg-slate-950">
+        <!-- sfondo decorativo -->
+        <div class="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+            <div class="absolute -top-32 -left-24 w-96 h-96 rounded-full bg-sky-600/30 blur-3xl"></div>
+            <div class="absolute -bottom-32 -right-24 w-[28rem] h-[28rem] rounded-full bg-indigo-600/20 blur-3xl"></div>
+        </div>
+
+        <div class="relative min-h-full flex items-center justify-center p-4">
+            <div class="anim-up bg-white rounded-[2rem] max-w-sm w-full p-7 sm:p-8 shadow-2xl ring-1 ring-white/10">
+                <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-sky-500 to-sky-700 text-white grid place-items-center mx-auto mb-5 text-2xl shadow-lg shadow-sky-600/40">
+                    <i class="fa-solid fa-utensils"></i>
                 </div>
-                <button type="button" onclick="handleLoginManual()" class="w-full bg-sky-600 hover:bg-sky-700 active:scale-[0.98] text-white font-black py-4 rounded-2xl transition shadow-lg shadow-sky-600/30 text-sm uppercase tracking-wider text-center cursor-pointer">
-                    Accedi al Menu 🚀
-                </button>
+                <h1 class="text-2xl font-black text-slate-900 tracking-tight text-center">Sport & Galleon</h1>
+                <p class="text-sm text-slate-500 mt-1 mb-7 text-center">Ordina dallo spogliatoio in pochi tocchi</p>
 
-                <!-- PULSANTE INSTALLAZIONE PWA (Per Android e PC) -->
-                <button type="button" id="install-app-btn" onclick="installPWA()" class="hidden w-full bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 hover:from-emerald-600 hover:to-teal-700 active:scale-[0.98] text-white font-black py-4 rounded-2xl transition-all shadow-xl shadow-emerald-500/40 text-xs uppercase tracking-wider text-center cursor-pointer flex items-center justify-center gap-2.5 border border-emerald-400/30 animate-pulse">
-                    <i class="fa-solid fa-cloud-arrow-down text-base bg-white/20 p-1.5 rounded-xl"></i> Scarica Subito l'App 📲
-                </button>
-
-                <!-- AVVISO SPECIFICO PER UTENTI APPLE / iPHONE -->
-                <div id="ios-install-banner" class="hidden mt-2 p-4 bg-sky-50 border-2 border-sky-300 rounded-2xl text-left text-xs shadow-xs">
-                    <div class="flex items-center gap-2 mb-2">
-                        <i class="fa-brands fa-apple text-sky-700 text-base"></i>
-                        <span class="font-black uppercase tracking-wider text-sky-900">Come scaricare l'app su iPhone:</span>
+                <form onsubmit="event.preventDefault(); handleLoginManual();" class="space-y-3" novalidate>
+                    <div>
+                        <label for="client-name" class="block text-xs font-semibold text-slate-600 mb-1.5 ml-1">Il tuo nome</label>
+                        <div class="relative">
+                            <i class="fa-regular fa-user absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                            <input type="text" id="client-name" autocomplete="given-name" enterkeyhint="go" placeholder="Es. Mario Rossi"
+                                oninput="clearLoginError()"
+                                class="w-full pl-11 pr-4 py-3.5 rounded-2xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-sky-500 focus:ring-4 focus:ring-sky-500/15 focus:outline-none font-semibold text-slate-800 placeholder:text-slate-400 placeholder:font-normal transition text-base">
+                        </div>
+                        <p id="login-error" class="hidden text-xs text-rose-600 font-medium mt-1.5 ml-1">
+                            <i class="fa-solid fa-circle-exclamation mr-1"></i>Inserisci il tuo nome per continuare
+                        </p>
                     </div>
-                    <ol class="space-y-1 text-slate-700 font-medium pl-1">
-                        <li>1. Tocca l'icona <b>Condividi</b> <i class="fa-solid fa-arrow-up-from-bracket text-sky-600"></i> in basso in Safari.</li>
-                        <li>2. Scorri il menu e seleziona <br><b>"Aggiungi alla schermata Home"</b> ➕.</li>
-                    </ol>
-                </div>
-            </div>
+                    <button type="submit" class="w-full bg-sky-600 hover:bg-sky-700 active:scale-[0.98] text-white font-bold py-4 rounded-2xl transition shadow-lg shadow-sky-600/30 flex items-center justify-center gap-2 cursor-pointer">
+                        Accedi al menu <i class="fa-solid fa-arrow-right text-sm"></i>
+                    </button>
 
-            <div class="mt-6 border-t border-slate-100 pt-4 flex justify-between items-center text-xs">
-                <button type="button" onclick="switchToRegia()" class="font-bold text-slate-500 hover:text-sky-600 transition flex items-center gap-1.5 cursor-pointer">
-                    <i class="fa-solid fa-desktop text-sm"></i> Il Capitano in Regia
-                </button>
-                <span class="text-emerald-600 font-bold flex items-center gap-1">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Live
-                </span>
+                </form>
+
+                <!-- INSTALLAZIONE APP (iPhone, Android e PC): un solo pulsante, poi guida passo-passo -->
+                <div id="install-login-box" class="hidden mt-3">
+                    <button type="button" onclick="openInstallGuide()" class="w-full bg-emerald-500 hover:bg-emerald-600 active:scale-[0.98] text-white font-bold py-4 rounded-2xl transition shadow-lg shadow-emerald-500/30 flex items-center justify-center gap-2.5 cursor-pointer">
+                        <i class="fa-solid fa-mobile-screen-button text-lg"></i> Scarica l'app sul telefono
+                    </button>
+                    <p class="text-center text-xs text-slate-500 mt-2">Gratis · senza App Store · bastano 10 secondi</p>
+                </div>
+
+                <div class="mt-7 pt-5 border-t border-slate-100 flex justify-between items-center text-xs">
+                    <button type="button" onclick="switchToRegia()" class="font-semibold text-slate-500 hover:text-sky-600 transition flex items-center gap-1.5 cursor-pointer">
+                        <i class="fa-solid fa-desktop"></i> Il Capitano in Regia
+                    </button>
+                    <span class="conn-indicator flex items-center gap-1.5 font-semibold text-slate-400">
+                        <span class="conn-dot w-2 h-2 rounded-full bg-slate-300"></span><span class="conn-label">Connessione…</span>
+                    </span>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- APP PRINCIPALE CLIENTE -->
-    <div id="main-app" class="hidden min-h-screen flex flex-col bg-slate-50">
+    <!-- ============ APP CLIENTE ============ -->
+    <div id="main-app" class="hidden min-h-screen flex flex-col">
         <!-- APPBAR -->
-        <header class="bg-white/95 backdrop-blur-md shadow-xs sticky top-0 z-30 border-b border-slate-200/60">
-            <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center gap-2">
-                <div class="flex items-center gap-2">
-                    <button type="button" onclick="toggleSidebar()" class="flex items-center gap-2 bg-sky-50 hover:bg-sky-100 text-sky-700 px-4 py-3 rounded-2xl font-black text-xs transition border-2 border-sky-200 active:scale-95 cursor-pointer shadow-xs">
-                        <i class="fa-solid fa-bars text-base text-sky-600"></i>
-                        <span class="tracking-wider">MENU</span>
-                    </button>
-                    <div class="hidden sm:block">
-                        <span class="text-[9px] font-black text-sky-600 uppercase tracking-widest block leading-none mb-0.5">Spogliatoio Online</span>
-                        <h1 class="font-black text-sm sm:text-base text-slate-900 leading-tight">PMU & The Galleon</h1>
+        <header class="sticky top-0 z-30 bg-white/85 backdrop-blur-xl border-b border-slate-200/70">
+            <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between gap-3">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="w-10 h-10 shrink-0 rounded-xl bg-gradient-to-br from-sky-500 to-sky-700 text-white grid place-items-center shadow-md shadow-sky-600/30">
+                        <i class="fa-solid fa-utensils"></i>
+                    </div>
+                    <div class="min-w-0">
+                        <h1 class="font-extrabold text-slate-900 leading-tight truncate">Sport & Galleon</h1>
+                        <p class="text-xs text-slate-500 truncate">Ciao, <span id="hello-name" class="font-semibold text-slate-700"></span> 👋</p>
                     </div>
                 </div>
-                <div class="flex items-center gap-2">
-                    <button type="button" onclick="openCart()" class="relative bg-sky-600 hover:bg-sky-700 active:scale-95 text-white px-4.5 py-3 rounded-2xl font-black flex items-center gap-2.5 transition shadow-md shadow-sky-600/30 cursor-pointer">
-                        <i class="fa-solid fa-basket-shopping text-base"></i>
-                        <span class="text-xs uppercase tracking-wider">Carrello</span>
-                        <!-- BADGE NUMERICO ANIMATO -->
-                        <span id="cart-count" class="bg-white text-sky-600 text-xs w-5 h-5 rounded-full flex items-center justify-center font-black shadow-inner">0</span>
+                <div class="flex items-center gap-1.5 shrink-0">
+                    <button type="button" onclick="openCart()" aria-label="Apri carrello" class="relative h-11 px-3.5 sm:px-4 rounded-xl bg-sky-600 hover:bg-sky-700 active:scale-95 text-white font-semibold flex items-center gap-2 transition shadow-md shadow-sky-600/25 cursor-pointer">
+                        <i class="fa-solid fa-basket-shopping"></i>
+                        <span class="hidden sm:inline text-sm">Carrello</span>
+                        <span id="cart-count" class="hidden absolute -top-1.5 -right-1.5 min-w-[1.375rem] h-[1.375rem] px-1 rounded-full bg-amber-400 text-slate-900 text-[11px] font-extrabold grid place-items-center ring-2 ring-white">0</span>
                     </button>
-                    <button type="button" onclick="switchToRegia()" class="bg-slate-900 hover:bg-slate-800 text-white px-3.5 py-3 rounded-2xl text-xs font-black transition flex items-center gap-1.5 shadow-xs active:scale-95 cursor-pointer" title="Il Capitano in Regia">
-                        <i class="fa-solid fa-desktop text-sm"></i> <span class="hidden sm:inline">Il Capitano in Regia</span>
+                    <button type="button" onclick="switchToRegia()" title="Il Capitano in Regia" aria-label="Il Capitano in Regia" class="h-11 px-3 rounded-xl text-slate-600 hover:bg-slate-100 hover:text-slate-900 active:scale-95 transition flex items-center gap-2 cursor-pointer">
+                        <i class="fa-solid fa-desktop"></i><span class="hidden md:inline text-sm font-semibold">Regia</span>
                     </button>
-                    <button type="button" onclick="logoutClient()" class="bg-red-50 hover:bg-red-100 text-red-600 px-3 py-3 rounded-2xl text-xs font-bold transition border border-red-200 flex items-center justify-center active:scale-95 cursor-pointer" title="Esci">
-                        <i class="fa-solid fa-right-from-bracket text-sm"></i>
+                    <button type="button" onclick="logoutClient()" title="Esci" aria-label="Esci" class="h-11 w-11 rounded-xl text-slate-500 hover:bg-rose-50 hover:text-rose-600 active:scale-95 transition grid place-items-center cursor-pointer">
+                        <i class="fa-solid fa-right-from-bracket"></i>
                     </button>
                 </div>
             </div>
         </header>
 
-        <!-- BODY CONTAINER -->
-        <div class="flex-1 max-w-5xl w-full mx-auto flex p-4 gap-6 relative">
-            
-            <!-- DRAWER CATEGORIE -->
-            <aside id="sidebar" class="fixed inset-y-0 left-0 z-40 w-80 bg-white shadow-2xl p-5 transform -translate-x-full transition-transform duration-300 md:translate-x-0 md:static md:w-72 md:shadow-none md:border-r md:border-slate-200/60 md:bg-transparent flex flex-col">
-                <div class="flex justify-between items-center mb-4 md:hidden">
-                    <h3 class="font-black text-lg text-slate-900">Categorie Menu</h3>
-                    <button type="button" onclick="toggleSidebar()" class="text-slate-400 hover:text-slate-700 text-2xl font-bold cursor-pointer">&times;</button>
-                </div>
-                <h3 class="hidden md:block font-black text-xs uppercase tracking-wider text-slate-400 mb-3">Categorie</h3>
-                <div id="sidebar-category-list" class="space-y-3 overflow-y-auto flex-1 pr-1 no-scrollbar">
-                    <!-- Generato via JS -->
+        <!-- CATEGORIE (mobile/tablet): barra a chip orizzontale sempre visibile -->
+        <nav class="lg:hidden sticky top-16 z-20 bg-slate-50/90 backdrop-blur-xl border-b border-slate-200/70" aria-label="Categorie">
+            <div id="category-chips" class="flex gap-2 overflow-x-auto no-scrollbar px-4 py-3 scroll-smooth"></div>
+        </nav>
+
+        <div class="flex-1 max-w-6xl w-full mx-auto px-4 py-5 lg:py-8 lg:grid lg:grid-cols-[240px_1fr] lg:gap-8">
+            <!-- CATEGORIE (desktop): sidebar fissa -->
+            <aside class="hidden lg:block">
+                <div class="sticky top-24">
+                    <h3 class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-3 px-3">Categorie</h3>
+                    <div id="sidebar-category-list" class="space-y-1"></div>
                 </div>
             </aside>
 
-            <!-- OVERLAY MOBILE -->
-            <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-slate-900/40 backdrop-blur-2xs z-30 hidden md:hidden"></div>
+            <main class="min-w-0">
+                <!-- BANNER ORDINE ATTIVO (con stato live) -->
+                <div id="active-order-banner" class="hidden mb-5"></div>
 
-            <!-- CATALOGO PRODOTTI -->
-            <main class="flex-1 w-full">
-                <!-- BANNER ORDINE ATTIVO -->
-                <div id="active-order-banner" class="hidden mb-4 p-4 bg-emerald-50 border-2 border-emerald-300 rounded-2xl flex justify-between items-center shadow-xs">
+                <!-- INVITO A INSTALLARE L'APP (chiudibile) -->
+                <div id="install-card" class="hidden mb-5 bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-2xl p-4 shadow-lg shadow-emerald-500/20 flex items-center gap-3">
+                    <div class="w-11 h-11 shrink-0 rounded-xl bg-white/20 grid place-items-center text-xl"><i class="fa-solid fa-mobile-screen-button"></i></div>
+                    <div class="flex-1 min-w-0">
+                        <p class="font-bold text-sm">Metti l'app sul telefono</p>
+                        <p class="text-xs text-white/85">La ritrovi sulla schermata Home, come un'app vera</p>
+                    </div>
+                    <button type="button" onclick="openInstallGuide()" class="shrink-0 bg-white text-emerald-700 font-bold text-sm px-4 py-2.5 rounded-xl active:scale-95 transition cursor-pointer">Installa</button>
+                    <button type="button" onclick="dismissInstallCard()" aria-label="Non ora" class="shrink-0 w-8 h-8 -mr-1 rounded-full text-white/80 hover:bg-white/15 grid place-items-center cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+
+                <!-- RICERCA -->
+                <div class="relative mb-5">
+                    <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                    <input type="search" id="search-input" placeholder="Cerca un piatto o un ingrediente…" oninput="onSearch(this.value)"
+                        class="w-full pl-11 pr-11 py-3 rounded-2xl bg-white border border-slate-200 shadow-card focus:border-sky-500 focus:ring-4 focus:ring-sky-500/15 focus:outline-none text-base placeholder:text-slate-400 transition [&::-webkit-search-cancel-button]:hidden">
+                    <button type="button" id="search-clear" onclick="clearSearch()" aria-label="Cancella ricerca" class="hidden absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full text-slate-400 hover:bg-slate-100 hover:text-slate-700 cursor-pointer">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <div class="flex items-end justify-between mb-4">
                     <div>
-                        <span class="text-[10px] font-black text-emerald-700 uppercase tracking-widest block">Stato Ordine</span>
-                        <p class="text-xs font-bold text-emerald-900">Hai un ordine attivo in corso. Puoi aggiungere altri piatti o modificare il carrello!</p>
+                        <h2 id="current-category-title" class="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">Antipasti</h2>
+                        <p id="current-category-sub" class="text-sm text-slate-500 mt-0.5"></p>
                     </div>
                 </div>
 
-                <div class="mb-4 flex justify-between items-center px-4 py-3 bg-white rounded-2xl border border-slate-200/60 shadow-2xs">
-                    <div>
-                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest block">Categoria</span>
-                        <h2 id="current-category-title" class="text-lg sm:text-xl font-black text-slate-900 tracking-tight">Antipasti</h2>
-                    </div>
-                    <span class="text-[11px] font-bold text-sky-600 bg-sky-50 px-3 py-1.5 rounded-xl border border-sky-100">Tocca per variare</span>
-                </div>
-                <!-- CATALOGO PRODOTTI -->
-                <div id="products-container" class="grid grid-cols-1 md:grid-cols-2 gap-4 pb-24">
-                    <!-- Generato via JS -->
-                </div>
+                <div id="products-container" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4 pb-32"></div>
             </main>
+        </div>
+
+        <!-- BARRA CARRELLO FLUTTUANTE -->
+        <div id="cart-bar" class="hidden fixed inset-x-0 bottom-0 z-30 px-4 pt-2 pointer-events-none" style="padding-bottom: max(1rem, env(safe-area-inset-bottom));">
+            <button type="button" id="cart-bar-btn" onclick="openCart()" class="pointer-events-auto anim-up max-w-xl mx-auto w-full flex items-center gap-3 rounded-2xl pl-3 pr-4 py-3 text-white shadow-2xl transition active:scale-[0.98] cursor-pointer">
+                <span class="relative w-11 h-11 shrink-0 rounded-xl bg-white/15 grid place-items-center">
+                    <i class="fa-solid fa-basket-shopping"></i>
+                    <span id="cart-bar-count" class="absolute -top-1.5 -right-1.5 min-w-[1.25rem] h-5 px-1 rounded-full bg-white text-slate-900 text-[11px] font-extrabold grid place-items-center">0</span>
+                </span>
+                <span class="flex-1 text-left min-w-0">
+                    <span id="cart-bar-label" class="block text-sm font-bold truncate"></span>
+                    <span id="cart-bar-sub" class="block text-xs opacity-80 truncate"></span>
+                </span>
+                <span id="cart-bar-total" class="font-extrabold text-base tabular-nums"></span>
+                <i class="fa-solid fa-chevron-right text-xs opacity-70"></i>
+            </button>
         </div>
     </div>
 
-    <!-- DASHBOARD IL CAPITANO IN REGIA -->
+    <!-- ============ DASHBOARD REGIA ============ -->
     <div id="regia-app" class="hidden min-h-screen bg-slate-100 flex flex-col">
-        <header class="bg-slate-900 text-white shadow-md sticky top-0 z-30">
-            <div class="max-w-5xl mx-auto px-4 py-3.5 flex justify-between items-center">
-                <div class="flex items-center gap-2.5">
-                    <div class="bg-sky-600 p-2 rounded-xl text-white shadow-inner"><i class="fa-solid fa-desktop text-sm"></i></div>
-                    <h1 class="text-base font-black">Il Capitano in Regia (Live Sync)</h1>
+        <header class="bg-slate-900 text-white sticky top-0 z-30 shadow-lg">
+            <div class="max-w-6xl mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-3">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-sky-600 grid place-items-center shadow-inner"><i class="fa-solid fa-desktop"></i></div>
+                    <div>
+                        <h1 class="font-extrabold leading-tight">Il Capitano in Regia</h1>
+                        <p class="conn-indicator text-xs text-slate-400 flex items-center gap-1.5">
+                            <span class="conn-dot w-2 h-2 rounded-full bg-slate-500"></span><span class="conn-label">Connessione…</span>
+                        </p>
+                    </div>
                 </div>
-                <div class="flex items-center gap-2 flex-wrap">
-                    <button type="button" onclick="sendAllOrdersToWhatsApp()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-md active:scale-95 cursor-pointer">
-                        <i class="fa-brands fa-whatsapp text-sm"></i> Invia a WhatsApp 📱
+                <div class="flex items-center gap-2">
+                    <button type="button" onclick="sendAllOrdersToWhatsApp()" class="h-10 bg-emerald-500 hover:bg-emerald-600 text-white px-4 rounded-xl text-sm font-semibold transition flex items-center gap-2 shadow-md shadow-emerald-500/20 active:scale-95 cursor-pointer">
+                        <i class="fa-brands fa-whatsapp text-base"></i> <span>Invia a WhatsApp</span>
                     </button>
-                    <button type="button" onclick="clearAllOrders()" class="bg-red-600 hover:bg-red-700 text-white px-3.5 py-2.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-md active:scale-95 cursor-pointer">
-                        <i class="fa-solid fa-trash text-sm"></i> Azzera Tutti 🗑️
+                    <button type="button" onclick="clearAllOrders()" title="Azzera tutti gli ordini" class="h-10 px-3.5 rounded-xl text-sm font-semibold text-rose-300 hover:bg-rose-500/15 hover:text-rose-200 transition flex items-center gap-2 active:scale-95 cursor-pointer">
+                        <i class="fa-solid fa-trash-can"></i> <span class="hidden sm:inline">Azzera</span>
                     </button>
-                    <button type="button" onclick="switchToClient()" class="bg-slate-800 hover:bg-slate-700 text-white px-4 py-2.5 rounded-xl text-xs font-bold transition active:scale-95 cursor-pointer">
-                        Menu
+                    <button type="button" onclick="switchToClient()" class="h-10 px-3.5 rounded-xl text-sm font-semibold bg-white/10 hover:bg-white/15 transition flex items-center gap-2 active:scale-95 cursor-pointer">
+                        <i class="fa-solid fa-arrow-left text-xs"></i> Menu
                     </button>
                 </div>
             </div>
         </header>
-        <main class="flex-1 max-w-5xl w-full mx-auto p-4">
-            <div class="flex justify-between items-center mb-3">
-                <h2 class="text-xs font-black uppercase tracking-wider text-slate-500">Ordini dello spogliatoio in tempo reale</h2>
-                <span class="text-[11px] bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full font-bold flex items-center gap-1.5 shadow-2xs">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span> Firebase Connesso
-                </span>
-            </div>
-            <div id="orders-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <!-- Ordini dinamici -->
-            </div>
+        <main class="flex-1 max-w-6xl w-full mx-auto p-4 sm:py-6">
+            <div id="regia-stats" class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6"></div>
+            <h2 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">Ordini in tempo reale</h2>
+            <div id="orders-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 items-start"></div>
         </main>
     </div>
 
-    <!-- MODALE CARRELLO -->
-    <div id="cart-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 hidden flex justify-end">
-        <div class="bg-white w-full max-w-md h-full flex flex-col shadow-2xl animate-in slide-in-from-right duration-200">
-            <div class="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-                <h2 class="font-black text-base text-slate-900 flex items-center gap-2">
-                    <i class="fa-solid fa-basket-shopping text-sky-600"></i> Il tuo Carrello
+    <!-- ============ CARRELLO (drawer) ============ -->
+    <div id="cart-modal" class="modal fixed inset-0 z-50 hidden" role="dialog" aria-modal="true" aria-labelledby="cart-title">
+        <div class="anim-fade absolute inset-0 bg-slate-900/50 backdrop-blur-sm" onclick="closeCart()"></div>
+        <div class="anim-right absolute right-0 inset-y-0 bg-white w-full max-w-md flex flex-col shadow-2xl">
+            <div class="px-5 h-16 border-b border-slate-100 flex justify-between items-center shrink-0">
+                <h2 id="cart-title" class="font-extrabold text-lg text-slate-900 flex items-center gap-2.5">
+                    <i class="fa-solid fa-basket-shopping text-sky-600"></i> Il tuo carrello
                 </h2>
-                <button type="button" onclick="closeCart()" class="text-slate-400 hover:text-slate-700 text-2xl font-bold w-8 h-8 flex items-center justify-center cursor-pointer">&times;</button>
+                <button type="button" onclick="closeCart()" aria-label="Chiudi" class="w-10 h-10 rounded-full text-slate-400 hover:bg-slate-100 hover:text-slate-700 grid place-items-center cursor-pointer">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
             </div>
 
-            <!-- PROMEMORIA DIMENTICANZA REGIA -->
-            <div id="cart-warning-banner" class="px-4 pt-3 hidden">
-                <div class="p-3 bg-amber-50 border-2 border-amber-300 rounded-2xl text-amber-900 text-xs font-bold flex items-start gap-2.5 shadow-xs">
-                    <i class="fa-solid fa-triangle-exclamation text-amber-600 text-base mt-0.5 animate-bounce"></i>
-                    <div>
-                        <span class="block font-black uppercase text-[10px] text-amber-800 tracking-wider">Attenzione! Ordine non Inviato</span>
-                        I prodotti qui sotto <strong>NON sono ancora stati inviati</strong> al Capitano in Regia! Clicca il pulsante in basso per confermare.
-                    </div>
-                </div>
-            </div>
+            <div id="cart-warning-banner" class="hidden px-4 pt-4"></div>
 
-            <div id="cart-items" class="flex-1 overflow-y-auto p-4 space-y-3">
-                <!-- Elementi carrello -->
-            </div>
+            <div id="cart-items" class="flex-1 overflow-y-auto p-4 space-y-2.5"></div>
 
-            <div class="p-4 border-t border-slate-100 bg-slate-50 space-y-3">
-                <div class="flex justify-between text-lg font-black text-slate-900">
-                    <span>Totale:</span>
-                    <span id="cart-total" class="text-sky-600">€ 0.00</span>
+            <div class="p-4 border-t border-slate-100 bg-slate-50/80 space-y-3 shrink-0" style="padding-bottom: max(1rem, env(safe-area-inset-bottom));">
+                <div class="flex justify-between items-baseline">
+                    <span class="text-sm font-medium text-slate-500">Totale</span>
+                    <span id="cart-total" class="text-2xl font-extrabold text-slate-900 tabular-nums">€ 0,00</span>
                 </div>
-                <div id="cart-action-buttons" class="space-y-2">
-                    <button type="button" onclick="submitOrder()" class="w-full bg-sky-600 hover:bg-sky-700 active:scale-[0.98] text-white font-black py-4 rounded-2xl transition shadow-lg shadow-sky-600/30 text-sm uppercase tracking-wider cursor-pointer">
-                        Invia Ordine al Capitano in Regia 🚀
-                    </button>
-                </div>
-                <button type="button" onclick="closeCart()" class="w-full bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold py-3 rounded-2xl transition text-xs uppercase tracking-wider cursor-pointer">
-                    🍕 Torna a Sfogliare il Menu
+                <div id="cart-action-buttons" class="space-y-2"></div>
+                <button type="button" onclick="closeCart()" class="w-full text-slate-600 hover:text-slate-900 hover:bg-slate-100 font-semibold py-2.5 rounded-xl transition text-sm cursor-pointer">
+                    Continua a sfogliare il menu
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- MODALE VARIAZIONI -->
-    <div id="variation-modal" class="fixed inset-0 bg-slate-900/70 backdrop-blur-xs z-50 hidden flex items-end sm:items-center justify-center sm:p-4">
-        <div class="bg-white rounded-t-[2.5rem] sm:rounded-[2.5rem] max-w-md w-full p-6 shadow-2xl border border-slate-100 animate-in fade-in zoom-in-95 duration-200">
-            <div class="flex justify-between items-start mb-3">
-                <div>
-                    <h3 id="modal-product-title" class="text-lg font-black text-slate-900 tracking-tight"></h3>
-                    <p id="modal-product-price" class="text-sky-600 font-bold text-xs mt-0.5"></p>
-                </div>
-                <button type="button" onclick="closeVariationModal()" class="text-slate-400 hover:text-slate-600 text-xl font-bold p-1 cursor-pointer">&times;</button>
-            </div>
-            
-            <div class="my-4">
-                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2">Quantità</label>
-                <div class="flex items-center gap-3">
-                    <button type="button" onclick="decrementQty()" class="bg-slate-100 hover:bg-slate-200 text-slate-800 font-black w-12 h-12 rounded-2xl text-lg flex items-center justify-center active:scale-95 transition cursor-pointer">-</button>
-                    <input type="number" id="product-qty" value="1" min="1" class="flex-1 text-center py-3 rounded-2xl bg-slate-50 border border-slate-200 font-black text-lg focus:outline-none">
-                    <button type="button" onclick="incrementQty()" class="bg-slate-100 hover:bg-slate-200 text-slate-800 font-black w-12 h-12 rounded-2xl text-lg flex items-center justify-center active:scale-95 transition cursor-pointer">+</button>
-                </div>
-            </div>
+    <!-- ============ VARIAZIONI PRODOTTO (bottom sheet) ============ -->
+    <div id="variation-modal" class="modal fixed inset-0 z-50 hidden" role="dialog" aria-modal="true" aria-labelledby="modal-product-title">
+        <div class="anim-fade absolute inset-0 bg-slate-900/50 backdrop-blur-sm" onclick="closeVariationModal()"></div>
+        <div class="absolute inset-x-0 bottom-0 sm:inset-0 sm:flex sm:items-center sm:justify-center sm:p-4 pointer-events-none">
+            <div class="anim-up pointer-events-auto bg-white rounded-t-[2rem] sm:rounded-[2rem] max-w-md w-full mx-auto shadow-2xl max-h-[92vh] overflow-y-auto" style="padding-bottom: env(safe-area-inset-bottom);">
+                <div class="sm:hidden w-10 h-1.5 rounded-full bg-slate-200 mx-auto mt-3"></div>
+                <div class="p-6">
+                    <div class="flex justify-between items-start gap-3">
+                        <div class="min-w-0">
+                            <div id="modal-product-tags" class="flex flex-wrap gap-1 mb-1.5"></div>
+                            <h3 id="modal-product-title" class="text-xl font-extrabold text-slate-900 tracking-tight leading-snug"></h3>
+                            <p id="modal-product-price" class="text-sky-600 font-bold mt-0.5"></p>
+                        </div>
+                        <button type="button" onclick="closeVariationModal()" aria-label="Chiudi" class="w-10 h-10 shrink-0 -mr-2 -mt-1 rounded-full text-slate-400 hover:bg-slate-100 hover:text-slate-700 grid place-items-center cursor-pointer">
+                            <i class="fa-solid fa-xmark text-lg"></i>
+                        </button>
+                    </div>
+                    <p id="modal-product-desc" class="text-sm text-slate-600 leading-relaxed mt-3"></p>
 
-            <div class="mb-6">
-                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Note / Variazioni (facoltativo)</label>
-                <textarea id="product-notes" rows="2.5" placeholder="Es. Senza cipolla, ben cotto..." class="w-full px-4 py-3 rounded-2xl bg-slate-50 border border-slate-200 focus:bg-white focus:ring-2 focus:ring-sky-500 focus:outline-none text-xs font-medium text-slate-800 transition"></textarea>
-            </div>
+                    <div class="mt-6">
+                        <label for="product-qty" class="block text-xs font-semibold text-slate-600 mb-2">Quantità</label>
+                        <div class="flex items-center gap-2 bg-slate-100 rounded-2xl p-1.5 w-fit">
+                            <button type="button" onclick="decrementQty()" aria-label="Diminuisci" class="w-11 h-11 rounded-xl bg-white text-slate-800 shadow-sm hover:bg-slate-50 active:scale-90 transition grid place-items-center cursor-pointer"><i class="fa-solid fa-minus text-sm"></i></button>
+                            <input type="number" id="product-qty" value="1" min="1" inputmode="numeric" oninput="updateModalTotal()" class="w-14 text-center bg-transparent font-extrabold text-xl text-slate-900 focus:outline-none tabular-nums">
+                            <button type="button" onclick="incrementQty()" aria-label="Aumenta" class="w-11 h-11 rounded-xl bg-white text-slate-800 shadow-sm hover:bg-slate-50 active:scale-90 transition grid place-items-center cursor-pointer"><i class="fa-solid fa-plus text-sm"></i></button>
+                        </div>
+                    </div>
 
-            <div class="flex gap-3">
-                <button type="button" onclick="closeVariationModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3.5 rounded-2xl transition text-sm active:scale-95 cursor-pointer">Annulla</button>
-                <button type="button" onclick="confirmAddToCart()" class="flex-1 bg-sky-600 hover:bg-sky-700 active:scale-[0.98] text-white font-bold py-3.5 rounded-2xl transition shadow-md shadow-sky-600/20 text-sm cursor-pointer">Aggiungi</button>
+                    <div class="mt-5">
+                        <label for="product-notes" class="block text-xs font-semibold text-slate-600 mb-2">Note / variazioni <span class="font-normal text-slate-400">(facoltativo)</span></label>
+                        <div id="note-chips" class="flex flex-wrap gap-1.5 mb-2"></div>
+                        <textarea id="product-notes" rows="2" placeholder="Es. senza cipolla, ben cotto…" class="w-full px-4 py-3 rounded-2xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-sky-500 focus:ring-4 focus:ring-sky-500/15 focus:outline-none text-base text-slate-800 placeholder:text-slate-400 transition resize-none"></textarea>
+                    </div>
+
+                    <div class="flex gap-2.5 mt-6">
+                        <button type="button" onclick="closeVariationModal()" class="px-5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-3.5 rounded-2xl transition active:scale-95 cursor-pointer">Annulla</button>
+                        <button type="button" onclick="confirmAddToCart()" class="flex-1 bg-sky-600 hover:bg-sky-700 active:scale-[0.98] text-white font-bold py-3.5 rounded-2xl transition shadow-lg shadow-sky-600/25 flex items-center justify-center gap-2 cursor-pointer">
+                            <i class="fa-solid fa-plus text-sm"></i> Aggiungi · <span id="modal-total" class="tabular-nums"></span>
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- SCRIPT APPLICATIVO -->
+    <!-- ============ GUIDA INSTALLAZIONE APP ============ -->
+    <div id="install-modal" class="modal fixed inset-0 z-[55] hidden" role="dialog" aria-modal="true" aria-labelledby="install-title">
+        <div class="anim-fade absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="closeInstallGuide()"></div>
+        <div class="absolute inset-x-0 bottom-0 sm:inset-0 sm:flex sm:items-center sm:justify-center sm:p-4 pointer-events-none">
+            <div class="anim-up pointer-events-auto bg-white rounded-t-[2rem] sm:rounded-[2rem] max-w-md w-full mx-auto shadow-2xl max-h-[92vh] overflow-y-auto" style="padding-bottom: env(safe-area-inset-bottom);">
+                <div class="sm:hidden w-10 h-1.5 rounded-full bg-slate-200 mx-auto mt-3"></div>
+                <div class="p-6">
+                    <div class="flex items-start justify-between gap-3 mb-5">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-sky-500 to-sky-700 text-white grid place-items-center text-xl shadow-md shadow-sky-600/30"><i class="fa-solid fa-utensils"></i></div>
+                            <div>
+                                <h3 id="install-title" class="text-lg font-extrabold text-slate-900 leading-tight">Installa Sport & Galleon</h3>
+                                <p id="install-subtitle" class="text-sm text-slate-500"></p>
+                            </div>
+                        </div>
+                        <button type="button" onclick="closeInstallGuide()" aria-label="Chiudi" class="w-10 h-10 shrink-0 -mr-2 -mt-1 rounded-full text-slate-400 hover:bg-slate-100 hover:text-slate-700 grid place-items-center cursor-pointer">
+                            <i class="fa-solid fa-xmark text-lg"></i>
+                        </button>
+                    </div>
+                    <div id="install-content"></div>
+                    <div class="mt-6 pt-5 border-t border-slate-100">
+                        <p class="text-xs font-semibold text-slate-500 mb-2">Fai scaricare l'app ai compagni di squadra</p>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button type="button" onclick="shareAppWhatsApp()" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-semibold text-sm py-3 rounded-xl flex items-center justify-center gap-2 transition active:scale-95 cursor-pointer">
+                                <i class="fa-brands fa-whatsapp text-base"></i> WhatsApp
+                            </button>
+                            <button type="button" onclick="copyAppLink()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-sm py-3 rounded-xl flex items-center justify-center gap-2 transition active:scale-95 cursor-pointer">
+                                <i class="fa-regular fa-copy"></i> Copia link
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Freccia che indica la barra di Safari (solo iPhone con Safari) -->
+                <div id="ios-arrow" class="hidden text-center pb-3 -mt-2">
+                    <p class="text-xs font-bold text-sky-700">Il tasto Condividi è qui sotto</p>
+                    <i class="fa-solid fa-arrow-down text-2xl text-sky-600 animate-bounce mt-1"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ DIALOG DI CONFERMA ============ -->
+    <div id="confirm-modal" class="modal fixed inset-0 z-[60] hidden" role="alertdialog" aria-modal="true" aria-labelledby="confirm-title">
+        <div class="anim-fade absolute inset-0 bg-slate-900/50 backdrop-blur-sm" onclick="resolveConfirm(false)"></div>
+        <div class="absolute inset-0 flex items-end sm:items-center justify-center p-4 pointer-events-none">
+            <div class="anim-up pointer-events-auto bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl">
+                <div id="confirm-icon" class="w-12 h-12 rounded-2xl grid place-items-center text-xl mb-4"></div>
+                <h3 id="confirm-title" class="text-lg font-extrabold text-slate-900"></h3>
+                <p id="confirm-message" class="text-sm text-slate-600 mt-1.5 leading-relaxed"></p>
+                <div class="flex gap-2.5 mt-6">
+                    <button type="button" id="confirm-cancel" onclick="resolveConfirm(false)" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-3 rounded-xl transition cursor-pointer">Annulla</button>
+                    <button type="button" id="confirm-ok" onclick="resolveConfirm(true)" class="flex-1 text-white font-bold py-3 rounded-xl transition cursor-pointer"></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============ SCRIPT APPLICATIVO ============ -->
     <script>
         const WHATSAPP_REGIA_NUMBER = "393391318613";
 
@@ -480,65 +613,357 @@
             }
         ];
 
+        const CATEGORY_EMOJI = {
+            "Antipasti": "🥗", "Torte al Testo": "🫓", "Pizza alla Pala": "🍕", "Pizze Rosse": "🍅",
+            "Pizze Bianche": "🧀", "Hamburger": "🍔", "Taglieri & Panini": "🥪", "Piadine & Hot Dog": "🌭",
+            "Friggitoria": "🍟", "Dolci": "🍰", "Bibite & Birre": "🍺", "Vini, Amari & Caffè": "🍷"
+        };
+        const TAG_STYLES = {
+            "Nuovo": "bg-amber-100 text-amber-800",
+            "Veg": "bg-emerald-100 text-emerald-800",
+            "Gluten Free": "bg-violet-100 text-violet-800"
+        };
+        const NOTE_SUGGESTIONS = ["Senza cipolla", "Ben cotto", "Piccante", "Tagliata a spicchi"];
+        const ORDER_STEPS = ["In attesa", "In preparazione", "Pronto", "Inviato"];
+        const STATUS_STYLES = {
+            "In attesa": "bg-slate-100 text-slate-700 border-slate-200",
+            "In preparazione": "bg-amber-50 text-amber-800 border-amber-200",
+            "Pronto": "bg-emerald-50 text-emerald-800 border-emerald-200",
+            "Inviato": "bg-sky-50 text-sky-800 border-sky-200"
+        };
+
         let currentUser = "";
         let cart = [];
         let currentSelectedProduct = null;
         let activeCategoryIndex = 0;
         let activeOrderId = null;
         let deferredPrompt = null;
+        let cartDirty = false;          // modifiche al carrello dopo l'ultimo invio
+        let searchQuery = "";
+        let orderStatusRef = null;      // listener sullo stato dell'ordine del cliente
+        let regiaListening = false;
+        let regiaOrders = {};
 
-        // EVENTO INSTALLAZIONE PWA & RILEVAMENTO iOS
+        // ---------- UTILITY ----------
+        const $ = (id) => document.getElementById(id);
+        const fmt = (n) => "€ " + Number(n || 0).toLocaleString("it-IT", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        const esc = (s) => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+        const cartQty = () => cart.reduce((sum, item) => sum + item.qty, 0);
+        const cartTotal = () => cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+        const hasUnsent = () => cart.length > 0 && (!activeOrderId || cartDirty);
+
+        // Estrae le etichette "(Nuovo, Veg, Gluten Free)" dalla descrizione e le mostra come badge
+        function parseItem(item) {
+            let desc = item.desc;
+            const tags = [];
+            const m = desc.match(/\(([^()]*)\)\s*$/);
+            if (m) {
+                const rest = [];
+                m[1].split(",").map(s => s.trim()).forEach(p => {
+                    const k = p.toLowerCase();
+                    if (k === "nuovo") tags.push("Nuovo");
+                    else if (k === "veg") tags.push("Veg");
+                    else if (k === "gluten free") tags.push("Gluten Free");
+                    else rest.push(p);
+                });
+                if (tags.length) desc = desc.slice(0, m.index).trim() + (rest.length ? ` (${rest.join(", ")})` : "");
+            }
+            if (/\(VEG\)/i.test(item.name) && !tags.includes("Veg")) tags.push("Veg");
+            return { desc, tags };
+        }
+        const tagsHtml = (tags) => tags.map(t => `<span class="text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-md ${TAG_STYLES[t]}">${t}</span>`).join("");
+
+        // ---------- TOAST ----------
+        function showToast(message, type = "success") {
+            const icons = {
+                success: "fa-circle-check text-emerald-400",
+                error: "fa-circle-xmark text-rose-400",
+                info: "fa-circle-info text-sky-400",
+                warning: "fa-triangle-exclamation text-amber-400"
+            };
+            const toast = document.createElement("div");
+            toast.className = "anim-toast pointer-events-auto max-w-sm w-fit bg-slate-900/95 backdrop-blur text-white pl-4 pr-5 py-3 rounded-2xl shadow-2xl text-sm font-medium flex items-center gap-2.5 transition-all duration-300";
+            toast.innerHTML = `<i class="fa-solid ${icons[type] || icons.info} text-base"></i><span>${esc(message)}</span>`;
+            const stack = $("toast-stack");
+            stack.appendChild(toast);
+            while (stack.children.length > 3) stack.firstChild.remove();
+            setTimeout(() => {
+                toast.style.opacity = "0";
+                toast.style.transform = "translateY(-8px)";
+                setTimeout(() => toast.remove(), 300);
+            }, type === "error" ? 4500 : 2600);
+        }
+
+        // ---------- MODALI ----------
+        function openModal(id) {
+            $(id).classList.remove("hidden");
+            document.body.classList.add("overflow-hidden");
+        }
+        function closeModal(id) {
+            $(id).classList.add("hidden");
+            if (!document.querySelector(".modal:not(.hidden)")) document.body.classList.remove("overflow-hidden");
+        }
+        const isOpen = (id) => !$(id).classList.contains("hidden");
+
+        let confirmResolver = null;
+        function askConfirm({ title, message, confirmText = "Conferma", tone = "danger", icon }) {
+            const tones = {
+                danger: { btn: "bg-rose-600 hover:bg-rose-700", box: "bg-rose-50 text-rose-600", icon: "fa-trash-can" },
+                warning: { btn: "bg-amber-500 hover:bg-amber-600", box: "bg-amber-50 text-amber-600", icon: "fa-triangle-exclamation" },
+                primary: { btn: "bg-sky-600 hover:bg-sky-700", box: "bg-sky-50 text-sky-600", icon: "fa-circle-question" },
+                success: { btn: "bg-emerald-500 hover:bg-emerald-600", box: "bg-emerald-50 text-emerald-600", icon: "fa-brands fa-whatsapp" }
+            };
+            const t = tones[tone] || tones.primary;
+            const ic = icon || t.icon;
+            $("confirm-icon").className = `w-12 h-12 rounded-2xl grid place-items-center text-xl mb-4 ${t.box}`;
+            $("confirm-icon").innerHTML = `<i class="${ic.startsWith("fa-brands") ? ic : "fa-solid " + ic}"></i>`;
+            $("confirm-title").textContent = title;
+            $("confirm-message").textContent = message;
+            $("confirm-ok").textContent = confirmText;
+            $("confirm-ok").className = `flex-1 text-white font-bold py-3 rounded-xl transition cursor-pointer ${t.btn}`;
+            openModal("confirm-modal");
+            setTimeout(() => $("confirm-cancel").focus(), 50);
+            return new Promise(resolve => { confirmResolver = resolve; });
+        }
+        function resolveConfirm(value) {
+            closeModal("confirm-modal");
+            if (confirmResolver) { confirmResolver(value); confirmResolver = null; }
+        }
+
+        function setBusy(btn, busy, label) {
+            if (!btn) return;
+            if (busy) {
+                btn.dataset.label = btn.innerHTML;
+                btn.disabled = true;
+                btn.classList.add("opacity-70", "pointer-events-none");
+                btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> ${label || "Invio in corso…"}`;
+            } else {
+                btn.disabled = false;
+                btn.classList.remove("opacity-70", "pointer-events-none");
+                if (btn.dataset.label) btn.innerHTML = btn.dataset.label;
+            }
+        }
+
+        // Tasto ESC chiude il livello più in alto
+        document.addEventListener("keydown", (e) => {
+            if (e.key !== "Escape") return;
+            if (isOpen("confirm-modal")) resolveConfirm(false);
+            else if (isOpen("install-modal")) closeInstallGuide();
+            else if (isOpen("variation-modal")) closeVariationModal();
+            else if (isOpen("cart-modal")) closeCart();
+        });
+
+        // ---------- STATO CONNESSIONE FIREBASE (reale) ----------
+        db.ref(".info/connected").on("value", (snap) => {
+            const online = snap.val() === true;
+            document.querySelectorAll(".conn-indicator").forEach(el => {
+                const dot = el.querySelector(".conn-dot");
+                const label = el.querySelector(".conn-label");
+                dot.className = `conn-dot w-2 h-2 rounded-full ${online ? "bg-emerald-500 animate-pulse" : "bg-rose-500"}`;
+                label.textContent = online ? "Live" : "Offline";
+                el.classList.toggle("text-emerald-600", online && !el.closest("#regia-app"));
+                el.classList.toggle("text-emerald-400", online && !!el.closest("#regia-app"));
+                el.classList.toggle("text-rose-500", !online);
+            });
+        });
+
+        // ---------- INSTALLAZIONE APP (iPhone, Android, PC) ----------
+        const UA = navigator.userAgent;
+        const device = {
+            ios: /iPad|iPhone|iPod/.test(UA) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1),
+            android: /Android/i.test(UA),
+            iosSafari: false, iosOther: false, samsung: /SamsungBrowser/i.test(UA),
+            // Browser interni di Facebook, Instagram, TikTok, ecc. (lì non si può installare)
+            inApp: /FBAN|FBAV|FB_IAB|Instagram|Line\/|TikTok|musical_ly|Snapchat|Twitter|; wv\)|GSA\//i.test(UA)
+        };
+        device.iosOther = device.ios && /CriOS|FxiOS|EdgiOS|OPiOS/i.test(UA);
+        device.iosSafari = device.ios && !device.iosOther && !device.inApp;
+        const isStandalone = () => window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+        const APP_URL = location.origin + location.pathname;
+
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
-            const installBtn = document.getElementById('install-app-btn');
-            if (installBtn) {
-                installBtn.classList.remove('hidden');
-            }
+            refreshInstallUI();
+            if (isOpen("install-modal")) renderInstallGuide();
         });
 
-        window.addEventListener('load', () => {
-            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-            const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-            
-            if (isIOS && !isStandalone) {
-                const iosBanner = document.getElementById('ios-install-banner');
-                if (iosBanner) {
-                    iosBanner.classList.remove('hidden');
-                }
-            }
-        });
+        function refreshInstallUI() {
+            const show = !isStandalone();
+            $("install-login-box").classList.toggle("hidden", !show);
+            let dismissed = false;
+            try { dismissed = localStorage.getItem("install_card_dismissed") === "1"; } catch (e) {}
+            const mobile = device.ios || device.android;
+            $("install-card").classList.toggle("hidden", !show || dismissed || (!mobile && !deferredPrompt));
+        }
+        refreshInstallUI();
 
-        function installPWA() {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                deferredPrompt.userChoice.then((choiceResult) => {
-                    if (choiceResult.outcome === 'accepted') {
-                        const installBtn = document.getElementById('install-app-btn');
-                        if (installBtn) installBtn.classList.add('hidden');
-                    }
-                    deferredPrompt = null;
-                });
-            }
+        function dismissInstallCard() {
+            try { localStorage.setItem("install_card_dismissed", "1"); } catch (e) {}
+            $("install-card").classList.add("hidden");
+            showToast("Puoi installarla quando vuoi dalla schermata di accesso", "info");
         }
 
-        window.addEventListener('appinstalled', () => {
-            const installBtn = document.getElementById('install-app-btn');
-            if (installBtn) installBtn.classList.add('hidden');
-            deferredPrompt = null;
-        });
-
-        if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
-            window.addEventListener('load', () => {
-                const installBtn = document.getElementById('install-app-btn');
-                if (installBtn) installBtn.classList.add('hidden');
+        function installPWA() {
+            if (!deferredPrompt) return renderInstallGuide();
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then((choice) => {
+                deferredPrompt = null;
+                if (choice.outcome === 'accepted') {
+                    closeInstallGuide();
+                    refreshInstallUI();
+                } else {
+                    renderInstallGuide();
+                }
             });
         }
 
+        window.addEventListener('appinstalled', () => {
+            deferredPrompt = null;
+            closeInstallGuide();
+            refreshInstallUI();
+            showToast("App installata! La trovi sulla schermata Home 🎉");
+        });
+
+        const step = (n, html) => `
+            <li class="flex gap-3 items-start p-3.5 rounded-2xl bg-slate-50 border border-slate-100">
+                <span class="w-8 h-8 shrink-0 rounded-full bg-sky-600 text-white font-extrabold grid place-items-center">${n}</span>
+                <span class="text-[15px] text-slate-700 leading-snug pt-1">${html}</span>
+            </li>`;
+        const key = (icon, label) => `<span class="inline-flex items-center gap-1.5 bg-white border border-slate-200 rounded-lg px-2 py-0.5 font-bold text-slate-900 whitespace-nowrap shadow-sm">${icon ? `<i class="${icon} text-sky-600"></i>` : ""}${label}</span>`;
+
+        function renderInstallGuide() {
+            const box = $("install-content");
+            const sub = $("install-subtitle");
+            $("ios-arrow").classList.add("hidden");
+
+            // 1) Installazione con un tocco (Android con Chrome, PC con Chrome/Edge)
+            if (deferredPrompt) {
+                sub.textContent = "Basta un tocco";
+                box.innerHTML = `
+                    <button type="button" onclick="installPWA()" class="w-full bg-emerald-500 hover:bg-emerald-600 active:scale-[0.98] text-white font-extrabold text-lg py-4 rounded-2xl transition shadow-lg shadow-emerald-500/30 flex items-center justify-center gap-2.5 cursor-pointer">
+                        <i class="fa-solid fa-download"></i> Installa ora
+                    </button>
+                    <p class="text-sm text-slate-500 text-center mt-3">Si aprirà una finestra: tocca <b>Installa</b>. Fatto!</p>`;
+                return;
+            }
+
+            // 2) Aperta dentro Facebook / Instagram / ecc.: bisogna aprirla nel browser vero
+            if (device.inApp) {
+                sub.textContent = "Prima aprila nel browser";
+                if (device.android) {
+                    const intent = `intent://${location.host}${location.pathname}#Intent;scheme=https;package=com.android.chrome;end`;
+                    box.innerHTML = `
+                        <p class="text-sm text-slate-600 mb-3">Da qui non si può installare. Aprila in Chrome con un tocco:</p>
+                        <a href="${intent}" class="w-full bg-sky-600 hover:bg-sky-700 text-white font-extrabold text-lg py-4 rounded-2xl transition shadow-lg shadow-sky-600/30 flex items-center justify-center gap-2.5">
+                            <i class="fa-brands fa-chrome"></i> Apri in Chrome
+                        </a>
+                        <p class="text-sm text-slate-500 text-center mt-3">Poi tocca di nuovo <b>Scarica l'app sul telefono</b>.</p>`;
+                } else {
+                    box.innerHTML = `
+                        <p class="text-sm text-slate-600 mb-3">Da qui non si può installare. Aprila in Safari:</p>
+                        <ol class="space-y-2">
+                            ${step(1, `Tocca ${key("", "•••")} oppure ${key("fa-solid fa-compass", "")} (in alto o in basso)`)}
+                            ${step(2, `Scegli ${key("fa-brands fa-safari", "Apri in Safari")} o “Apri nel browser”`)}
+                            ${step(3, `In Safari tocca <b>Scarica l'app sul telefono</b>`)}
+                        </ol>
+                        <p class="text-xs text-slate-500 text-center mt-3">In alternativa copia il link qui sotto e incollalo in Safari.</p>`;
+                }
+                return;
+            }
+
+            // 3) iPhone / iPad
+            if (device.ios) {
+                sub.textContent = "3 tocchi e la trovi sulla Home";
+                const where = device.iosOther
+                    ? "in alto a destra, nella barra dell'indirizzo"
+                    : (/iPad/.test(UA) || navigator.maxTouchPoints > 1 && !/iPhone/.test(UA) ? "in alto a destra" : "nella barra in basso (se non lo vedi, tocca prima •••)");
+                box.innerHTML = `
+                    <ol class="space-y-2">
+                        ${step(1, `Tocca il tasto ${key("fa-solid fa-arrow-up-from-bracket", "Condividi")} ${where}`)}
+                        ${step(2, `Scorri verso il basso e tocca ${key("fa-regular fa-square-plus", "Aggiungi alla schermata Home")}`)}
+                        ${step(3, `Tocca ${key("", "Aggiungi")} in alto a destra. Fatto! 🎉`)}
+                    </ol>
+                    <p class="text-xs text-slate-500 mt-3"><i class="fa-solid fa-circle-info mr-1"></i>Non trovi “Aggiungi alla schermata Home”? Scorri in fondo al menu e tocca “Modifica azioni”, oppure apri il link con Safari.</p>`;
+                if (device.iosSafari && /iPhone|iPod/.test(UA)) $("ios-arrow").classList.remove("hidden");
+                return;
+            }
+
+            // 4) Android senza installazione automatica
+            if (device.android) {
+                sub.textContent = "3 tocchi e la trovi sulla Home";
+                box.innerHTML = `
+                    <ol class="space-y-2">
+                        ${step(1, device.samsung
+                            ? `Tocca il menu ${key("fa-solid fa-bars", "")} in basso a destra`
+                            : `Tocca il menu ${key("fa-solid fa-ellipsis-vertical", "")} in alto a destra`)}
+                        ${step(2, device.samsung
+                            ? `Tocca ${key("fa-solid fa-plus", "Aggiungi pagina a")} → ${key("", "Schermata Home")}`
+                            : `Tocca ${key("fa-solid fa-mobile-screen-button", "Installa app")} oppure ${key("", "Aggiungi a schermata Home")}`)}
+                        ${step(3, `Conferma con ${key("", "Installa")} o ${key("", "Aggiungi")}. Fatto! 🎉`)}
+                    </ol>`;
+                return;
+            }
+
+            // 5) Computer: QR code da inquadrare con il telefono
+            sub.textContent = "Inquadra il codice con la fotocamera del telefono";
+            box.innerHTML = `
+                <div class="flex flex-col items-center">
+                    <div id="install-qr" class="p-3 bg-white rounded-2xl border border-slate-200 shadow-card w-[204px] h-[204px] grid place-items-center text-slate-400"><i class="fa-solid fa-circle-notch fa-spin"></i></div>
+                    <p class="text-sm text-slate-500 text-center mt-3">Si aprirà la pagina sul telefono: lì tocca <b>Scarica l'app sul telefono</b>.</p>
+                </div>`;
+            loadQr();
+        }
+
+        function loadQr() {
+            const draw = () => {
+                const el = $("install-qr");
+                if (!el) return;
+                el.innerHTML = "";
+                new QRCode(el, { text: APP_URL, width: 180, height: 180, correctLevel: QRCode.CorrectLevel.M });
+            };
+            if (window.QRCode) return draw();
+            const s = document.createElement("script");
+            s.src = "https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js";
+            s.onload = draw;
+            s.onerror = () => { const el = $("install-qr"); if (el) el.innerHTML = `<span class="text-xs text-center p-2">${esc(APP_URL)}</span>`; };
+            document.head.appendChild(s);
+        }
+
+        function openInstallGuide() {
+            renderInstallGuide();
+            openModal("install-modal");
+        }
+        function closeInstallGuide() { closeModal("install-modal"); }
+
+        function copyAppLink() {
+            const done = () => showToast("Link copiato! Incollalo dove vuoi");
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(APP_URL).then(done).catch(() => prompt("Copia questo link:", APP_URL));
+            } else {
+                prompt("Copia questo link:", APP_URL);
+            }
+        }
+
+        function shareAppWhatsApp() {
+            const text = `Ordina con l'app Sport & Galleon 🍕🍔\nApri il link e tocca "Scarica l'app sul telefono":\n${APP_URL}`;
+            window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
+        }
+
+        // ---------- NAVIGAZIONE "INDIETRO" ----------
         history.pushState({ page: 1 }, null, window.location.href);
 
-        window.addEventListener('popstate', function (event) {
-            if (cart.length > 0 && !activeOrderId) {
+        window.addEventListener('popstate', function () {
+            // Il tasto indietro chiude prima le finestre aperte (comportamento da app nativa)
+            if (isOpen("confirm-modal") || isOpen("install-modal") || isOpen("variation-modal") || isOpen("cart-modal")) {
+                if (isOpen("confirm-modal")) resolveConfirm(false);
+                else if (isOpen("install-modal")) closeInstallGuide();
+                else if (isOpen("variation-modal")) closeVariationModal();
+                else closeCart();
+                history.pushState({ page: 1 }, null, window.location.href);
+                return;
+            }
+            if (hasUnsent()) {
                 const confirmExit = confirm("⚠️ Attenzione! Hai dei prodotti nel carrello che NON sono ancora stati inviati in Regia!\n\nSe esci ora perderai l'ordine. Vuoi davvero uscire?");
                 if (!confirmExit) {
                     history.pushState({ page: 1 }, null, window.location.href);
@@ -551,293 +976,461 @@
         });
 
         window.addEventListener('beforeunload', function (e) {
-            if (cart.length > 0 && !activeOrderId) {
+            if (hasUnsent()) {
                 e.preventDefault();
                 e.returnValue = '';
             }
         });
 
-        function showToast(message) {
-            const existing = document.getElementById("custom-toast");
-            if(existing) existing.remove();
+        // ---------- LOGIN ----------
+        try {
+            const last = localStorage.getItem("pmu_last_name");
+            if (last) $("client-name").value = last;
+        } catch (e) {}
 
-            const toast = document.createElement("div");
-            toast.id = "custom-toast";
-            toast.className = "fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-slate-900 text-white px-5 py-3 rounded-2xl shadow-2xl z-50 text-xs font-black flex items-center gap-2 animate-in fade-in slide-in-from-bottom-5 duration-200 border border-slate-700";
-            toast.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-400 text-sm"></i> <span>${message}</span>`;
-            document.body.appendChild(toast);
-
-            setTimeout(() => {
-                toast.style.opacity = '0';
-                toast.style.transition = 'opacity 0.3s ease';
-                setTimeout(() => toast.remove(), 300);
-            }, 2300);
+        function clearLoginError() {
+            $("login-error").classList.add("hidden");
+            $("client-name").classList.remove("border-rose-400", "ring-4", "ring-rose-500/15");
         }
 
         function handleLoginManual() {
-            const nameInput = document.getElementById("client-name");
+            const nameInput = $("client-name");
             const name = nameInput.value.trim();
-            if(!name) {
-                alert("Inserisci il tuo nome per continuare!");
+            if (!name) {
+                $("login-error").classList.remove("hidden");
+                nameInput.classList.add("border-rose-400", "ring-4", "ring-rose-500/15");
+                nameInput.classList.remove("anim-shake"); void nameInput.offsetWidth; nameInput.classList.add("anim-shake");
                 nameInput.focus();
                 return;
             }
 
             currentUser = name;
+            try { localStorage.setItem("pmu_last_name", name); } catch (e) {}
+            $("hello-name").textContent = name;
             history.pushState({ page: 1 }, null, window.location.href);
-            document.getElementById("login-screen").classList.add("hidden");
-            document.getElementById("main-app").classList.remove("hidden");
+            $("login-screen").classList.add("hidden");
+            $("main-app").classList.remove("hidden");
+            restoreState(name);
             initApp();
         }
 
-        function logoutClient() {
-            if(cart.length > 0) {
-                if(!confirm("⚠️ Attenzione! Hai dei prodotti nel carrello non inviati in Regia. Vuoi uscire e svuotare il carrello?")) return;
+        async function logoutClient() {
+            if (cart.length > 0) {
+                const ok = await askConfirm({
+                    title: "Vuoi davvero uscire?",
+                    message: hasUnsent()
+                        ? "Hai prodotti nel carrello non ancora inviati in Regia: uscendo il carrello verrà svuotato."
+                        : "Il carrello verrà svuotato su questo dispositivo. L'ordine già inviato resta in Regia.",
+                    confirmText: "Esci", tone: "warning", icon: "fa-right-from-bracket"
+                });
+                if (!ok) return;
             }
+            stopOrderListener();
+            clearPersistedState();
             cart = [];
             activeOrderId = null;
+            cartDirty = false;
             currentUser = "";
-            document.getElementById("client-name").value = "";
-            updateCartCount();
-            document.getElementById("main-app").classList.add("hidden");
-            document.getElementById("regia-app").classList.add("hidden");
-            document.getElementById("login-screen").classList.remove("hidden");
+            updateCartUI();
+            renderActiveOrderBanner(null);
+            $("main-app").classList.add("hidden");
+            $("regia-app").classList.add("hidden");
+            $("login-screen").classList.remove("hidden");
         }
 
-        function toggleSidebar() {
-            const sidebar = document.getElementById("sidebar");
-            const overlay = document.getElementById("sidebar-overlay");
-            sidebar.classList.toggle("-translate-x-full");
-            overlay.classList.toggle("hidden");
-        }
-
-        function switchToRegia() {
-            if (cart.length > 0 && !activeOrderId) {
-                if (!confirm("⚠️ Hai dei prodotti nel carrello non inviati in Regia! Vuoi passare comunque in Regia perdendo la visuale del carrello?")) {
-                    return;
-                }
+        async function switchToRegia() {
+            if (hasUnsent()) {
+                const ok = await askConfirm({
+                    title: "Ordine non ancora inviato",
+                    message: "Hai prodotti nel carrello non inviati in Regia. Puoi tornare al menu in qualsiasi momento: il carrello resta salvato.",
+                    confirmText: "Vai in Regia", tone: "warning"
+                });
+                if (!ok) return;
             }
-            document.getElementById("login-screen").classList.add("hidden");
-            document.getElementById("main-app").classList.add("hidden");
-            document.getElementById("regia-app").classList.remove("hidden");
+            $("login-screen").classList.add("hidden");
+            $("main-app").classList.add("hidden");
+            $("regia-app").classList.remove("hidden");
             loadRegiaOrders();
         }
 
         function switchToClient() {
-            document.getElementById("regia-app").classList.add("hidden");
-            document.getElementById("main-app").classList.remove("hidden");
+            $("regia-app").classList.add("hidden");
+            // Se si è entrati in Regia dalla schermata di login, si torna lì
+            if (currentUser) $("main-app").classList.remove("hidden");
+            else $("login-screen").classList.remove("hidden");
         }
 
+        // ---------- MENU ----------
         function initApp() {
-            renderSidebar();
-            renderProducts(activeCategoryIndex);
+            renderCategories();
+            renderProducts();
+            updateCartUI();
         }
 
-        function renderSidebar() {
-            const list = document.getElementById("sidebar-category-list");
+        function selectCategory(index) {
+            activeCategoryIndex = index;
+            if (searchQuery) clearSearch(false);
+            renderCategories();
+            renderProducts();
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+
+        function renderCategories() {
+            const chips = $("category-chips");
+            const list = $("sidebar-category-list");
+            chips.innerHTML = "";
             list.innerHTML = "";
+
             menuData.forEach((cat, index) => {
+                const active = index === activeCategoryIndex && !searchQuery;
+                const emoji = CATEGORY_EMOJI[cat.category] || "🍽️";
+
+                const chip = document.createElement("button");
+                chip.type = "button";
+                chip.className = `shrink-0 h-10 px-4 rounded-full text-sm font-semibold whitespace-nowrap transition active:scale-95 cursor-pointer flex items-center gap-1.5 ${
+                    active ? "bg-slate-900 text-white shadow-md" : "bg-white text-slate-700 border border-slate-200 hover:border-slate-300"}`;
+                chip.innerHTML = `<span>${emoji}</span>${esc(cat.category)}`;
+                chip.setAttribute("aria-pressed", active);
+                chip.onclick = () => selectCategory(index);
+                chips.appendChild(chip);
+                if (active) requestAnimationFrame(() => chip.scrollIntoView({ inline: "center", block: "nearest", behavior: "smooth" }));
+
                 const btn = document.createElement("button");
                 btn.type = "button";
-                
-                if (index === activeCategoryIndex) {
-                    btn.className = "w-full text-left px-5 py-4 rounded-2xl text-sm font-black uppercase tracking-wide transition flex justify-between items-center cursor-pointer bg-sky-600 text-white shadow-inner border-2 border-sky-700 transform scale-[0.98]";
-                } else {
-                    btn.className = "w-full text-left px-5 py-4 rounded-2xl text-sm font-black uppercase tracking-wide transition flex justify-between items-center cursor-pointer bg-sky-100/90 text-sky-900 border-2 border-sky-200 shadow-sm hover:bg-sky-200 active:scale-95";
-                }
-
-                btn.innerHTML = `<span>${cat.category}</span> <i class="fa-solid fa-chevron-right text-xs opacity-60"></i>`;
-                btn.onclick = () => {
-                    activeCategoryIndex = index;
-                    renderSidebar();
-                    renderProducts(index);
-                    if(window.innerWidth < 768) toggleSidebar();
-                };
+                btn.className = `w-full text-left px-3 py-2.5 rounded-xl text-sm font-semibold transition flex items-center gap-3 cursor-pointer ${
+                    active ? "bg-white text-sky-700 shadow-card ring-1 ring-slate-200/70" : "text-slate-600 hover:bg-white/70 hover:text-slate-900"}`;
+                btn.innerHTML = `<span class="text-base">${emoji}</span><span class="flex-1">${esc(cat.category)}</span>
+                    <span class="text-xs ${active ? "text-sky-600" : "text-slate-400"} tabular-nums">${cat.items.length}</span>`;
+                btn.onclick = () => selectCategory(index);
                 list.appendChild(btn);
             });
         }
 
-        function renderProducts(catIndex) {
-            const container = document.getElementById("products-container");
-            const cat = menuData[catIndex];
-            document.getElementById("current-category-title").innerText = cat.category;
-            container.innerHTML = "";
-
-            cat.items.forEach((item, itemIndex) => {
-                const card = document.createElement("div");
-                card.className = "bg-white p-5 rounded-3xl border-4 border-sky-500 shadow-md flex flex-col justify-between transition cursor-pointer hover:bg-sky-50/30 group";
-                card.onclick = () => openVariationModal(catIndex, itemIndex);
-                card.innerHTML = `
-                    <div>
-                        <div class="flex justify-between items-start gap-2 mb-2">
-                            <h3 class="font-black text-slate-900 text-sm sm:text-base tracking-tight group-hover:text-sky-600 transition">${item.name}</h3>
-                            <span class="bg-sky-50 text-sky-600 font-black px-3 py-1.5 rounded-xl text-xs sm:text-sm whitespace-nowrap border-2 border-sky-200">€ ${item.price.toFixed(2)}</span>
-                        </div>
-                        <p class="text-xs text-slate-600 leading-relaxed mb-4">${item.desc}</p>
-                    </div>
-                    <div class="w-full bg-sky-600 text-white font-black py-3.5 rounded-2xl text-xs transition flex items-center justify-center gap-2 shadow-xs">
-                        <i class="fa-solid fa-plus text-xs"></i> <span>Aggiungi al carrello</span>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
+        function onSearch(value) {
+            searchQuery = value.trim().toLowerCase();
+            $("search-clear").classList.toggle("hidden", !value);
+            renderCategories();
+            renderProducts();
         }
 
+        function clearSearch(rerender = true) {
+            $("search-input").value = "";
+            searchQuery = "";
+            $("search-clear").classList.add("hidden");
+            if (rerender) { renderCategories(); renderProducts(); }
+        }
+
+        function productCard(item, catIdx, itemIdx) {
+            const { desc, tags } = parseItem(item);
+            const inCart = cart.filter(c => c.name === item.name).reduce((s, c) => s + c.qty, 0);
+            const card = document.createElement("button");
+            card.type = "button";
+            card.className = `group text-left bg-white p-4 sm:p-5 rounded-2xl border shadow-card hover:shadow-lift hover:-translate-y-0.5 active:scale-[0.99] transition duration-200 flex flex-col cursor-pointer focus:outline-none focus-visible:ring-4 focus-visible:ring-sky-500/30 ${
+                inCart ? "border-sky-300 ring-1 ring-sky-200" : "border-slate-200/80"}`;
+            card.onclick = () => openVariationModal(catIdx, itemIdx);
+            card.innerHTML = `
+                <div class="flex justify-between items-start gap-3">
+                    <div class="min-w-0">
+                        ${tags.length ? `<div class="flex flex-wrap gap-1 mb-1.5">${tagsHtml(tags)}</div>` : ""}
+                        <h3 class="font-bold text-slate-900 leading-snug group-hover:text-sky-700 transition">${esc(item.name)}</h3>
+                    </div>
+                    <span class="font-extrabold text-slate-900 whitespace-nowrap tabular-nums">${fmt(item.price)}</span>
+                </div>
+                <p class="text-sm text-slate-500 leading-relaxed mt-1.5 line-clamp-3">${esc(desc)}</p>
+                <div class="mt-auto pt-4 flex items-center justify-between">
+                    ${inCart
+                        ? `<span class="text-xs font-semibold text-sky-700 bg-sky-50 px-2.5 py-1 rounded-full"><i class="fa-solid fa-check mr-1"></i>${inCart} nel carrello</span>`
+                        : `<span class="text-xs text-slate-400">${searchQuery ? esc(menuData[catIdx].category) : "Tocca per aggiungere"}</span>`}
+                    <span class="w-10 h-10 rounded-full bg-sky-600 text-white grid place-items-center shadow-md shadow-sky-600/30 group-hover:bg-sky-700 group-hover:scale-105 transition">
+                        <i class="fa-solid fa-plus"></i>
+                    </span>
+                </div>`;
+            return card;
+        }
+
+        function renderProducts() {
+            const container = $("products-container");
+            container.innerHTML = "";
+            const results = [];
+
+            if (searchQuery) {
+                menuData.forEach((cat, ci) => cat.items.forEach((item, ii) => {
+                    if ((item.name + " " + item.desc).toLowerCase().includes(searchQuery)) results.push([item, ci, ii]);
+                }));
+                $("current-category-title").textContent = `Risultati per “${$("search-input").value.trim()}”`;
+                $("current-category-sub").textContent = `${results.length} ${results.length === 1 ? "prodotto trovato" : "prodotti trovati"}`;
+            } else {
+                const cat = menuData[activeCategoryIndex];
+                cat.items.forEach((item, ii) => results.push([item, activeCategoryIndex, ii]));
+                $("current-category-title").textContent = `${CATEGORY_EMOJI[cat.category] || ""} ${cat.category}`;
+                $("current-category-sub").textContent = `${cat.items.length} ${cat.items.length === 1 ? "prodotto" : "prodotti"} · tocca un piatto per aggiungere note`;
+            }
+
+            if (!results.length) {
+                container.innerHTML = `
+                    <div class="col-span-full text-center py-16">
+                        <div class="w-16 h-16 rounded-full bg-slate-100 text-slate-400 grid place-items-center mx-auto mb-4 text-2xl"><i class="fa-solid fa-magnifying-glass"></i></div>
+                        <p class="font-semibold text-slate-700">Nessun prodotto trovato</p>
+                        <p class="text-sm text-slate-500 mt-1">Prova con un altro nome o ingrediente.</p>
+                    </div>`;
+                return;
+            }
+            results.forEach(([item, ci, ii]) => container.appendChild(productCard(item, ci, ii)));
+        }
+
+        // ---------- MODALE PRODOTTO ----------
         function openVariationModal(catIdx, itemIdx) {
             currentSelectedProduct = menuData[catIdx].items[itemIdx];
-            document.getElementById("modal-product-title").innerText = currentSelectedProduct.name;
-            document.getElementById("modal-product-price").innerText = `Prezzo unitario: € ${currentSelectedProduct.price.toFixed(2)}`;
-            document.getElementById("product-qty").value = 1;
-            document.getElementById("product-notes").value = "";
-            document.getElementById("variation-modal").classList.remove("hidden");
+            const { desc, tags } = parseItem(currentSelectedProduct);
+            $("modal-product-title").textContent = currentSelectedProduct.name;
+            $("modal-product-price").textContent = fmt(currentSelectedProduct.price);
+            $("modal-product-desc").textContent = desc;
+            $("modal-product-tags").innerHTML = tagsHtml(tags);
+            $("product-qty").value = 1;
+            $("product-notes").value = "";
+            $("note-chips").innerHTML = NOTE_SUGGESTIONS.map(n =>
+                `<button type="button" onclick="addNoteChip('${n}')" class="text-xs font-medium px-3 py-1.5 rounded-full bg-white border border-slate-200 text-slate-600 hover:border-sky-300 hover:text-sky-700 active:scale-95 transition cursor-pointer">+ ${n}</button>`
+            ).join("");
+            updateModalTotal();
+            openModal("variation-modal");
         }
 
         function closeVariationModal() {
-            document.getElementById("variation-modal").classList.add("hidden");
+            closeModal("variation-modal");
             currentSelectedProduct = null;
         }
 
+        function addNoteChip(text) {
+            const ta = $("product-notes");
+            const v = ta.value.trim();
+            if (v.toLowerCase().includes(text.toLowerCase())) return;
+            ta.value = v ? `${v}, ${text.toLowerCase()}` : text;
+        }
+
+        function updateModalTotal() {
+            if (!currentSelectedProduct) return;
+            const qty = Math.max(1, parseInt($("product-qty").value) || 1);
+            $("modal-total").textContent = fmt(currentSelectedProduct.price * qty);
+        }
+
         function incrementQty() {
-            const input = document.getElementById("product-qty");
+            const input = $("product-qty");
             input.value = parseInt(input.value || 1) + 1;
+            updateModalTotal();
         }
 
         function decrementQty() {
-            const input = document.getElementById("product-qty");
+            const input = $("product-qty");
             let val = parseInt(input.value || 1) - 1;
             if (val < 1) val = 1;
             input.value = val;
+            updateModalTotal();
         }
 
         function confirmAddToCart() {
-            const qty = parseInt(document.getElementById("product-qty").value) || 1;
-            const notes = document.getElementById("product-notes").value.trim();
+            if (!currentSelectedProduct) return;
+            const qty = Math.max(1, parseInt($("product-qty").value) || 1);
+            const notes = $("product-notes").value.trim();
+            const name = currentSelectedProduct.name;
 
-            cart.push({
-                ...currentSelectedProduct,
-                qty: qty,
-                notes: notes
-            });
-            updateCartCount();
+            cart.push({ ...currentSelectedProduct, qty: qty, notes: notes });
+            if (activeOrderId) cartDirty = true;
             closeVariationModal();
+            updateCartUI(true);
+            renderProducts();
 
-            showToast(`🛒 Aggiunto al carrello: ${qty}x ${currentSelectedProduct.name}`);
+            showToast(`${qty}× ${name} aggiunto al carrello`);
         }
 
-        function updateCartCount() {
-            const totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
-            const countBadge = document.getElementById("cart-count");
-            countBadge.innerText = totalItems;
+        // ---------- CARRELLO ----------
+        function updateCartUI(bump = false) {
+            const totalItems = cartQty();
+            const badge = $("cart-count");
+            badge.textContent = totalItems;
+            badge.classList.toggle("hidden", totalItems === 0);
+            badge.classList.toggle("grid", totalItems > 0);
+            $("cart-bar-count").textContent = totalItems;
+            $("cart-bar-total").textContent = fmt(cartTotal());
 
-            if (totalItems > 0) {
-                countBadge.classList.add("animate-bounce", "bg-amber-300", "text-slate-900");
+            const bar = $("cart-bar");
+            const showBar = !!currentUser && (cart.length > 0 || !!activeOrderId);
+            bar.classList.toggle("hidden", !showBar);
+
+            const btn = $("cart-bar-btn");
+            const unsent = hasUnsent();
+            btn.classList.toggle("bg-slate-900", unsent || (!activeOrderId));
+            btn.classList.toggle("hover:bg-slate-800", unsent || (!activeOrderId));
+            btn.classList.toggle("bg-emerald-600", !unsent && !!activeOrderId);
+            btn.classList.toggle("hover:bg-emerald-700", !unsent && !!activeOrderId);
+
+            if (unsent) {
+                $("cart-bar-label").innerHTML = `<span class="inline-block w-2 h-2 rounded-full bg-amber-400 animate-pulse mr-1.5 align-middle"></span>${activeOrderId ? "Modifiche da inviare" : "Ordine da inviare"}`;
+                $("cart-bar-sub").textContent = "Tocca per rivedere e inviare al Capitano";
+            } else if (activeOrderId) {
+                $("cart-bar-label").innerHTML = `<i class="fa-solid fa-circle-check mr-1.5"></i>Ordine inviato`;
+                $("cart-bar-sub").textContent = "Tocca per modificarlo";
             } else {
-                countBadge.classList.remove("animate-bounce", "bg-amber-300", "text-slate-900");
+                $("cart-bar-label").textContent = "Il tuo carrello";
+                $("cart-bar-sub").textContent = "";
             }
+
+            if (bump && totalItems > 0) {
+                [badge, $("cart-bar-count")].forEach(el => {
+                    el.classList.remove("anim-pop"); void el.offsetWidth; el.classList.add("anim-pop");
+                });
+            }
+            if (isOpen("cart-modal")) renderCart();
+            persistState();
         }
 
-        function openCart() {
-            const container = document.getElementById("cart-items");
-            const warningBanner = document.getElementById("cart-warning-banner");
+        // ---------- SALVATAGGIO LOCALE (protegge da chiusure accidentali dell'app) ----------
+        const STATE_KEY = "pmu_cart_state";
+        function persistState() {
+            if (!currentUser) return;
+            try {
+                localStorage.setItem(STATE_KEY, JSON.stringify({ user: currentUser, cart, activeOrderId, cartDirty }));
+            } catch (e) {}
+        }
+        function clearPersistedState() {
+            try { localStorage.removeItem(STATE_KEY); } catch (e) {}
+        }
+        function restoreState(name) {
+            try {
+                const s = JSON.parse(localStorage.getItem(STATE_KEY) || "null");
+                if (!s || s.user.toLowerCase() !== name.toLowerCase()) return;
+                cart = Array.isArray(s.cart) ? s.cart : [];
+                activeOrderId = s.activeOrderId || null;
+                cartDirty = !!s.cartDirty;
+                if (activeOrderId) listenToOrder(activeOrderId);
+                if (cart.length) {
+                    showToast(hasUnsent()
+                        ? "Abbiamo recuperato il tuo carrello: ricordati di inviarlo!"
+                        : "Bentornato! Il tuo ordine è ancora attivo", hasUnsent() ? "warning" : "success");
+                }
+            } catch (e) {}
+        }
+
+        // Mantengo il nome originale per compatibilità
+        function updateCartCount() { updateCartUI(); }
+
+        function renderCart() {
+            const container = $("cart-items");
+            const warning = $("cart-warning-banner");
             container.innerHTML = "";
-            let total = 0;
 
-            if (cart.length > 0 && !activeOrderId) {
-                warningBanner.classList.remove("hidden");
+            if (hasUnsent()) {
+                warning.classList.remove("hidden");
+                warning.innerHTML = `
+                    <div class="p-3.5 bg-amber-50 border border-amber-200 rounded-2xl text-amber-900 text-sm flex items-start gap-3">
+                        <i class="fa-solid fa-triangle-exclamation text-amber-500 mt-0.5"></i>
+                        <div>
+                            <p class="font-bold">${activeOrderId ? "Modifiche non ancora inviate" : "Ordine non ancora inviato"}</p>
+                            <p class="text-amber-800/90 text-[13px] mt-0.5">Il Capitano in Regia non vede ancora questi prodotti. Conferma con il pulsante in basso.</p>
+                        </div>
+                    </div>`;
             } else {
-                warningBanner.classList.add("hidden");
+                warning.classList.add("hidden");
             }
 
-            if(cart.length === 0) {
-                container.innerHTML = `<p class="text-center text-slate-400 py-16 font-medium text-sm">Il tuo carrello è vuoto</p>`;
+            if (cart.length === 0) {
+                container.innerHTML = `
+                    <div class="h-full flex flex-col items-center justify-center text-center py-16">
+                        <div class="w-20 h-20 rounded-full bg-slate-100 text-slate-300 grid place-items-center text-3xl mb-4"><i class="fa-solid fa-basket-shopping"></i></div>
+                        <p class="font-semibold text-slate-700">Il carrello è vuoto</p>
+                        <p class="text-sm text-slate-500 mt-1">Scegli qualcosa di buono dal menu.</p>
+                    </div>`;
             } else {
                 cart.forEach((item, index) => {
-                    const subtotal = item.price * item.qty;
-                    total += subtotal;
                     const div = document.createElement("div");
-                    div.className = "bg-slate-50 p-4 rounded-2xl border border-slate-200/60 flex justify-between items-center";
-                    
-                    let noteHtml = item.notes ? `<p class="text-xs text-sky-600 font-bold mt-0.5">Nota: ${item.notes}</p>` : '';
-
+                    div.className = "bg-white p-3.5 rounded-2xl border border-slate-200/80 flex gap-3 items-center";
                     div.innerHTML = `
-                        <div class="flex-1 pr-2">
-                            <h4 class="font-black text-sm text-slate-900">${item.qty}x ${item.name}</h4>
-                            ${noteHtml}
-                            <p class="text-xs font-bold text-slate-700 mt-1">€ ${subtotal.toFixed(2)}</p>
+                        <div class="flex-1 min-w-0">
+                            <h4 class="font-bold text-sm text-slate-900 leading-snug">${esc(item.name)}</h4>
+                            ${item.notes ? `<p class="text-xs text-sky-700 bg-sky-50 inline-block px-2 py-0.5 rounded-md mt-1"><i class="fa-regular fa-note-sticky mr-1"></i>${esc(item.notes)}</p>` : ""}
+                            <p class="text-xs text-slate-500 mt-1 tabular-nums">${fmt(item.price)} cad. · <span class="font-bold text-slate-800">${fmt(item.price * item.qty)}</span></p>
                         </div>
-                        <div class="flex items-center gap-1.5 bg-white p-1.5 rounded-xl border border-slate-200 shadow-2xs">
-                            <button type="button" onclick="decreaseCartItem(${index})" class="bg-slate-100 text-slate-800 w-8 h-8 rounded-lg font-bold text-xs flex items-center justify-center cursor-pointer">-</button>
-                            <span class="text-xs font-black px-1">${item.qty}</span>
-                            <button type="button" onclick="increaseCartItem(${index})" class="bg-slate-100 text-slate-800 w-8 h-8 rounded-lg font-bold text-xs flex items-center justify-center cursor-pointer">+</button>
-                            <button type="button" onclick="removeFromCart(${index})" class="text-red-500 ml-1.5 p-1 cursor-pointer"><i class="fa-solid fa-trash text-sm"></i></button>
-                        </div>
-                    `;
+                        <div class="flex items-center gap-1 bg-slate-100 p-1 rounded-xl shrink-0">
+                            <button type="button" onclick="decreaseCartItem(${index})" aria-label="${item.qty === 1 ? "Rimuovi" : "Diminuisci"}" class="w-8 h-8 rounded-lg bg-white shadow-sm text-slate-700 grid place-items-center active:scale-90 transition cursor-pointer ${item.qty === 1 ? "text-rose-500" : ""}">
+                                <i class="fa-solid ${item.qty === 1 ? "fa-trash-can" : "fa-minus"} text-xs"></i>
+                            </button>
+                            <span class="w-7 text-center text-sm font-extrabold tabular-nums">${item.qty}</span>
+                            <button type="button" onclick="increaseCartItem(${index})" aria-label="Aumenta" class="w-8 h-8 rounded-lg bg-white shadow-sm text-slate-700 grid place-items-center active:scale-90 transition cursor-pointer">
+                                <i class="fa-solid fa-plus text-xs"></i>
+                            </button>
+                        </div>`;
                     container.appendChild(div);
                 });
             }
 
-            document.getElementById("cart-total").innerText = `€ ${total.toFixed(2)}`;
-            
-            const actionContainer = document.getElementById("cart-action-buttons");
-            if(activeOrderId) {
-                actionContainer.innerHTML = `
-                    <button type="button" onclick="updateExistingOrder()" class="w-full bg-emerald-600 hover:bg-emerald-700 active:scale-[0.98] text-white font-black py-4 rounded-2xl transition shadow-lg shadow-emerald-600/30 text-sm uppercase tracking-wider cursor-pointer">
-                        Aggiorna Ordine in Regia 🔄
-                    </button>
-                    <button type="button" onclick="cancelExistingOrder()" class="w-full bg-red-50 hover:bg-red-100 text-red-600 active:scale-[0.98] font-bold py-3 rounded-2xl transition text-xs uppercase tracking-wider cursor-pointer border border-red-200">
-                        Annulla e Cancella Ordine 🗑️
-                    </button>
-                `;
-            } else {
-                actionContainer.innerHTML = `
-                    <button type="button" onclick="submitOrder()" class="w-full bg-sky-600 hover:bg-sky-700 active:scale-[0.98] text-white font-black py-4 rounded-2xl transition shadow-lg shadow-sky-600/30 text-sm uppercase tracking-wider cursor-pointer">
-                        Invia Ordine al Capitano in Regia 🚀
-                    </button>
-                `;
-            }
+            $("cart-total").textContent = fmt(cartTotal());
 
-            document.getElementById("cart-modal").classList.remove("hidden");
+            const actions = $("cart-action-buttons");
+            if (activeOrderId) {
+                actions.innerHTML = `
+                    <button type="button" onclick="updateExistingOrder(this)" ${!cartDirty ? "disabled" : ""} class="w-full bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-200 disabled:text-slate-500 disabled:shadow-none disabled:cursor-not-allowed active:scale-[0.98] text-white font-bold py-4 rounded-2xl transition shadow-lg shadow-emerald-600/25 flex items-center justify-center gap-2 cursor-pointer">
+                        ${cartDirty ? `<i class="fa-solid fa-rotate"></i> Aggiorna ordine in Regia` : `<i class="fa-solid fa-circle-check"></i> Ordine aggiornato`}
+                    </button>
+                    <button type="button" onclick="cancelExistingOrder()" class="w-full text-rose-600 hover:bg-rose-50 font-semibold py-2.5 rounded-xl transition text-sm cursor-pointer">
+                        Annulla e cancella ordine
+                    </button>`;
+            } else {
+                actions.innerHTML = `
+                    <button type="button" onclick="submitOrder(this)" ${cart.length === 0 ? "disabled" : ""} class="w-full bg-sky-600 hover:bg-sky-700 disabled:bg-slate-200 disabled:text-slate-500 disabled:shadow-none disabled:cursor-not-allowed active:scale-[0.98] text-white font-bold py-4 rounded-2xl transition shadow-lg shadow-sky-600/25 flex items-center justify-center gap-2 cursor-pointer">
+                        <i class="fa-solid fa-paper-plane"></i> Invia ordine al Capitano
+                    </button>`;
+            }
         }
 
-        function closeCart() {
-            if (cart.length > 0 && !activeOrderId) {
-                if (!confirm("⚠️ Attenzione! Hai dei prodotti nel carrello che NON sono ancora stati inviati in Regia!\n\nSe esci ora, il Capitano non li vedrà. Vuoi davvero chiudere senza inviare l'ordine?")) {
-                    return;
-                }
+        function openCart() {
+            renderCart();
+            openModal("cart-modal");
+        }
+
+        async function closeCart(force = false) {
+            // Promemoria: non chiudere il carrello senza aver inviato l'ordine
+            if (!force && hasUnsent()) {
+                const ok = await askConfirm({
+                    title: activeOrderId ? "Modifiche non ancora inviate!" : "Ordine non ancora inviato!",
+                    message: "Il Capitano in Regia NON vede ancora questi prodotti. Vuoi davvero chiudere il carrello senza inviare?",
+                    confirmText: "Chiudi senza inviare", tone: "warning"
+                });
+                if (!ok) return;
             }
-            document.getElementById("cart-modal").classList.add("hidden");
+            closeModal("cart-modal");
+        }
+
+        function markChanged() {
+            if (activeOrderId) cartDirty = true;
+            updateCartUI();
+            renderProducts();
         }
 
         function increaseCartItem(index) {
             cart[index].qty++;
-            updateCartCount();
-            openCart();
+            markChanged();
         }
 
         function decreaseCartItem(index) {
             cart[index].qty--;
-            if (cart[index].qty <= 0) {
-                cart.splice(index, 1);
-            }
-            updateCartCount();
-            openCart();
+            if (cart[index].qty <= 0) cart.splice(index, 1);
+            markChanged();
         }
 
         function removeFromCart(index) {
             cart.splice(index, 1);
-            updateCartCount();
-            openCart();
+            markChanged();
         }
 
-        function submitOrder() {
-            if(cart.length === 0) return alert("Il carrello è vuoto!");
+        // ---------- ORDINE: INVIO / AGGIORNAMENTO / CANCELLAZIONE ----------
+        function submitOrder(btn) {
+            if (cart.length === 0) return showToast("Il carrello è vuoto!", "warning");
 
             const newOrderId = 'ORD-' + Math.floor(1000 + Math.random() * 9000);
             const newOrder = {
                 id: newOrderId,
                 client: currentUser,
                 items: JSON.parse(JSON.stringify(cart)),
-                total: cart.reduce((sum, item) => sum + (item.price * item.qty), 0),
+                total: cartTotal(),
                 status: 'In attesa',
                 sentToWhatsApp: false,
                 isModified: false,
@@ -845,26 +1438,27 @@
                 time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
             };
 
+            setBusy(btn, true);
             db.ref('restaurant_orders/' + newOrderId).set(newOrder)
                 .then(() => {
                     activeOrderId = newOrderId;
-                    document.getElementById("active-order-banner").classList.remove("hidden");
-                    document.getElementById("cart-modal").classList.add("hidden");
-                    updateCartCount();
-                    alert("Ordine inviato con successo a Il Capitano in Regia! 🚀 Puoi continuare a ordinare se vuoi.");
+                    cartDirty = false;
+                    closeCart();
+                    updateCartUI();
+                    listenToOrder(newOrderId);
+                    showToast("Ordine inviato al Capitano in Regia! Puoi ancora aggiungere piatti.");
                 })
                 .catch(err => {
-                    alert("Errore di invio Firebase: " + err.message);
+                    setBusy(btn, false);
+                    showToast("Errore di invio: " + err.message, "error");
                 });
         }
 
-        function updateExistingOrder() {
-            if(!activeOrderId) return submitOrder();
-            
-            if(cart.length === 0) {
-                return cancelExistingOrder();
-            }
+        function updateExistingOrder(btn) {
+            if (!activeOrderId) return submitOrder(btn);
+            if (cart.length === 0) return cancelExistingOrder();
 
+            setBusy(btn, true, "Aggiornamento…");
             db.ref('restaurant_orders/' + activeOrderId).once('value', snapshot => {
                 const existingOrder = snapshot.val() || {};
                 let existingCancelled = existingOrder.cancelledItems || [];
@@ -881,7 +1475,7 @@
 
                 const updatedData = {
                     items: JSON.parse(JSON.stringify(cart)),
-                    total: cart.reduce((sum, item) => sum + (item.price * item.qty), 0),
+                    total: cartTotal(),
                     sentToWhatsApp: false,
                     isModified: true,
                     cancelledItems: existingCancelled
@@ -889,245 +1483,340 @@
 
                 db.ref('restaurant_orders/' + activeOrderId).update(updatedData)
                     .then(() => {
-                        document.getElementById("cart-modal").classList.add("hidden");
-                        alert("Ordine aggiornato in tempo reale con Il Capitano in Regia! 🔄");
+                        cartDirty = false;
+                        closeCart();
+                        updateCartUI();
+                        showToast("Ordine aggiornato in tempo reale con la Regia");
                     })
                     .catch(err => {
-                        alert("Errore nell'aggiornamento: " + err.message);
+                        setBusy(btn, false);
+                        showToast("Errore nell'aggiornamento: " + err.message, "error");
                     });
             });
         }
 
-        function cancelExistingOrder() {
-            if(!activeOrderId) {
+        async function cancelExistingOrder() {
+            if (!activeOrderId) {
                 cart = [];
-                updateCartCount();
-                document.getElementById("cart-modal").classList.add("hidden");
+                updateCartUI();
+                renderProducts();
+                closeCart();
                 return;
             }
 
-            if(confirm("Sei sicuro di voler cancellare definitivamente questo ordine?")) {
-                db.ref('restaurant_orders/' + activeOrderId).remove()
-                    .then(() => {
+            const ok = await askConfirm({
+                title: "Cancellare l'ordine?",
+                message: "L'ordine verrà eliminato definitivamente dalla Regia e il carrello svuotato.",
+                confirmText: "Cancella ordine", tone: "danger"
+            });
+            if (!ok) return;
+
+            const id = activeOrderId;
+            stopOrderListener();
+            db.ref('restaurant_orders/' + id).remove()
+                .then(() => {
+                    activeOrderId = null;
+                    cartDirty = false;
+                    cart = [];
+                    renderActiveOrderBanner(null);
+                    updateCartUI();
+                    renderProducts();
+                    closeCart();
+                    showToast("Ordine cancellato", "info");
+                })
+                .catch(err => {
+                    listenToOrder(id);
+                    showToast("Errore nella cancellazione: " + err.message, "error");
+                });
+        }
+
+        // ---------- STATO ORDINE LIVE PER IL CLIENTE ----------
+        function listenToOrder(id) {
+            stopOrderListener();
+            orderStatusRef = db.ref('restaurant_orders/' + id);
+            orderStatusRef.on('value', snap => {
+                const order = snap.val();
+                if (!order) {
+                    // L'ordine è stato eliminato dalla Regia
+                    if (activeOrderId === id) {
                         activeOrderId = null;
-                        document.getElementById("active-order-banner").classList.add("hidden");
-                        cart = [];
-                        updateCartCount();
-                        document.getElementById("cart-modal").classList.add("hidden");
-                        alert("Ordine cancellato con successo.");
-                    })
-                    .catch(err => {
-                        alert("Errore nella cancellazione: " + err.message);
-                    });
-            }
+                        cartDirty = false;
+                        stopOrderListener();
+                        renderActiveOrderBanner(null);
+                        updateCartUI();
+                        if (cart.length) showToast("Il tuo ordine è stato rimosso dalla Regia. Il carrello è ancora qui: puoi reinviarlo.", "warning");
+                    }
+                    return;
+                }
+                renderActiveOrderBanner(order);
+            });
+        }
+
+        function stopOrderListener() {
+            if (orderStatusRef) { orderStatusRef.off(); orderStatusRef = null; }
+        }
+
+        function renderActiveOrderBanner(order) {
+            const banner = $("active-order-banner");
+            if (!order) { banner.classList.add("hidden"); banner.innerHTML = ""; return; }
+            const step = Math.max(0, ORDER_STEPS.indexOf(order.status || "In attesa"));
+            banner.classList.remove("hidden");
+            banner.innerHTML = `
+                <div class="anim-up bg-white border border-emerald-200 rounded-2xl p-4 shadow-card">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 shrink-0 rounded-xl bg-emerald-100 text-emerald-600 grid place-items-center"><i class="fa-solid fa-receipt"></i></div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-sm font-bold text-slate-900">Ordine ${esc(order.id)} inviato</p>
+                            <p class="text-xs text-slate-500">Puoi aggiungere altri piatti o modificarlo dal carrello</p>
+                        </div>
+                        <span class="text-xs font-bold px-2.5 py-1 rounded-full border ${STATUS_STYLES[order.status] || STATUS_STYLES["In attesa"]}">${esc(order.status || "In attesa")}</span>
+                    </div>
+                    <div class="grid grid-cols-4 gap-1.5 mt-3.5" aria-hidden="true">
+                        ${ORDER_STEPS.map((_, i) => `<div class="h-1.5 rounded-full ${i <= step ? "bg-emerald-500" : "bg-slate-200"}"></div>`).join("")}
+                    </div>
+                    <div class="grid grid-cols-4 gap-1.5 mt-1.5 text-[10px] font-medium text-slate-400">
+                        ${ORDER_STEPS.map((s, i) => `<span class="${i === step ? "text-emerald-700 font-bold" : ""}">${s}</span>`).join("")}
+                    </div>
+                </div>`;
+        }
+
+        // ---------- REGIA ----------
+        function parseOrders(data, onlyValidItems = true) {
+            if (!data) return [];
+            let orders = [];
+            if (Array.isArray(data)) orders = data.filter(o => o && o.items && (!onlyValidItems || Array.isArray(o.items)));
+            else if (typeof data === 'object') orders = Object.values(data).filter(o => o && o.items && (!onlyValidItems || Array.isArray(o.items))).reverse();
+            return orders;
+        }
+
+        function statCard(label, value, icon, tone) {
+            return `
+                <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-card">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-semibold text-slate-500">${label}</span>
+                        <span class="w-8 h-8 rounded-lg grid place-items-center text-sm ${tone}"><i class="fa-solid ${icon}"></i></span>
+                    </div>
+                    <p class="text-2xl font-extrabold text-slate-900 mt-1 tabular-nums">${value}</p>
+                </div>`;
         }
 
         function loadRegiaOrders() {
-            const grid = document.getElementById("orders-grid");
-            
+            if (regiaListening) return;   // evita listener duplicati a ogni apertura
+            regiaListening = true;
+            const grid = $("orders-grid");
+            grid.innerHTML = `<p class="col-span-full text-center text-slate-400 py-16 text-sm"><i class="fa-solid fa-circle-notch fa-spin mr-2"></i>Caricamento ordini…</p>`;
+
             db.ref('restaurant_orders').on('value', snapshot => {
-                const data = snapshot.val();
-                if(!data) {
-                    grid.innerHTML = `<p class="text-center text-slate-400 col-span-full py-16 font-medium text-sm">Nessun ordine ricevuto al momento.</p>`;
+                let orders = [];
+                try { orders = parseOrders(snapshot.val()); }
+                catch (e) { console.error("Errore di parsing dei dati:", e); }
+
+                regiaOrders = {};
+                orders.forEach(o => { regiaOrders[o.id] = o; });
+
+                const pending = orders.filter(o => !o.sentToWhatsApp).length;
+                const modified = orders.filter(o => o.isModified && !o.sentToWhatsApp).length;
+                const revenue = orders.reduce((s, o) => s + (o.total || 0), 0);
+                $("regia-stats").innerHTML =
+                    statCard("Ordini", orders.length, "fa-receipt", "bg-sky-50 text-sky-600") +
+                    statCard("Da inviare", pending, "fa-paper-plane", pending ? "bg-amber-50 text-amber-600" : "bg-slate-50 text-slate-400") +
+                    statCard("Modificati", modified, "fa-pen-to-square", modified ? "bg-purple-50 text-purple-600" : "bg-slate-50 text-slate-400") +
+                    statCard("Totale", fmt(revenue), "fa-euro-sign", "bg-emerald-50 text-emerald-600");
+
+                if (orders.length === 0) {
+                    grid.innerHTML = `
+                        <div class="col-span-full text-center py-20 bg-white rounded-3xl border border-dashed border-slate-300">
+                            <div class="w-16 h-16 rounded-full bg-slate-100 text-slate-400 grid place-items-center mx-auto mb-4 text-2xl"><i class="fa-solid fa-inbox"></i></div>
+                            <p class="font-semibold text-slate-700">Nessun ordine ricevuto</p>
+                            <p class="text-sm text-slate-500 mt-1">Gli ordini appariranno qui in tempo reale.</p>
+                        </div>`;
                     return;
                 }
 
                 grid.innerHTML = "";
-                let orders = [];
-                
-                try {
-                    if (Array.isArray(data)) {
-                        orders = data.filter(o => o && o.items && Array.isArray(o.items));
-                    } else if (typeof data === 'object') {
-                        orders = Object.values(data).filter(o => o && o.items && Array.isArray(o.items)).reverse();
-                    }
-                } catch(e) {
-                    console.error("Errore di parsing dei dati:", e);
-                }
-
-                if (orders.length === 0) {
-                    grid.innerHTML = `<p class="text-center text-slate-400 col-span-full py-16 font-medium text-sm">Nessun ordine valido nel database.</p>`;
-                    return;
-                }
-
-                orders.forEach((order) => {
-                    const card = document.createElement("div");
-                    const isSent = order.sentToWhatsApp;
-                    const isMod = order.isModified;
-                    
-                    let cardBorderClass = isSent ? "border-2 border-emerald-400 bg-white" : "border-4 border-amber-500 bg-amber-50/30 shadow-md";
-                    if(isMod) cardBorderClass = "border-4 border-purple-500 bg-purple-50/30 shadow-lg";
-
-                    const statusBadge = isSent 
-                        ? `<span class="bg-emerald-100 text-emerald-700 text-[10px] font-black px-2.5 py-1 rounded-full"><i class="fa-brands fa-whatsapp"></i> Inviato a WhatsApp</span>`
-                        : `<span class="bg-amber-100 text-amber-800 text-[10px] font-black px-2.5 py-1 rounded-full animate-pulse"><i class="fa-solid fa-triangle-exclamation"></i> Da Inviare a WhatsApp</span>`;
-
-                    const modBadge = isMod 
-                        ? `<span class="bg-purple-100 text-purple-700 text-[10px] font-black px-2.5 py-1 rounded-full ml-1"><i class="fa-solid fa-pen-to-square"></i> MODIFICATO</span>` 
-                        : '';
-
-                    card.className = `rounded-3xl p-5 flex flex-col justify-between ${cardBorderClass}`;
-                    
-                    let itemsHtml = order.items.map(i => {
-                        let noteBlock = i.notes ? `<p class="text-[11px] text-sky-600 bg-sky-50 px-2 py-0.5 rounded-md mt-1 inline-block font-semibold">Var: ${i.notes}</p>` : '';
-                        return `
-                            <div class="text-xs py-1.5 border-b border-slate-100 last:border-none">
-                                <div class="flex justify-between font-bold text-slate-800">
-                                    <span>${i.qty || 1}x ${i.name || 'Prodotto'}</span>
-                                    <span>€ ${( (i.price || 0) * (i.qty || 1) ).toFixed(2)}</span>
-                                </div>
-                                ${noteBlock}
-                            </div>
-                        `;
-                    }).join('');
-
-                    let cancelledHtml = '';
-                    if (order.cancelledItems && order.cancelledItems.length > 0) {
-                        let cancelledList = order.cancelledItems.map(i => `
-                            <div class="text-xs py-1 text-red-600 line-through font-bold flex justify-between">
-                                <span>❌ ${i.qty}x ${i.name}</span>
-                                <span>€ ${(i.price * i.qty).toFixed(2)}</span>
-                            </div>
-                        `).join('');
-
-                        cancelledHtml = `
-                            <div class="my-2 p-3 bg-red-50 rounded-2xl border border-red-200">
-                                <p class="text-[10px] font-black text-red-700 uppercase tracking-wider mb-1">❌ Prodotti Cancellati:</p>
-                                ${cancelledList}
-                            </div>
-                        `;
-                    }
-
-                    card.innerHTML = `
-                        <div>
-                            <div class="flex justify-between items-start mb-2">
-                                <div>
-                                    <span class="text-[10px] font-black text-slate-400">${order.id || 'ORD'} • ${order.time || ''}</span>
-                                    <h3 class="font-black text-lg text-slate-900">${order.client || 'Ospite'}</h3>
-                                </div>
-                                <div class="flex items-center gap-1.5">
-                                    <select onchange="updateOrderStatus('${order.id}', this.value)" class="text-xs font-bold px-2.5 py-2 rounded-xl border border-slate-200 bg-white focus:outline-none shadow-xs cursor-pointer">
-                                        <option value="In attesa" ${order.status === 'In attesa' ? 'selected' : ''}>In attesa</option>
-                                        <option value="In preparazione" ${order.status === 'In preparazione' ? 'selected' : ''}>In preparazione</option>
-                                        <option value="Pronto" ${order.status === 'Pronto' ? 'selected' : ''}>Pronto</option>
-                                        <option value="Inviato" ${order.status === 'Inviato' ? 'selected' : ''}>Inviato</option>
-                                    </select>
-                                    <button type="button" onclick="deleteSingleOrder('${order.id}', '${order.client}')" class="bg-red-50 hover:bg-red-100 text-red-600 p-2 rounded-xl border border-red-200 transition active:scale-95 cursor-pointer" title="Elimina questo ordine">
-                                        <i class="fa-solid fa-trash text-sm"></i>
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="mb-3 flex flex-wrap gap-1">${statusBadge} ${modBadge}</div>
-                            <div class="my-3 space-y-1 bg-white p-3.5 rounded-2xl max-h-44 overflow-y-auto border border-slate-100">
-                                ${itemsHtml}
-                            </div>
-                            ${cancelledHtml}
-                        </div>
-                        <div class="flex justify-between font-black text-slate-900 pt-3 border-t border-slate-100 text-sm items-center">
-                            <span>Totale:</span>
-                            <span class="text-sky-600 text-base">€ ${order.total ? order.total.toFixed(2) : '0.00'}</span>
-                        </div>
-                    `;
-                    grid.appendChild(card);
-                });
+                orders.forEach(order => grid.appendChild(orderCard(order)));
             }, error => {
                 console.error("Errore di connessione Firebase Realtime:", error);
+                showToast("Errore di connessione al database", "error");
+                regiaListening = false;
             });
+        }
+
+        function orderCard(order) {
+            const isSent = order.sentToWhatsApp;
+            const isMod = order.isModified;
+            const accent = isMod && !isSent ? "bg-purple-500" : isSent ? "bg-emerald-500" : "bg-amber-400";
+            const status = order.status || "In attesa";
+            const client = order.client || "Ospite";
+
+            const badges = [
+                isSent
+                    ? `<span class="bg-emerald-50 text-emerald-700 text-[11px] font-bold px-2.5 py-1 rounded-full"><i class="fa-brands fa-whatsapp mr-1"></i>Inviato</span>`
+                    : `<span class="bg-amber-50 text-amber-800 text-[11px] font-bold px-2.5 py-1 rounded-full"><i class="fa-solid fa-clock mr-1"></i>Da inviare</span>`,
+                isMod ? `<span class="bg-purple-50 text-purple-700 text-[11px] font-bold px-2.5 py-1 rounded-full"><i class="fa-solid fa-pen-to-square mr-1"></i>Modificato</span>` : ""
+            ].join("");
+
+            const itemsHtml = order.items.map(i => `
+                <div class="py-2 border-b border-slate-100 last:border-none">
+                    <div class="flex justify-between gap-3 text-sm">
+                        <span class="text-slate-800"><b class="tabular-nums">${i.qty || 1}×</b> ${esc(i.name || 'Prodotto')}</span>
+                        <span class="text-slate-500 tabular-nums whitespace-nowrap">${fmt((i.price || 0) * (i.qty || 1))}</span>
+                    </div>
+                    ${i.notes ? `<p class="text-xs text-sky-700 bg-sky-50 px-2 py-0.5 rounded-md mt-1 inline-block"><i class="fa-regular fa-note-sticky mr-1"></i>${esc(i.notes)}</p>` : ""}
+                </div>`).join("");
+
+            let cancelledHtml = "";
+            if (order.cancelledItems && order.cancelledItems.length > 0) {
+                cancelledHtml = `
+                    <div class="mt-3 p-3 bg-rose-50 rounded-xl border border-rose-100">
+                        <p class="text-[11px] font-bold text-rose-700 uppercase tracking-wider mb-1">Prodotti cancellati</p>
+                        ${order.cancelledItems.map(i => `
+                            <div class="text-xs py-0.5 text-rose-600 line-through flex justify-between gap-3">
+                                <span>${i.qty}× ${esc(i.name)}</span><span class="tabular-nums">${fmt(i.price * i.qty)}</span>
+                            </div>`).join("")}
+                    </div>`;
+            }
+
+            const card = document.createElement("article");
+            card.className = "bg-white rounded-2xl border border-slate-200/80 shadow-card overflow-hidden flex flex-col";
+            card.innerHTML = `
+                <div class="h-1.5 ${accent}"></div>
+                <div class="p-5 flex-1 flex flex-col">
+                    <div class="flex justify-between items-start gap-3">
+                        <div class="flex items-center gap-3 min-w-0">
+                            <div class="w-10 h-10 shrink-0 rounded-full bg-slate-900 text-white grid place-items-center font-bold">${esc(client.charAt(0).toUpperCase())}</div>
+                            <div class="min-w-0">
+                                <h3 class="font-extrabold text-slate-900 truncate">${esc(client)}</h3>
+                                <p class="text-xs text-slate-400">${esc(order.id || 'ORD')} · ${esc(order.time || '')}</p>
+                            </div>
+                        </div>
+                        <button type="button" onclick="deleteSingleOrder('${esc(order.id)}')" title="Elimina ordine" aria-label="Elimina ordine" class="w-9 h-9 shrink-0 rounded-lg text-slate-400 hover:bg-rose-50 hover:text-rose-600 grid place-items-center transition active:scale-95 cursor-pointer">
+                            <i class="fa-solid fa-trash-can text-sm"></i>
+                        </button>
+                    </div>
+                    <div class="flex flex-wrap gap-1.5 mt-3">${badges}</div>
+                    <div class="mt-3 max-h-56 overflow-y-auto pr-1">${itemsHtml}</div>
+                    ${cancelledHtml}
+                    <div class="mt-auto pt-4 flex items-center justify-between gap-3 border-t border-slate-100 mt-4">
+                        <select onchange="updateOrderStatus('${esc(order.id)}', this.value)" aria-label="Stato ordine"
+                            class="text-xs font-bold pl-3 pr-8 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-sky-500/30 cursor-pointer ${STATUS_STYLES[status] || STATUS_STYLES["In attesa"]}">
+                            ${ORDER_STEPS.map(s => `<option value="${s}" ${status === s ? "selected" : ""}>${s}</option>`).join("")}
+                        </select>
+                        <span class="text-lg font-extrabold text-slate-900 tabular-nums">${fmt(order.total)}</span>
+                    </div>
+                </div>`;
+            return card;
         }
 
         function updateOrderStatus(orderId, newStatus) {
-            db.ref('restaurant_orders/' + orderId + '/status').set(newStatus);
+            db.ref('restaurant_orders/' + orderId + '/status').set(newStatus)
+                .then(() => showToast(`Stato aggiornato: ${newStatus}`))
+                .catch(err => showToast("Errore: " + err.message, "error"));
         }
 
-        function deleteSingleOrder(orderId, clientName) {
-            if(confirm(`Sei sicuro di voler eliminare l'ordine di ${clientName} (${orderId})?`)) {
-                db.ref('restaurant_orders/' + orderId).remove()
-                    .then(() => {})
-                    .catch(err => {
-                        alert("Errore nella cancellazione: " + err.message);
-                    });
-            }
+        async function deleteSingleOrder(orderId) {
+            const clientName = regiaOrders[orderId]?.client || "Ospite";
+            const ok = await askConfirm({
+                title: "Eliminare l'ordine?",
+                message: `L'ordine di ${clientName} (${orderId}) verrà eliminato definitivamente.`,
+                confirmText: "Elimina", tone: "danger"
+            });
+            if (!ok) return;
+            db.ref('restaurant_orders/' + orderId).remove()
+                .then(() => showToast("Ordine eliminato", "info"))
+                .catch(err => showToast("Errore nella cancellazione: " + err.message, "error"));
         }
 
-        function clearAllOrders() {
-            if(confirm("Sei sicuro di voler azzerare ed eliminare TUTTI gli ordini da Il Capitano in Regia?")) {
-                db.ref('restaurant_orders').remove().then(() => {
-                    alert("Tutti gli ordini sono stati azzerati con successo!");
-                });
-            }
+        async function clearAllOrders() {
+            const count = Object.keys(regiaOrders).length;
+            const ok = await askConfirm({
+                title: "Azzerare tutti gli ordini?",
+                message: `Verranno eliminati definitivamente ${count ? count + " ordini" : "tutti gli ordini"} dalla Regia. L'operazione non è reversibile.`,
+                confirmText: "Azzera tutto", tone: "danger"
+            });
+            if (!ok) return;
+            db.ref('restaurant_orders').remove()
+                .then(() => showToast("Tutti gli ordini sono stati azzerati"))
+                .catch(err => showToast("Errore: " + err.message, "error"));
         }
 
         function sendAllOrdersToWhatsApp() {
-            db.ref('restaurant_orders').once('value', snapshot => {
+            db.ref('restaurant_orders').once('value', async snapshot => {
                 const data = snapshot.val();
-                if(!data) return alert("Nessun ordine presente.");
+                if (!data) return showToast("Nessun ordine presente.", "info");
 
-                let orders = [];
-                if (Array.isArray(data)) {
-                    orders = data.filter(o => o && o.items);
-                } else if (typeof data === 'object') {
-                    orders = Object.values(data).filter(o => o && o.items);
-                }
-
+                const orders = parseOrders(data, false);
                 const pendingOrders = orders.filter(o => !o.sentToWhatsApp);
 
-                if(pendingOrders.length === 0) {
-                    return alert("Tutti gli ordini presenti sono già stati inviati su WhatsApp!");
+                if (pendingOrders.length === 0) {
+                    return showToast("Tutti gli ordini sono già stati inviati su WhatsApp!", "info");
                 }
 
-                if (!confirm("Sei sicura che tutti hanno ordinato?")) {
-                    return;
-                }
+                const ok = await askConfirm({
+                    title: "Sei sicura che tutti hanno ordinato?",
+                    message: `Stai per inviare ${pendingOrders.length} ${pendingOrders.length === 1 ? "ordine" : "ordini"} su WhatsApp.`,
+                    confirmText: "Invia su WhatsApp", tone: "success", icon: "fa-brands fa-whatsapp"
+                });
+                if (!ok) return;
 
-                let text = `*RIEPILOGO ORDINI SPOGLIATOIO*%0A`;
-                
+                let text = `*RIEPILOGO ORDINI SPOGLIATOIO*\n`;
                 pendingOrders.forEach(order => {
-                    text += `%0A-----------------------------------%0A`;
-                    text += `*${order.client.toUpperCase()}*%0A`;
-                    text += `-----------------------------------%0A%0A`;
-                    
+                    text += `\n-----------------------------------\n`;
+                    text += `*${(order.client || 'Ospite').toUpperCase()}*\n`;
+                    text += `-----------------------------------\n\n`;
+
                     order.items.forEach(i => {
-                        text += `• *${i.qty}x ${i.name}*%0A`;
-                        if(i.notes) {
-                            text += `   _↪ Note: ${i.notes}_%0A`;
-                        }
-                        text += `%0A`;
+                        text += `• *${i.qty}x ${i.name}*\n`;
+                        if (i.notes) text += `   _↪ Note: ${i.notes}_\n`;
+                        text += `\n`;
                     });
 
                     if (order.cancelledItems && order.cancelledItems.length > 0) {
-                        text += `*❌ CANCELLATI:*%0A`;
-                        order.cancelledItems.forEach(ci => {
-                            text += `• ~${ci.qty}x ${ci.name}~%0A`;
-                        });
-                        text += `%0A`;
+                        text += `*❌ CANCELLATI:*\n`;
+                        order.cancelledItems.forEach(ci => { text += `• ~${ci.qty}x ${ci.name}~\n`; });
+                        text += `\n`;
                     }
                 });
-                
                 text += `-----------------------------------`;
+                const encoded = encodeURIComponent(text);
 
                 const updates = {};
-                pendingOrders.forEach(order => {
-                    updates[order.id + '/sentToWhatsApp'] = true;
-                });
+                pendingOrders.forEach(order => { updates[order.id + '/sentToWhatsApp'] = true; });
 
                 db.ref('restaurant_orders').update(updates).then(() => {
                     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-                    
                     if (isMobile) {
-                        window.location.href = `whatsapp://send?phone=${WHATSAPP_REGIA_NUMBER}&text=${text}`;
+                        window.location.href = `whatsapp://send?phone=${WHATSAPP_REGIA_NUMBER}&text=${encoded}`;
                     } else {
-                        window.open(`https://wa.me/${WHATSAPP_REGIA_NUMBER}?text=${text}`, '_blank');
+                        window.open(`https://wa.me/${WHATSAPP_REGIA_NUMBER}?text=${encoded}`, '_blank');
                     }
                 }).catch(err => {
-                    alert("Errore nell'aggiornamento dello stato WhatsApp: " + err.message);
+                    showToast("Errore nell'aggiornamento dello stato WhatsApp: " + err.message, "error");
                 });
             });
         }
 
+        // ---------- SERVICE WORKER + AGGIORNAMENTI AUTOMATICI ----------
         if ('serviceWorker' in navigator) {
+            const hadController = !!navigator.serviceWorker.controller;
+            let refreshing = false;
+
+            // Quando arriva una nuova versione dell'app la carica subito,
+            // ma solo se l'utente è sulla schermata di accesso (non interrompe un ordine)
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+                if (refreshing || !hadController) return;
+                if (!currentUser) { refreshing = true; location.reload(); }
+            });
+
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('./sw.js')
-                    .then((reg) => console.log('Service Worker PWA registrato:', reg.scope))
+                    .then((reg) => {
+                        console.log('Service Worker PWA registrato:', reg.scope);
+                        // Controlla se c'è una nuova versione ogni volta che l'app torna in primo piano
+                        document.addEventListener('visibilitychange', () => {
+                            if (document.visibilityState === 'visible') reg.update().catch(() => {});
+                        });
+                    })
                     .catch((err) => console.log('Registrazione Service Worker fallita:', err));
             });
         }
