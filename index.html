@@ -52,6 +52,8 @@
         @keyframes fadeIn   { from { opacity: 0 } to { opacity: 1 } }
         @keyframes slideUp  { from { opacity: 0; transform: translateY(18px) } to { opacity: 1; transform: none } }
         @keyframes slideInR { from { transform: translateX(100%) } to { transform: none } }
+        @keyframes slideInL { from { transform: translateX(-100%) } to { transform: none } }
+        .anim-left  { animation: slideInL .28s cubic-bezier(.2,.8,.2,1) both; }
         @keyframes toastIn  { from { opacity: 0; transform: translateY(-12px) scale(.96) } to { opacity: 1; transform: none } }
         @keyframes pop      { 0% { transform: scale(1) } 40% { transform: scale(1.35) } 100% { transform: scale(1) } }
         @keyframes shake    { 0%,100% { transform: translateX(0) } 20%,60% { transform: translateX(-6px) } 40%,80% { transform: translateX(6px) } }
@@ -138,8 +140,12 @@
         <!-- APPBAR -->
         <header class="sticky top-0 z-30 bg-white/85 backdrop-blur-xl border-b border-slate-200/70">
             <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between gap-3">
-                <div class="flex items-center gap-3 min-w-0">
-                    <div class="w-10 h-10 shrink-0 rounded-xl bg-gradient-to-br from-sky-500 to-sky-700 text-white grid place-items-center shadow-md shadow-sky-600/30">
+                <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
+                    <!-- Pulsante MENU (tre lineette): apre il pannello con tutte le categorie -->
+                    <button type="button" onclick="openCategoryDrawer()" aria-label="Apri il menu delle categorie" class="lg:hidden h-11 shrink-0 pl-3 pr-3.5 rounded-xl bg-sky-50 hover:bg-sky-100 text-sky-700 border border-sky-200 font-bold text-sm flex items-center gap-2 active:scale-95 transition cursor-pointer">
+                        <i class="fa-solid fa-bars text-base"></i><span>Menu</span>
+                    </button>
+                    <div class="hidden sm:grid w-10 h-10 shrink-0 rounded-xl bg-gradient-to-br from-sky-500 to-sky-700 text-white place-items-center shadow-md shadow-sky-600/30">
                         <i class="fa-solid fa-utensils"></i>
                     </div>
                     <div class="min-w-0">
@@ -261,6 +267,22 @@
             <h2 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">Ordini in tempo reale</h2>
             <div id="orders-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 items-start"></div>
         </main>
+    </div>
+
+    <!-- ============ MENU CATEGORIE (pannello laterale) ============ -->
+    <div id="category-drawer" class="modal fixed inset-0 z-50 hidden" role="dialog" aria-modal="true" aria-labelledby="drawer-title">
+        <div class="anim-fade absolute inset-0 bg-slate-900/50 backdrop-blur-sm" onclick="closeCategoryDrawer()"></div>
+        <aside class="anim-left absolute left-0 inset-y-0 bg-white w-[85%] max-w-xs flex flex-col shadow-2xl">
+            <div class="px-5 h-16 border-b border-slate-100 flex justify-between items-center shrink-0">
+                <h2 id="drawer-title" class="font-extrabold text-lg text-slate-900 flex items-center gap-2.5">
+                    <i class="fa-solid fa-bars text-sky-600"></i> Categorie
+                </h2>
+                <button type="button" onclick="closeCategoryDrawer()" aria-label="Chiudi" class="w-10 h-10 rounded-full text-slate-400 hover:bg-slate-100 hover:text-slate-700 grid place-items-center cursor-pointer">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <nav id="drawer-category-list" class="flex-1 overflow-y-auto p-3 space-y-1" style="padding-bottom: max(0.75rem, env(safe-area-inset-bottom));"></nav>
+        </aside>
     </div>
 
     <!-- ============ CARRELLO (drawer) ============ -->
@@ -749,6 +771,7 @@
             if (e.key !== "Escape") return;
             if (isOpen("confirm-modal")) resolveConfirm(false);
             else if (isOpen("install-modal")) closeInstallGuide();
+            else if (isOpen("category-drawer")) closeCategoryDrawer();
             else if (isOpen("variation-modal")) closeVariationModal();
             else if (isOpen("cart-modal")) closeCart();
         });
@@ -955,9 +978,10 @@
 
         window.addEventListener('popstate', function () {
             // Il tasto indietro chiude prima le finestre aperte (comportamento da app nativa)
-            if (isOpen("confirm-modal") || isOpen("install-modal") || isOpen("variation-modal") || isOpen("cart-modal")) {
+            if (isOpen("confirm-modal") || isOpen("install-modal") || isOpen("category-drawer") || isOpen("variation-modal") || isOpen("cart-modal")) {
                 if (isOpen("confirm-modal")) resolveConfirm(false);
                 else if (isOpen("install-modal")) closeInstallGuide();
+                else if (isOpen("category-drawer")) closeCategoryDrawer();
                 else if (isOpen("variation-modal")) closeVariationModal();
                 else closeCart();
                 history.pushState({ page: 1 }, null, window.location.href);
@@ -1078,8 +1102,10 @@
         function renderCategories() {
             const chips = $("category-chips");
             const list = $("sidebar-category-list");
+            const drawer = $("drawer-category-list");
             chips.innerHTML = "";
             list.innerHTML = "";
+            drawer.innerHTML = "";
 
             menuData.forEach((cat, index) => {
                 const active = index === activeCategoryIndex && !searchQuery;
@@ -1103,8 +1129,24 @@
                     <span class="text-xs ${active ? "text-sky-600" : "text-slate-400"} tabular-nums">${cat.items.length}</span>`;
                 btn.onclick = () => selectCategory(index);
                 list.appendChild(btn);
+
+                // Voce del menu ☰ (pulsanti grandi, facili da toccare)
+                const item = document.createElement("button");
+                item.type = "button";
+                item.className = `w-full text-left px-4 py-3.5 rounded-2xl text-[15px] font-semibold transition flex items-center gap-3 active:scale-[0.98] cursor-pointer ${
+                    active ? "bg-sky-600 text-white shadow-md shadow-sky-600/25" : "text-slate-700 hover:bg-slate-100"}`;
+                item.innerHTML = `<span class="text-xl w-7 text-center">${emoji}</span><span class="flex-1">${esc(cat.category)}</span>
+                    <span class="text-xs font-bold px-2 py-0.5 rounded-full tabular-nums ${active ? "bg-white/20 text-white" : "bg-slate-100 text-slate-500"}">${cat.items.length}</span>`;
+                item.onclick = () => { closeCategoryDrawer(); selectCategory(index); };
+                drawer.appendChild(item);
             });
         }
+
+        function openCategoryDrawer() {
+            renderCategories();
+            openModal("category-drawer");
+        }
+        function closeCategoryDrawer() { closeModal("category-drawer"); }
 
         function onSearch(value) {
             searchQuery = value.trim().toLowerCase();
