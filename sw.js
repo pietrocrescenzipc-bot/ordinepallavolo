@@ -1,7 +1,7 @@
 // Sport & Galleon - Service Worker
 // IMPORTANTE: quando pubblichi una nuova versione di index.html non serve cambiare nulla,
 // la pagina viene sempre scaricata fresca da internet (e salvata per l'uso offline).
-const CACHE_NAME = 'sport-galleon-v3';
+const CACHE_NAME = 'sport-galleon-v4';
 
 const APP_SHELL = [
     './',
@@ -56,8 +56,10 @@ self.addEventListener('fetch', (event) => {
     // Pagina dell'app: prima internet (così tutti vedono subito l'ultima versione),
     // se manca la connessione usa la copia salvata
     if (isPage) {
+        // cache: 'no-cache' = chiede sempre al server se c'è una versione nuova
+        // (GitHub Pages altrimenti fa usare al browser la copia vecchia per 10 minuti)
         event.respondWith(
-            fetch(req)
+            fetch(req, { cache: 'no-cache' })
                 .then((res) => {
                     if (res && res.ok) {
                         const copy = res.clone();
