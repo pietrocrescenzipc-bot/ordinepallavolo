@@ -684,6 +684,8 @@
         let orderStatusRef = null;      // listener sullo stato dell'ordine del cliente
         let regiaListening = false;
         let regiaOrders = {};
+        let lastResetValue;             // ultimo segnale di azzeramento ricevuto da Firebase (undefined = non ancora letto)
+        let sentAtReset = null;         // segnale di azzeramento valido quando il cliente ha inviato l'ordine (null = nessun ordine)
 
         // ---------- UTILITY ----------
         const $ = (id) => document.getElementById(id);
@@ -1091,6 +1093,7 @@
             cart = [];
             activeOrderId = null;
             cartDirty = false;
+            sentAtReset = null;
             currentUser = "";
             updateCartUI();
             renderActiveOrderBanner(null);
@@ -1367,7 +1370,7 @@
         function persistState() {
             if (!currentUser) return;
             try {
-                localStorage.setItem(STATE_KEY, JSON.stringify({ user: currentUser, cart, activeOrderId, cartDirty }));
+                localStorage.setItem(STATE_KEY, JSON.stringify({ user: currentUser, cart, activeOrderId, cartDirty, sentAtReset }));
             } catch (e) {}
         }
         function clearPersistedState() {
@@ -1380,7 +1383,9 @@
                 cart = Array.isArray(s.cart) ? s.cart : [];
                 activeOrderId = s.activeOrderId || null;
                 cartDirty = !!s.cartDirty;
+                sentAtReset = (s.sentAtReset !== undefined) ? s.sentAtReset : (activeOrderId ? "pending" : null);
                 if (activeOrderId) listenToOrder(activeOrderId);
+                checkResetSignal();
                 if (cart.length) {
                     showToast(hasUnsent()
                         ? "Abbiamo recuperato il tuo carrello: ricordati di inviarlo!"
@@ -1522,6 +1527,7 @@
                 .then(() => {
                     activeOrderId = newOrderId;
                     cartDirty = false;
+                    sentAtReset = (lastResetValue === undefined) ? "pending" : lastResetValue;
                     closeCart();
                     updateCartUI();
                     listenToOrder(newOrderId);
@@ -1596,6 +1602,7 @@
                 .then(() => {
                     activeOrderId = null;
                     cartDirty = false;
+                    sentAtReset = null;
                     cart = [];
                     renderActiveOrderBanner(null);
                     updateCartUI();
@@ -1626,11 +1633,9 @@
                         db.ref('restaurant_orders').once('value', all => {
                             if (activeOrderId) return; // nel frattempo è partito un nuovo ordine
                             if (!all.exists()) {
-                                cart = [];
-                                updateCartUI();
-                                renderProducts();
-                                showToast("Ordini inviati dal Capitano: il carrello è stato azzerato", "info");
+                                resetClientAfterSend(true);
                             } else {
+                                sentAtReset = null;
                                 updateCartUI();
                                 if (cart.length) showToast("Il tuo ordine è stato rimosso dalla Regia. Il carrello è ancora qui: puoi reinviarlo.", "warning");
                             }
@@ -1641,6 +1646,32 @@
                 renderActiveOrderBanner(order);
             });
         }
+
+        // ---------- AZZERAMENTO DOPO INVIO SU WHATSAPP ----------
+        // La Regia scrive 'restaurant_reset' dopo aver svuotato gli ordini: chi aveva un ordine svuota tutto.
+        function resetClientAfterSend(force = false) {
+            if (!force && !activeOrderId && sentAtReset === null) return;
+            stopOrderListener();
+            activeOrderId = null;
+            cartDirty = false;
+            sentAtReset = null;
+            cart = [];
+            renderActiveOrderBanner(null);
+            updateCartUI();
+            renderProducts();
+            showToast("Ordini inviati dal Capitano: il carrello è stato azzerato", "info");
+        }
+
+        function checkResetSignal() {
+            if (!currentUser || lastResetValue === undefined || sentAtReset === null) return;
+            if (sentAtReset === "pending") { sentAtReset = lastResetValue; persistState(); return; }
+            if (lastResetValue !== sentAtReset) resetClientAfterSend();
+        }
+
+        db.ref('restaurant_reset').on('value', snap => {
+            lastResetValue = snap.val() || 0;
+            checkResetSignal();
+        });
 
         function stopOrderListener() {
             if (orderStatusRef) { orderStatusRef.off(); orderStatusRef = null; }
@@ -1870,23 +1901,25 @@
                 text += `-----------------------------------`;
                 const encoded = encodeURIComponent(text);
 
-                const updates = {};
-                pendingOrders.forEach(order => { updates[order.id + '/sentToWhatsApp'] = true; });
-
-                db.ref('restaurant_orders').update(updates).then(() => {
+                const openWhatsApp = () => {
                     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
                     if (isMobile) {
                         window.location.href = `whatsapp://send?phone=${WHATSAPP_REGIA_NUMBER}&text=${encoded}`;
                     } else {
                         window.open(`https://wa.me/${WHATSAPP_REGIA_NUMBER}?text=${encoded}`, '_blank');
                     }
-                    // Azzeramento automatico (stessa pulizia di clearAllOrders, senza seconda conferma)
-                    db.ref('restaurant_orders').remove()
-                        .then(() => showToast("Tutti gli ordini sono stati azzerati"))
-                        .catch(err => showToast("Errore: " + err.message, "error"));
-                }).catch(err => {
-                    showToast("Errore nell'aggiornamento dello stato WhatsApp: " + err.message, "error");
-                });
+                };
+
+                // 1) Azzera gli ordini (stessa pulizia di clearAllOrders, senza seconda conferma)
+                // 2) Avvisa tutti i telefoni dei clienti   3) Apre WhatsApp col riepilogo già pronto
+                db.ref('restaurant_orders').remove()
+                    .then(() => {
+                        db.ref('restaurant_reset').set(firebase.database.ServerValue.TIMESTAMP)
+                            .catch(err => console.warn("Segnale di azzeramento non scritto:", err));
+                        showToast("Tutti gli ordini sono stati azzerati");
+                    })
+                    .catch(err => showToast("Errore nell'azzeramento: " + err.message + " — usa \"Azzera tutto\"", "error"))
+                    .finally(openWhatsApp);
             });
         }
 
