@@ -1622,8 +1622,19 @@
                         cartDirty = false;
                         stopOrderListener();
                         renderActiveOrderBanner(null);
-                        updateCartUI();
-                        if (cart.length) showToast("Il tuo ordine è stato rimosso dalla Regia. Il carrello è ancora qui: puoi reinviarlo.", "warning");
+                        // Se è sparito l'intero elenco ordini la Regia li ha inviati e azzerati: svuoto anche il carrello
+                        db.ref('restaurant_orders').once('value', all => {
+                            if (activeOrderId) return; // nel frattempo è partito un nuovo ordine
+                            if (!all.exists()) {
+                                cart = [];
+                                updateCartUI();
+                                renderProducts();
+                                showToast("Ordini inviati dal Capitano: il carrello è stato azzerato", "info");
+                            } else {
+                                updateCartUI();
+                                if (cart.length) showToast("Il tuo ordine è stato rimosso dalla Regia. Il carrello è ancora qui: puoi reinviarlo.", "warning");
+                            }
+                        });
                     }
                     return;
                 }
@@ -1833,7 +1844,7 @@
 
                 const ok = await askConfirm({
                     title: "Sei sicura che tutti hanno ordinato?",
-                    message: `Stai per inviare ${pendingOrders.length} ${pendingOrders.length === 1 ? "ordine" : "ordini"} su WhatsApp.`,
+                    message: `Stai per inviare ${pendingOrders.length} ${pendingOrders.length === 1 ? "ordine" : "ordini"} su WhatsApp. Dopo l'invio tutti gli ordini verranno azzerati e i carrelli dei clienti svuotati.`,
                     confirmText: "Invia su WhatsApp", tone: "success", icon: "fa-brands fa-whatsapp"
                 });
                 if (!ok) return;
@@ -1869,6 +1880,10 @@
                     } else {
                         window.open(`https://wa.me/${WHATSAPP_REGIA_NUMBER}?text=${encoded}`, '_blank');
                     }
+                    // Azzeramento automatico (stessa pulizia di clearAllOrders, senza seconda conferma)
+                    db.ref('restaurant_orders').remove()
+                        .then(() => showToast("Tutti gli ordini sono stati azzerati"))
+                        .catch(err => showToast("Errore: " + err.message, "error"));
                 }).catch(err => {
                     showToast("Errore nell'aggiornamento dello stato WhatsApp: " + err.message, "error");
                 });
