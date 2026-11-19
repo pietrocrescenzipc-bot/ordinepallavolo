@@ -321,8 +321,15 @@
 
             <div class="p-4 border-t border-slate-100 bg-slate-50/80 space-y-3 shrink-0" style="padding-bottom: max(1rem, env(safe-area-inset-bottom));">
                 <div class="flex justify-between items-baseline">
-                    <span class="text-sm font-medium text-slate-500">Totale</span>
+                    <span class="text-sm font-medium text-slate-500">Totale prodotti</span>
                     <span id="cart-total" class="text-2xl font-extrabold text-slate-900 tabular-nums">€ 0,00</span>
+                </div>
+                <div class="rounded-xl bg-sky-50 border border-sky-100 px-3 py-2.5 text-xs text-sky-900 leading-snug">
+                    <p class="font-bold mb-1"><i class="fa-solid fa-circle-info mr-1"></i>Il totale è indicativo</p>
+                    <p>Al momento del conto verranno aggiunti:</p>
+                    <p>• Coperto € 1,50 a persona</p>
+                    <p>• Ingredienti aggiunti: da € 1,00 l'uno (alcuni, come la bufala, qualcosa in più)</p>
+                    <p class="mt-1 text-sky-700">Togliere un ingrediente non costa nulla 😊</p>
                 </div>
                 <div id="cart-action-buttons" class="space-y-2"></div>
                 <button type="button" onclick="closeCart()" class="w-full text-slate-600 hover:text-slate-900 hover:bg-slate-100 font-semibold py-2.5 rounded-xl transition text-sm cursor-pointer">
@@ -364,6 +371,7 @@
                         <label for="product-notes" class="block text-xs font-semibold text-slate-600 mb-2">Note / variazioni <span class="font-normal text-slate-400">(facoltativo)</span></label>
                         <div id="note-chips" class="flex flex-wrap gap-1.5 mb-2"></div>
                         <textarea id="product-notes" rows="2" placeholder="Es. senza cipolla, ben cotto…" class="w-full px-4 py-3 rounded-2xl bg-slate-50 border border-slate-200 focus:bg-white focus:border-sky-500 focus:ring-4 focus:ring-sky-500/15 focus:outline-none text-base text-slate-800 placeholder:text-slate-400 transition resize-none"></textarea>
+                        <p class="mt-2 text-xs text-slate-500 leading-snug"><i class="fa-solid fa-circle-info text-sky-500 mr-1"></i>Gli ingredienti aggiunti (es. crudo, salame) costano da € 1,00 in su, alcuni come la bufala qualcosa in più, e vengono conteggiati al conto. Togliere un ingrediente è gratuito.</p>
                     </div>
 
                     <!-- Pulsanti sempre visibili in fondo alla finestra, anche su schermi bassi -->
@@ -1769,12 +1777,14 @@
             const accent = isMod && !isSent ? "bg-purple-500" : isSent ? "bg-emerald-500" : "bg-amber-400";
             const status = order.status || "In attesa";
             const client = order.client || "Ospite";
+            const notesCount = (order.items || []).filter(i => i.notes && String(i.notes).trim()).length;
 
             const badges = [
                 isSent
                     ? `<span class="bg-emerald-50 text-emerald-700 text-[11px] font-bold px-2.5 py-1 rounded-full"><i class="fa-brands fa-whatsapp mr-1"></i>Inviato</span>`
                     : `<span class="bg-amber-50 text-amber-800 text-[11px] font-bold px-2.5 py-1 rounded-full"><i class="fa-solid fa-clock mr-1"></i>Da inviare</span>`,
-                isMod ? `<span class="bg-purple-50 text-purple-700 text-[11px] font-bold px-2.5 py-1 rounded-full"><i class="fa-solid fa-pen-to-square mr-1"></i>Modificato</span>` : ""
+                isMod ? `<span class="bg-purple-50 text-purple-700 text-[11px] font-bold px-2.5 py-1 rounded-full"><i class="fa-solid fa-pen-to-square mr-1"></i>Modificato</span>` : "",
+                notesCount ? `<span class="bg-sky-50 text-sky-700 text-[11px] font-bold px-2.5 py-1 rounded-full"><i class="fa-regular fa-note-sticky mr-1"></i>${notesCount} ${notesCount === 1 ? "nota" : "note"} da verificare</span>` : ""
             ].join("");
 
             const itemsHtml = order.items.map(i => `
@@ -1823,7 +1833,10 @@
                             class="text-xs font-bold pl-3 pr-8 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-sky-500/30 cursor-pointer ${STATUS_STYLES[status] || STATUS_STYLES["In attesa"]}">
                             ${ORDER_STEPS.map(s => `<option value="${s}" ${status === s ? "selected" : ""}>${s}</option>`).join("")}
                         </select>
-                        <span class="text-lg font-extrabold text-slate-900 tabular-nums">${fmt(order.total)}</span>
+                        <div class="text-right leading-tight">
+                            <span class="block text-lg font-extrabold text-slate-900 tabular-nums">${fmt(order.total)}</span>
+                            <span class="block text-[11px] text-slate-400">+ coperto e aggiunte</span>
+                        </div>
                     </div>
                 </div>`;
             return card;
